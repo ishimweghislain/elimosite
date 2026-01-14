@@ -535,43 +535,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         var currentStatus = '<?php echo $property['status'] ?? 'draft'; ?>';
         
         const districtsByProvince = {
-            'Kigali City': ['Nyarugenge', 'Gasabo', 'Kicukiro'],
-            'Northern Province': ['Musanze', 'Burera', 'Gicumbi', 'Rulindo', 'Gakenke'],
-            'Southern Province': ['Huye', 'Nyamagabe', 'Gisagara', 'Nyanza', 'Nyaruguru', 'Ruhango', 'Muhanga', 'Kamonyi'],
-            'Eastern Province': ['Rwamagana', 'Nyagatare', 'Gatsibo', 'Kayonza', 'Kirehe', 'Ngoma', 'Bugesera'],
-            'Western Province': ['Rubavu', 'Rusizi', 'Ngororero', 'Nyabihu', 'Nyamasheke', 'Karongi', 'Rutsiro']
+            'Kigali City': ['Gasabo', 'Kicukiro', 'Nyarugenge'],
+            'Eastern Province': ['Bugesera', 'Gatsibo', 'Kayonza', 'Kirehe', 'Ngoma', 'Nyagatare', 'Rwamagana'],
+            'Northern Province': ['Burera', 'Gakenke', 'Gicumbi', 'Musanze', 'Rulindo'],
+            'Southern Province': ['Gisagara', 'Huye', 'Kamonyi', 'Muhanga', 'Nyamagabe', 'Nyanza', 'Nyaruguru', 'Ruhango'],
+            'Western Province': ['Karongi', 'Ngororero', 'Nyabihu', 'Nyamasheke', 'Rubavu', 'Rusizi', 'Rutsiro']
         };
 
         const provinceSelect = document.getElementById('provinceSelect');
         const districtSelect = document.getElementById('districtSelect');
 
-        provinceSelect.addEventListener('change', function() {
-            const province = this.value;
+        function populateDistricts(province, selectedDistrict = '') {
             districtSelect.innerHTML = '<option value="">Select District</option>';
-            
             if (districtsByProvince[province]) {
                 districtsByProvince[province].forEach(district => {
                     const option = document.createElement('option');
                     option.value = district;
                     option.textContent = district;
+                    if (district === selectedDistrict) option.selected = true;
                     districtSelect.appendChild(option);
                 });
             }
+        }
+
+        provinceSelect.addEventListener('change', function() {
+            populateDistricts(this.value);
         });
 
-        // Initialize district if province is already selected
-        if (provinceSelect.value && !districtSelect.value) {
-            const province = provinceSelect.value;
+        // Initialize district if province is already selected (e.g., when editing)
+        if (provinceSelect.value) {
             const currentDistrict = '<?php echo $property['district'] ?? ''; ?>';
-            if (districtsByProvince[province]) {
-                districtsByProvince[province].forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district;
-                    option.textContent = district;
-                    if (district === currentDistrict) option.selected = true;
-                    districtSelect.appendChild(option);
-                });
-            }
+            populateDistricts(provinceSelect.value, currentDistrict);
         }
 
         function removeSubImage(btn, filename) {
