@@ -1,0 +1,239 @@
+<?php
+require_once '../includes/config.php';
+
+require_admin();
+
+$blog_post = null;
+$edit_mode = false;
+
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $blog_post = get_record('blog_posts', $id);
+    $edit_mode = true;
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $status = isset($_POST['save_draft']) ? 'draft' : clean_input($_POST['status'] ?? 'draft');
+
+    $data = [
+        'title' => clean_input($_POST['title'] ?? ''),
+        'slug' => create_slug(clean_input($_POST['title'] ?? '')),
+        'category' => clean_input($_POST['category'] ?? 'creative'),
+        'excerpt' => clean_input($_POST['excerpt'] ?? ''),
+        'content' => $_POST['content'] ?? '', // Don't clean HTML content
+        'status' => $status
+    ];
+
+    // Handle image upload
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $upload_result = upload_file($_FILES['image'], '../images/', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 2 * 1024 * 1024); // 2MB
+        if ($upload_result['success']) {
+            $data['image'] = $upload_result['filename'];
+        }
+    }
+
+    if ($edit_mode) {
+        // Update existing blog post
+        $result = update_record('blog_posts', $data, $id);
+        $message = 'updated';
+    } else {
+        // Add new blog post
+        $result = insert_record('blog_posts', $data);
+        $message = 'added';
+    }
+
+    if ($result) {
+        $redirect_url = ($data['status'] === 'draft') ? 'drafts.php' : 'blog.php';
+        header('Location: ' . $redirect_url . '?success=' . $message);
+        exit;
+    } else {
+        $error = 'Failed to save blog post. Please try again.';
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $edit_mode ? 'Edit' : 'Add'; ?> Blog Post - Admin Panel</title>
+    <?php include 'includes/header.php'; ?>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <style>
+        .preview-img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            border: 2px solid #e3e6f0;
+        }
+        .note-editor {
+            border-color: #e3e6f0 !important;
+            box-shadow: none !important;
+        }
+        .note-toolbar {
+            background-color: #f8f9fc !important;
+            border-bottom: 1px solid #e3e6f0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <?php include 'includes/sidebar.php'; ?>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-secondary d-md-none me-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="h2 fw-bold text-dark mb-0"><?php echo $edit_mode ? 'Edit' : 'Add'; ?> Blog Post</h1>
+                    </div>
+                    <a href="blog.php" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Blog
+                    </a>
+                </div>
+
+                <?php if (isset($error)): ?>
+                    <div class="alert alert-danger fade-in"><?php echo $error; ?></div>
+                <?php endif; ?>
+
+                <div class="card shadow mb-4 fade-in">
+                    <div class="card-body p-4">
+                        <form method="POST" enctype="multipart/form-data">
+                            <h5 class="mb-4 text-primary fw-bold">Post Details</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-8">
+                                    <label class="form-label">Title *</label>
+                                    <input type="text" name="title" class="form-control" value="<?php echo htmlspecialchars($blog_post['title'] ?? ''); ?>" required placeholder="Enter post title">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Category *</label>
+                                    <select name="category" class="form-select">
+                                        <option value="creative" <?php echo ($blog_post['category'] ?? '') === 'creative' ? 'selected' : ''; ?>>Creative</option>
+                                        <option value="rental" <?php echo ($blog_post['category'] ?? '') === 'rental' ? 'selected' : ''; ?>>Rental</option>
+                                        <option value="news" <?php echo ($blog_post['category'] ?? '') === 'news' ? 'selected' : ''; ?>>News</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Excerpt / Summary</label>
+                                <textarea name="excerpt" class="form-control" rows="2" placeholder="Brief summary for listing pages..."><?php echo htmlspecialchars($blog_post['excerpt'] ?? ''); ?></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Content *</label>
+                                <textarea name="content" id="content" class="form-control" required><?php echo htmlspecialchars($blog_post['content'] ?? ''); ?></textarea>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Publish Status</label>
+                                    <select name="status" class="form-select">
+                                        <option value="draft" <?php echo ($blog_post['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Draft</option>
+                                        <option value="published" <?php echo ($blog_post['status'] ?? '') === 'published' ? 'selected' : ''; ?>>Published</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Featured Image</label>
+                                    <input type="file" name="image" class="form-control" accept="image/*">
+                                    <?php if ($edit_mode && !empty($blog_post['image'])): ?>
+                                        <div class="mt-2 text-center">
+                                            <img src="../images/<?php echo htmlspecialchars($blog_post['image']); ?>" class="preview-img" alt="Current image">
+                                            <div class="small text-muted mt-1">Current Image</div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-5">
+                                <a href="blog.php" class="btn btn-outline-secondary">Cancel</a>
+                                <button type="submit" name="save_draft" value="1" class="btn btn-outline-primary">
+                                    <i class="fas fa-file-alt me-2"></i>Save as Draft
+                                </button>
+                                <button type="button" class="btn btn-primary px-4" onclick="handlePublishClick()">
+                                    <i class="fas fa-save me-2"></i><?php echo $edit_mode ? 'Update Post' : 'Publish Post'; ?>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Publish Confirmation Modal -->
+    <div class="modal fade" id="publishModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Confirm Publish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you finished and want to publish this item?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" onclick="submitDraft()">No, Save as Draft</button>
+                    <button type="button" class="btn btn-primary" onclick="submitPublish()">Yes, Publish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#content').summernote({
+                height: 300,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+        });
+
+        var currentStatus = '<?php echo $blog_post['status'] ?? 'draft'; ?>';
+
+        function handlePublishClick() {
+            // If currently draft, confirm publish
+            if (currentStatus === 'draft') {
+                var myModal = new bootstrap.Modal(document.getElementById('publishModal'));
+                myModal.show();
+            } else {
+                // Already published, just save updates
+                submitPublish();
+            }
+        }
+
+        function submitDraft() {
+            var form = document.querySelector('form');
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'save_draft';
+            input.value = '1';
+            form.appendChild(input);
+            form.submit();
+        }
+
+        function submitPublish() {
+            var form = document.querySelector('form');
+            var statusSelect = document.querySelector('select[name="status"]');
+            if (statusSelect && statusSelect.value === 'draft') {
+                statusSelect.value = 'published';
+            }
+            form.submit();
+        }
+    </script>
+    <?php include 'includes/footer.php'; ?>
