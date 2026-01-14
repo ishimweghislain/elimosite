@@ -68,7 +68,6 @@ $team_members = get_records('team_members', "WHERE is_active = 1 ORDER BY create
                                         <th>Name</th>
                                         <th>Position</th>
                                         <th>Contact Info</th>
-                                        <th>Properties</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -96,9 +95,7 @@ $team_members = get_records('team_members', "WHERE is_active = 1 ORDER BY create
                                                         <small><i class="fas fa-phone me-2 text-muted"></i><?php echo htmlspecialchars($member['phone']); ?></small>
                                                     </div>
                                                 </td>
-                                                <td>
-                                                    <span class="badge bg-info rounded-pill"><?php echo $member['listed_properties']; ?> Listings</span>
-                                                </td>
+
                                                 <td>
                                                     <div class="btn-group">
                                                         <a href="team-edit.php?id=<?php echo $member['id']; ?>" class="btn btn-sm btn-outline-primary" title="Edit">

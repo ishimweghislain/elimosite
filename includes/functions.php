@@ -171,7 +171,7 @@ function handle_contact_form() {
             $headers .= "Reply-To: " . $data['email'] . "\r\n";
             $headers .= "X-Mailer: PHP/" . phpversion();
             
-            mail($admin_email, $subject, $message, $headers);
+            @mail($admin_email, $subject, $message, $headers);
             
             return ['success' => true, 'message' => 'Your message has been sent successfully!'];
         } else {
@@ -348,6 +348,16 @@ function send_email($to, $subject, $message, $from = 'noreply@elimo.rw') {
     $headers .= "Reply-To: $from\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     
-    return mail($to, $subject, $message, $headers);
+    return @mail($to, $subject, $message, $headers);
+}
+/**
+ * Fix external URLs that may be missing the protocol
+ */
+function fix_url($url) {
+    if (empty($url)) return '#';
+    if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
+        return "https://" . $url;
+    }
+    return $url;
 }
 ?>

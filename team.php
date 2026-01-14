@@ -66,51 +66,47 @@ $team_members = get_team_members();
               <?php foreach ($team_members as $member): ?>
                 <div class="col-sm-6 col-md-4 col-lg-4 mb-6">
                   <div class="card shadow-hover-xs-4 agent-3">
-                    <div class="card-header text-center pt-6 pb-3 bg-transparent text-center">
+                    <div class="card-header text-center pt-6 pb-3 bg-transparent text-center border-0">
                       <a href="#" class="d-inline-block mb-2 w-120px h-120">
-                        <img src="<?php echo !empty($member['image']) ? 'images/' . $member['image'] : 'images/team-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($member['name']); ?>">
+                        <img src="<?php echo !empty($member['image']) ? 'images/' . $member['image'] : 'images/team-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($member['name']); ?>" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
                       </a>
                       <a href="#"
                                class="d-block fs-16 lh-2 text-dark mb-0 font-weight-500 hover-primary"><?php echo htmlspecialchars($member['name']); ?></a>
                       <p class="mb-2"><?php echo htmlspecialchars($member['position']); ?></p>
                       <ul class="list-inline mb-0">
-                        <?php
-                        $social_links = json_decode($member['social_links'] ?? '{}', true);
-                        if (!empty($social_links['twitter'])): ?>
-                          <li class="list-inline-item mr-6">
-                            <a href="<?php echo htmlspecialchars($social_links['twitter']); ?>"
-                                       class="text-muted hover-primary"><i
-                                        class="fab fa-twitter"></i></a>
-                          </li>
-                        <?php endif; ?>
-                        <?php if (!empty($social_links['facebook'])): ?>
-                          <li class="list-inline-item mr-6">
-                            <a href="<?php echo htmlspecialchars($social_links['facebook']); ?>"
-                                       class="text-muted hover-primary"><i
-                                        class="fab fa-facebook-f"></i></a>
-                          </li>
-                        <?php endif; ?>
-                        <?php if (!empty($social_links['linkedin'])): ?>
-                          <li class="list-inline-item">
-                            <a href="<?php echo htmlspecialchars($social_links['linkedin']); ?>"
-                                       class="text-muted hover-primary"><i
-                                        class="fab fa-linkedin-in"></i></a>
-                          </li>
-                        <?php endif; ?>
+                        <?php $social = json_decode($member['social_links'] ?? '{}', true); ?>
+                        <li class="list-inline-item mr-6">
+                          <?php if (!empty($social['facebook'])): ?>
+                            <a href="<?php echo fix_url($social['facebook']); ?>" target="_blank" class="text-muted hover-primary" title="Facebook">
+                              <i class="fab fa-facebook-f"></i>
+                            </a>
+                          <?php else: ?>
+                            <span class="text-light" style="cursor: default;" title="Facebook (Not provided)"><i class="fab fa-facebook-f"></i></span>
+                          <?php endif; ?>
+                        </li>
+                        <li class="list-inline-item mr-6">
+                          <?php if (!empty($social['twitter'])): ?>
+                            <a href="<?php echo fix_url($social['twitter']); ?>" target="_blank" class="text-muted hover-primary" title="Twitter">
+                              <i class="fab fa-twitter"></i>
+                            </a>
+                          <?php else: ?>
+                            <span class="text-light" style="cursor: default;" title="Twitter (Not provided)"><i class="fab fa-twitter"></i></span>
+                          <?php endif; ?>
+                        </li>
+                        <li class="list-inline-item">
+                          <?php if (!empty($social['linkedin'])): ?>
+                            <a href="<?php echo fix_url($social['linkedin']); ?>" target="_blank" class="text-muted hover-primary" title="LinkedIn">
+                              <i class="fab fa-linkedin-in"></i>
+                            </a>
+                          <?php else: ?>
+                            <span class="text-light" style="cursor: default;" title="LinkedIn (Not provided)"><i class="fab fa-linkedin-in"></i></span>
+                          <?php endif; ?>
+                        </li>
                       </ul>
                     </div>
-                    <div class="card-body text-center pt-2 px-0">
-                      <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>" class="text-body"><?php echo htmlspecialchars($member['email']); ?></a>
-                      <a href="tel:<?php echo htmlspecialchars($member['phone']); ?>" class="text-heading font-weight-600 d-block mb-3"><?php echo htmlspecialchars($member['phone']); ?></a>
-                      
-                    </div>
-                    <div class="card-footer px-0 text-center hover-image border-0">
-                      <a href="#"
-                               class="d-flex align-items-center justify-content-center text-heading">
-                        <span class="badge badge-white badge-circle border fs-13 font-weight-bold mr-2 lh-12"><?php echo $member['listed_properties']; ?></span>
-                        <span class="font-weight-500 mr-2">Listed Properties</span>
-                        <span class="text-primary fs-16 icon"><i class="far fa-long-arrow-right"></i></span>
-                      </a>
+                    <div class="card-body text-center pt-2 px-0 pb-6">
+                      <a href="mailto:<?php echo htmlspecialchars($member['email']); ?>" class="text-body d-block"><?php echo htmlspecialchars($member['email']); ?></a>
+                      <a href="tel:<?php echo htmlspecialchars($member['phone']); ?>" class="text-heading font-weight-600 d-block"><?php echo htmlspecialchars($member['phone']); ?></a>
                     </div>
                   </div>
                 </div>
@@ -149,7 +145,5 @@ $team_members = get_team_members();
     <script src="vendors/dataTables/jquery.dataTables.min.js"></script>
     <!-- Theme scripts -->
     <script src="js/theme.js"></script>
-    
-
   </body>
 </html>

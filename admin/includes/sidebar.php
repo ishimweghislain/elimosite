@@ -38,7 +38,7 @@
                 <i class="fas fa-cogs"></i> <span>Settings</span>
             </a>
             <div class="mt-4 border-top border-secondary pt-2">
-                <a href="../logout.php" class="nav-link text-danger">
+                <a href="#" class="nav-link text-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                     <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </a>
             </div>

@@ -342,6 +342,19 @@ $districts = [
                     data: { id: propertyId },
                     success: function(response) {
                         $('#modalPropertyContent').html(response);
+                        
+                        // Initialize Slider
+                        setTimeout(function() {
+                            $('.modal-property-slider').slick({
+                                dots: false,
+                                infinite: true,
+                                speed: 300,
+                                slidesToShow: 1,
+                                adaptiveHeight: true,
+                                prevArrow: $('.slider-prev'),
+                                nextArrow: $('.slider-next')
+                            });
+                        }, 200);
                     },
                     error: function() {
                         $('#modalPropertyContent').html('<div class="text-danger text-center py-5">Failed to load property details.</div>');

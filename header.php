@@ -41,3 +41,4 @@
   </div>
 </header>
 <?php include 'includes/login-modal-simple.php'; ?>
+<link rel="stylesheet" href="css/toasts.css">

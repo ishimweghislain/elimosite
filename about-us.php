@@ -121,9 +121,31 @@ $team_members = get_team_members();
                                 <h5 class="card-title text-dark mb-1"><?php echo htmlspecialchars($member['name']); ?></h5>
                                 <p class="text-gray-light mb-3"><?php echo htmlspecialchars($member['position']); ?></p>
                                 <ul class="list-inline text-gray-lighter">
-                                    <li class="list-inline-item mr-3"><a href="mailto:<?php echo htmlspecialchars($member['email']); ?>" class="text-hover-dark"><i class="fas fa-envelope"></i></a></li>
+                                    <?php $social = json_decode($member['social_links'] ?? '{}', true); ?>
+                                    <li class="list-inline-item mr-3">
+                                      <?php if (!empty($social['facebook'])): ?>
+                                        <a href="<?php echo fix_url($social['facebook']); ?>" target="_blank" class="text-hover-dark" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                      <?php else: ?>
+                                        <span class="text-light opacity-25" title="Facebook (Not provided)"><i class="fab fa-facebook-f"></i></span>
+                                      <?php endif; ?>
+                                    </li>
+                                    <li class="list-inline-item mr-3">
+                                      <?php if (!empty($social['twitter'])): ?>
+                                        <a href="<?php echo fix_url($social['twitter']); ?>" target="_blank" class="text-hover-dark" title="Twitter"><i class="fab fa-twitter"></i></a>
+                                      <?php else: ?>
+                                        <span class="text-light opacity-25" title="Twitter (Not provided)"><i class="fab fa-twitter"></i></span>
+                                      <?php endif; ?>
+                                    </li>
+                                    <li class="list-inline-item mr-3">
+                                      <?php if (!empty($social['linkedin'])): ?>
+                                        <a href="<?php echo fix_url($social['linkedin']); ?>" target="_blank" class="text-hover-dark" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                      <?php else: ?>
+                                        <span class="text-light opacity-25" title="LinkedIn (Not provided)"><i class="fab fa-linkedin-in"></i></span>
+                                      <?php endif; ?>
+                                    </li>
+                                    <li class="list-inline-item mr-3"><a href="mailto:<?php echo htmlspecialchars($member['email']); ?>" class="text-hover-dark" title="Email"><i class="fas fa-envelope"></i></a></li>
                                     <?php if (!empty($member['phone'])): ?>
-                                        <li class="list-inline-item"><a href="tel:<?php echo htmlspecialchars($member['phone']); ?>" class="text-hover-dark"><i class="fas fa-phone"></i></a></li>
+                                        <li class="list-inline-item"><a href="tel:<?php echo htmlspecialchars($member['phone']); ?>" class="text-hover-dark" title="Phone"><i class="fas fa-phone"></i></a></li>
                                     <?php endif; ?>
                                 </ul>
                             </div>

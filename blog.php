@@ -185,6 +185,19 @@ $blog_posts = get_blog_posts(9);
                     data: { id: postId },
                     success: function(response) {
                         $('#blogModalContent').html(response);
+                        
+                        // Initialize Slider
+                        setTimeout(function() {
+                            $('.modal-blog-slider').slick({
+                                dots: false,
+                                infinite: true,
+                                speed: 300,
+                                slidesToShow: 1,
+                                adaptiveHeight: true,
+                                prevArrow: $('.slider-prev'),
+                                nextArrow: $('.slider-next')
+                            });
+                        }, 200);
                     },
                     error: function() {
                         $('#blogModalContent').html('<div class="alert alert-danger">Error loading blog details. Please try again.</div>');

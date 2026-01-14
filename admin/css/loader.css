@@ -1,0 +1,137 @@
+/* Admin Loading Overlay */
+#admin-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #252839;
+    /* Elimo Dark Blue */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    color: white;
+    font-family: 'Inter', sans-serif;
+}
+
+.loader-content {
+    text-align: center;
+    position: relative;
+}
+
+.loader-logo {
+    width: 120px;
+    margin-bottom: 2rem;
+    animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.loader-text {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards 0.5s;
+}
+
+.loader-subtext {
+    font-size: 1.1rem;
+    color: #ffd700;
+    /* Gold */
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards 0.8s;
+}
+
+/* Stars Animation */
+.stars-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle var(--duration) infinite;
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0) rotate(-20deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Popping Shapes */
+.pop-circle {
+    position: absolute;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: expandPop 2s ease-out infinite;
+}
+
+@keyframes expandPop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+/* Exit Animation */
+#admin-loader.fade-out {
+    animation: fadeOutLoader 0.8s ease-in forwards;
+}
+
+@keyframes fadeOutLoader {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}

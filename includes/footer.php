@@ -105,3 +105,5 @@
     </div>
   </div>
 </footer>
+<script src="js/toasts.js"></script>
+<?php output_session_toast(); ?>

@@ -52,6 +52,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Handle sub-images upload
+    $current_sub_images = [];
+    if ($edit_mode && !empty($property['images'])) {
+        $current_sub_images = json_decode($property['images'], true);
+        if (!is_array($current_sub_images)) $current_sub_images = [];
+    }
+
+    // Check if any sub-images were marked for deletion
+    if (isset($_POST['remove_sub_images']) && is_array($_POST['remove_sub_images'])) {
+        foreach ($_POST['remove_sub_images'] as $img_to_remove) {
+            if (($key = array_search($img_to_remove, $current_sub_images)) !== false) {
+                unset($current_sub_images[$key]);
+                // Optional: delete physical file
+                // @unlink('../images/' . $img_to_remove);
+            }
+        }
+        $current_sub_images = array_values($current_sub_images);
+    }
+
+    if (isset($_FILES['sub_images'])) {
+        foreach ($_FILES['sub_images']['tmp_name'] as $key => $tmp_name) {
+            if ($_FILES['sub_images']['error'][$key] === UPLOAD_ERR_OK) {
+                $file = [
+                    'name' => $_FILES['sub_images']['name'][$key],
+                    'type' => $_FILES['sub_images']['type'][$key],
+                    'tmp_name' => $_FILES['sub_images']['tmp_name'][$key],
+                    'error' => $_FILES['sub_images']['error'][$key],
+                    'size' => $_FILES['sub_images']['size'][$key]
+                ];
+                $upload_result = upload_file($file, '../images/', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
+                if ($upload_result['success']) {
+                    $current_sub_images[] = $upload_result['filename'];
+                }
+            }
+        }
+    }
+    $data['images'] = json_encode($current_sub_images);
+
     if ($edit_mode) {
         // Update existing property
         $result = update_record('properties', $data, $id);
@@ -87,11 +125,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         .preview-img {
             max-width: 100%;
-            height: 200px;
+            height: 150px;
             object-fit: cover;
             border-radius: 0.5rem;
             margin-top: 0.5rem;
             border: 2px solid #e3e6f0;
+        }
+        .sub-image-preview {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        .sub-image-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .remove-img-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            line-height: 20px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .remove-img-btn:hover {
+            background: #ff6b81;
+        }
+        .new-images-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px dashed #ced4da;
+            border-radius: 8px;
+        }
+        .new-img-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .new-img-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -185,12 +278,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <input type="text" name="location" class="form-control" value="<?php echo htmlspecialchars($property['location'] ?? ''); ?>" required placeholder="e.g. Kiyovu, Kigali">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">Province</label>
-                                    <input type="text" name="province" class="form-control" value="<?php echo htmlspecialchars($property['province'] ?? ''); ?>" placeholder="e.g. Kigali City">
+                                    <label class="form-label">Province *</label>
+                                    <select name="province" id="provinceSelect" class="form-select" required>
+                                        <option value="">Select Province</option>
+                                        <?php 
+                                        $provinces = ['Kigali City', 'Northern Province', 'Southern Province', 'Eastern Province', 'Western Province'];
+                                        foreach ($provinces as $p) {
+                                            $selected = ($property['province'] ?? '') === $p ? 'selected' : '';
+                                            echo "<option value=\"$p\" $selected>$p</option>";
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">District</label>
-                                    <input type="text" name="district" class="form-control" value="<?php echo htmlspecialchars($property['district'] ?? ''); ?>" placeholder="e.g. Nyarugenge">
+                                    <label class="form-label">District *</label>
+                                    <select name="district" id="districtSelect" class="form-select" required>
+                                        <option value="">Select District</option>
+                                        <?php if (!empty($property['district'])): ?>
+                                            <option value="<?php echo htmlspecialchars($property['district']); ?>" selected><?php echo htmlspecialchars($property['district']); ?></option>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                             </div>
 
@@ -349,15 +456,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <textarea name="description" class="form-control" rows="5" placeholder="Detailed description of the property..."><?php echo htmlspecialchars($property['description'] ?? ''); ?></textarea>
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label">Property Main Image</label>
-                                <input type="file" name="image" class="form-control" accept="image/*">
-                                <?php if ($edit_mode && !empty($property['image_main'])): ?>
-                                    <div class="mt-2 text-center">
-                                        <img src="../images/<?php echo htmlspecialchars($property['image_main']); ?>" class="preview-img text-center" alt="Current image">
-                                        <div class="small text-muted mt-1">Current Image</div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Property Main Image</label>
+                                    <input type="file" name="image" class="form-control" accept="image/*">
+                                    <?php if ($edit_mode && !empty($property['image_main'])): ?>
+                                        <div class="mt-2">
+                                            <img src="../images/<?php echo htmlspecialchars($property['image_main']); ?>" class="preview-img" alt="Current image">
+                                            <div class="small text-muted mt-1">Current Main Image</div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Other Gallery Images (Sub-images)</label>
+                                    <div class="small text-muted mb-2"><i class="fas fa-info-circle me-1"></i> Hold <strong>Ctrl</strong> (or <strong>Cmd</strong>) to select multiple images at once.</div>
+                                    <input type="file" name="sub_images[]" id="subImagesInput" class="form-control" accept="image/*" multiple>
+                                    
+                                    <div id="new-sub-images-preview" class="new-images-preview mt-3 d-none">
+                                        <div class="w-100 mb-2 small fw-bold text-success">Newly selected images:</div>
+                                        <!-- Previews will appear here -->
                                     </div>
-                                <?php endif; ?>
+
+                                    <div id="existing-sub-images" class="mt-3">
+                                        <?php 
+                                        $sub_images = json_decode($property['images'] ?? '[]', true);
+                                        if (is_array($sub_images) && !empty($sub_images)): 
+                                            echo '<div class="small fw-bold text-muted mb-2">Current gallery images:</div>';
+                                            echo '<div class="d-flex flex-wrap gap-2">';
+                                            foreach ($sub_images as $img): ?>
+                                                <div class="sub-image-preview">
+                                                    <img src="../images/<?php echo htmlspecialchars($img); ?>" alt="Sub image">
+                                                    <button type="button" class="remove-img-btn" onclick="removeSubImage(this, '<?php echo $img; ?>')">&times;</button>
+                                                </div>
+                                            <?php endforeach; 
+                                            echo '</div>';
+                                        endif; ?>
+                                    </div>
+                                    <div id="removed-images-container"></div>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-end gap-2 mt-5">
@@ -398,6 +534,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         var currentStatus = '<?php echo $property['status'] ?? 'draft'; ?>';
         
+        const districtsByProvince = {
+            'Kigali City': ['Nyarugenge', 'Gasabo', 'Kicukiro'],
+            'Northern Province': ['Musanze', 'Burera', 'Gicumbi', 'Rulindo', 'Gakenke'],
+            'Southern Province': ['Huye', 'Nyamagabe', 'Gisagara', 'Nyanza', 'Nyaruguru', 'Ruhango', 'Muhanga', 'Kamonyi'],
+            'Eastern Province': ['Rwamagana', 'Nyagatare', 'Gatsibo', 'Kayonza', 'Kirehe', 'Ngoma', 'Bugesera'],
+            'Western Province': ['Rubavu', 'Rusizi', 'Ngororero', 'Nyabihu', 'Nyamasheke', 'Karongi', 'Rutsiro']
+        };
+
+        const provinceSelect = document.getElementById('provinceSelect');
+        const districtSelect = document.getElementById('districtSelect');
+
+        provinceSelect.addEventListener('change', function() {
+            const province = this.value;
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            
+            if (districtsByProvince[province]) {
+                districtsByProvince[province].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        });
+
+        // Initialize district if province is already selected
+        if (provinceSelect.value && !districtSelect.value) {
+            const province = provinceSelect.value;
+            const currentDistrict = '<?php echo $property['district'] ?? ''; ?>';
+            if (districtsByProvince[province]) {
+                districtsByProvince[province].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    if (district === currentDistrict) option.selected = true;
+                    districtSelect.appendChild(option);
+                });
+            }
+        }
+
+        function removeSubImage(btn, filename) {
+            if (confirm('Are you sure you want to remove this image?')) {
+                const container = document.getElementById('removed-images-container');
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'remove_sub_images[]';
+                input.value = filename;
+                container.appendChild(input);
+                btn.parentElement.remove();
+            }
+        }
+
         function handlePublishClick() {
             var statusSelect = document.getElementById('statusSelect');
             // If current status is draft OR user has 'draft' selected
@@ -431,5 +619,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             form.submit();
         }
+
+        // New Images Preview Logic
+        document.getElementById('subImagesInput').addEventListener('change', function() {
+            const previewContainer = document.getElementById('new-sub-images-preview');
+            // Keep the header
+            previewContainer.innerHTML = '<div class="w-100 mb-2 small fw-bold text-success">Newly selected images (to be uploaded):</div>';
+            
+            if (this.files && this.files.length > 0) {
+                previewContainer.classList.remove('d-none');
+                Array.from(this.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'new-img-item';
+                            div.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                            previewContainer.appendChild(div);
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+            } else {
+                previewContainer.classList.add('d-none');
+            }
+        });
     </script>
     <?php include 'includes/footer.php'; ?>

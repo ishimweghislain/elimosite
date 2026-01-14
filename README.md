@@ -190,6 +190,4 @@ For issues or questions:
 3. Ensure PHP error reporting is enabled for debugging
 4. Check browser console for JavaScript errors
 
-## License
 
-This project is based on the Elimo Real Estate HTML template and converted to a functional PHP/MySQL system.

@@ -16,13 +16,19 @@ if (isset($_GET['id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $is_active = isset($_POST['save_draft']) ? 0 : 1;
 
+    $social_links = [
+        'twitter' => clean_input($_POST['twitter'] ?? ''),
+        'facebook' => clean_input($_POST['facebook'] ?? ''),
+        'linkedin' => clean_input($_POST['linkedin'] ?? '')
+    ];
+
     $data = [
         'name' => clean_input($_POST['name'] ?? ''),
         'position' => clean_input($_POST['position'] ?? ''),
         'email' => clean_input($_POST['email'] ?? ''),
         'phone' => clean_input($_POST['phone'] ?? ''),
         'bio' => clean_input($_POST['bio'] ?? ''),
-        'listed_properties' => intval($_POST['listed_properties'] ?? 0),
+        'social_links' => json_encode($social_links),
         'is_active' => $is_active
     ];
 
@@ -126,23 +132,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <textarea name="bio" class="form-control" rows="4" placeholder="Brief biography of the team member..."><?php echo htmlspecialchars($team_member['bio'] ?? ''); ?></textarea>
                             </div>
 
+                            <?php 
+                            $social = json_decode($team_member['social_links'] ?? '{}', true);
+                            ?>
+                            <h5 class="mb-3 text-primary fw-bold mt-4">Social Media Profiles</h5>
+                            <div class="row g-3 mb-4 text-muted small mb-2"><i class="fas fa-info-circle me-1"></i> Enter full URLs (e.g., https://facebook.com/username)</div>
                             <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-label">Listed Properties Count</label>
+                                <div class="col-md-4">
+                                    <label class="form-label">Facebook Profile</label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-home"></i></span>
-                                        <input type="number" name="listed_properties" class="form-control" value="<?php echo $team_member['listed_properties'] ?? 0; ?>" min="0">
+                                        <span class="input-group-text bg-light text-primary"><i class="fab fa-facebook-f"></i></span>
+                                        <input type="url" name="facebook" class="form-control" value="<?php echo htmlspecialchars($social['facebook'] ?? ''); ?>" placeholder="Facebook URL">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <label class="form-label">Twitter/X Profile</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-info"><i class="fab fa-twitter"></i></span>
+                                        <input type="url" name="twitter" class="form-control" value="<?php echo htmlspecialchars($social['twitter'] ?? ''); ?>" placeholder="Twitter URL">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">LinkedIn Profile</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-primary"><i class="fab fa-linkedin-in"></i></span>
+                                        <input type="url" name="linkedin" class="form-control" value="<?php echo htmlspecialchars($social['linkedin'] ?? ''); ?>" placeholder="LinkedIn URL">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-12">
                                     <label class="form-label">Profile Photo</label>
                                     <input type="file" name="image" class="form-control" accept="image/*">
                                     <?php if ($edit_mode && !empty($team_member['image'])): ?>
-                                        <div class="mt-2">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../images/<?php echo htmlspecialchars($team_member['image']); ?>" class="preview-img me-3" alt="Current photo">
-                                                <span class="text-muted small">Current Photo</span>
-                                            </div>
+                                        <div class="mt-2 text-center">
+                                            <img src="../images/<?php echo htmlspecialchars($team_member['image']); ?>" class="preview-img mb-2" alt="Current photo">
+                                            <div class="text-muted small">Current Photo</div>
                                         </div>
                                     <?php endif; ?>
                                 </div>

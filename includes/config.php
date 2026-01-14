@@ -17,10 +17,24 @@ define('ADMIN_URL', SITE_URL . '/admin');
 define('UPLOAD_PATH', __DIR__ . '/../images/uploads/');
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
 
-// Session settings
-define('SESSION_LIFETIME', 3600); // 1 hour
-define('COOKIE_SECURE', false); // Set to true for HTTPS
-define('COOKIE_HTTPONLY', true);
+// Session security settings
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_only_cookies', 1);
+ini_set('session.cookie_secure', 0); // Set to 1 if using HTTPS
+
+// Start session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Regenerate session ID periodically to prevent fixation
+if (!isset($_SESSION['last_regeneration'])) {
+    session_regenerate_id(true);
+    $_SESSION['last_regeneration'] = time();
+} elseif (time() - $_SESSION['last_regeneration'] > 1800) { // 30 minutes
+    session_regenerate_id(true);
+    $_SESSION['last_regeneration'] = time();
+}
 
 // Error reporting
 error_reporting(E_ALL);
@@ -28,9 +42,6 @@ ini_set('display_errors', 1);
 
 // Timezone
 date_default_timezone_set('Africa/Kigali');
-
-// Start session
-session_start();
 
 // Include functions
 require_once __DIR__ . '/functions.php';
@@ -57,6 +68,7 @@ function require_login() {
 // Redirect if not admin
 function require_admin() {
     if (!is_admin()) {
+        set_flash_message('Unauthorized access. Admin login required.', 'error');
         header('Location: ' . SITE_URL . '/index.php');
         exit;
     }
@@ -137,5 +149,45 @@ function get_setting($key, $default = '') {
     }
     
     return isset($settings[$key]) ? $settings[$key] : $default;
+}
+
+/**
+ * Flash messaging system
+ */
+function set_flash_message($message, $type = 'success') {
+    $_SESSION['flash_message'] = [
+        'text' => $message,
+        'type' => $type
+    ];
+}
+
+function get_flash_message() {
+    if (isset($_SESSION['flash_message'])) {
+        $message = $_SESSION['flash_message'];
+        unset($_SESSION['flash_message']);
+        return $message;
+    }
+    return null;
+}
+
+/**
+ * Output session toast if exists
+ */
+function output_session_toast() {
+    $flash = get_flash_message();
+    if ($flash) {
+        $text = addslashes($flash['text']);
+        $type = $flash['type'];
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof ElimoToast !== 'undefined') {
+                    ElimoToast.show('{$text}', '{$type}');
+                } else {
+                    // Fallback if script not loaded yet
+                    window.addEventListener('load', () => ElimoToast.show('{$text}', '{$type}'));
+                }
+            });
+        </script>";
+    }
 }
 ?>

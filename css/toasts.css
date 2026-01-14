@@ -1,0 +1,127 @@
+/* Toast Container */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Individual Toast */
+.elimo-toast {
+    min-width: 300px;
+    max-width: 400px;
+    background: #fff;
+    color: #333;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    opacity: 0;
+    transform: translateX(100%);
+    border-left: 6px solid #ccc;
+    position: relative;
+    overflow: hidden;
+}
+
+.elimo-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.elimo-toast.success {
+    border-left-color: #28a745;
+}
+
+.elimo-toast.error {
+    border-left-color: #dc3545;
+}
+
+.elimo-toast.info {
+    border-left-color: #17a2b8;
+}
+
+.elimo-toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.elimo-toast-icon {
+    font-size: 20px;
+}
+
+.success .elimo-toast-icon {
+    color: #28a745;
+}
+
+.error .elimo-toast-icon {
+    color: #dc3545;
+}
+
+.info .elimo-toast-icon {
+    color: #17a2b8;
+}
+
+.elimo-toast-message {
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Inter', 'Poppins', sans-serif;
+}
+
+.elimo-toast-close {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    margin-left: 10px;
+    transition: color 0.2s;
+}
+
+.elimo-toast-close:hover {
+    color: #333;
+}
+
+/* Progress bar animation */
+.elimo-toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.elimo-toast-progress-bar {
+    height: 100%;
+    width: 100%;
+}
+
+.success .elimo-toast-progress-bar {
+    background: #28a745;
+}
+
+.error .elimo-toast-progress-bar {
+    background: #dc3545;
+}
+
+.info .elimo-toast-progress-bar {
+    background: #17a2b8;
+}
+
+@keyframes progress {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}

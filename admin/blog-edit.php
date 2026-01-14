@@ -33,6 +33,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Handle sub-images upload
+    $current_sub_images = [];
+    if ($edit_mode && !empty($blog_post['images'])) {
+        $current_sub_images = json_decode($blog_post['images'], true);
+        if (!is_array($current_sub_images)) $current_sub_images = [];
+    }
+
+    // Check if any sub-images were marked for deletion
+    if (isset($_POST['remove_sub_images']) && is_array($_POST['remove_sub_images'])) {
+        foreach ($_POST['remove_sub_images'] as $img_to_remove) {
+            if (($key = array_search($img_to_remove, $current_sub_images)) !== false) {
+                unset($current_sub_images[$key]);
+            }
+        }
+        $current_sub_images = array_values($current_sub_images);
+    }
+
+    if (isset($_FILES['sub_images'])) {
+        foreach ($_FILES['sub_images']['tmp_name'] as $key => $tmp_name) {
+            if ($_FILES['sub_images']['error'][$key] === UPLOAD_ERR_OK) {
+                $file = [
+                    'name' => $_FILES['sub_images']['name'][$key],
+                    'type' => $_FILES['sub_images']['type'][$key],
+                    'tmp_name' => $_FILES['sub_images']['tmp_name'][$key],
+                    'error' => $_FILES['sub_images']['error'][$key],
+                    'size' => $_FILES['sub_images']['size'][$key]
+                ];
+                $upload_result = upload_file($file, '../images/', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
+                if ($upload_result['success']) {
+                    $current_sub_images[] = $upload_result['filename'];
+                }
+            }
+        }
+    }
+    $data['images'] = json_encode($current_sub_images);
+
     if ($edit_mode) {
         // Update existing blog post
         $result = update_record('blog_posts', $data, $id);
@@ -63,11 +99,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         .preview-img {
             max-width: 100%;
-            height: 200px;
+            height: 150px;
             object-fit: cover;
             border-radius: 0.5rem;
             margin-top: 0.5rem;
             border: 2px solid #e3e6f0;
+        }
+        .sub-image-preview {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        .sub-image-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .remove-img-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            line-height: 20px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .remove-img-btn:hover {
+            background: #ff6b81;
+        }
+        .new-images-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px dashed #ced4da;
+            border-radius: 8px;
+        }
+        .new-img-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .new-img-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
         }
         .note-editor {
             border-color: #e3e6f0 !important;
@@ -140,14 +231,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Featured Image</label>
+                                    <label class="form-label">Featured Main Image</label>
                                     <input type="file" name="image" class="form-control" accept="image/*">
                                     <?php if ($edit_mode && !empty($blog_post['image'])): ?>
-                                        <div class="mt-2 text-center">
+                                        <div class="mt-2">
                                             <img src="../images/<?php echo htmlspecialchars($blog_post['image']); ?>" class="preview-img" alt="Current image">
                                             <div class="small text-muted mt-1">Current Image</div>
                                         </div>
                                     <?php endif; ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Other Gallery Images (Sub-images)</label>
+                                    <div class="small text-muted mb-2"><i class="fas fa-info-circle me-1"></i> Hold <strong>Ctrl</strong> to select multiple images.</div>
+                                    <input type="file" name="sub_images[]" id="subImagesInput" class="form-control" accept="image/*" multiple>
+                                    
+                                    <div id="new-sub-images-preview" class="new-images-preview mt-3 d-none">
+                                        <div class="w-100 mb-2 small fw-bold text-success">Newly selected images:</div>
+                                    </div>
+
+                                    <div id="sub-images-preview" class="mt-3">
+                                        <?php 
+                                        $sub_images = json_decode($blog_post['images'] ?? '[]', true);
+                                        if (is_array($sub_images) && !empty($sub_images)): 
+                                            foreach ($sub_images as $img): ?>
+                                                <div class="sub-image-preview">
+                                                    <img src="../images/<?php echo htmlspecialchars($img); ?>" alt="Sub image">
+                                                    <button type="button" class="remove-img-btn" onclick="removeSubImage(this, '<?php echo $img; ?>')">&times;</button>
+                                                </div>
+                                            <?php endforeach; 
+                                        endif; ?>
+                                    </div>
+                                    <div id="removed-images-container"></div>
                                 </div>
                             </div>
 
@@ -206,6 +320,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         var currentStatus = '<?php echo $blog_post['status'] ?? 'draft'; ?>';
 
+        function removeSubImage(btn, filename) {
+            if (confirm('Are you sure you want to remove this image?')) {
+                const container = document.getElementById('removed-images-container');
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'remove_sub_images[]';
+                input.value = filename;
+                container.appendChild(input);
+                btn.parentElement.remove();
+            }
+        }
+
         function handlePublishClick() {
             // If currently draft, confirm publish
             if (currentStatus === 'draft') {
@@ -235,5 +361,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             form.submit();
         }
+
+        // New Images Preview Logic
+        document.getElementById('subImagesInput').addEventListener('change', function() {
+            const previewContainer = document.getElementById('new-sub-images-preview');
+            previewContainer.innerHTML = '<div class="w-100 mb-2 small fw-bold text-success">Newly selected images (to be uploaded):</div>';
+            
+            if (this.files && this.files.length > 0) {
+                previewContainer.classList.remove('d-none');
+                Array.from(this.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'new-img-item';
+                            div.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                            previewContainer.appendChild(div);
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+            } else {
+                previewContainer.classList.add('d-none');
+            }
+        });
     </script>
     <?php include 'includes/footer.php'; ?>
