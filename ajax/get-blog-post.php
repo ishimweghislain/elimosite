@@ -18,6 +18,27 @@ if (!$post) {
 $image = !empty($post['image']) ? 'images/' . $post['image'] : 'images/blog-details.jpg';
 $date = format_date($post['created_at'], 'F d, Y');
 ?>
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .blog-modal-content, .blog-modal-content * {
+            visibility: visible;
+        }
+        .blog-modal-content {
+            position: absolute;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .d-print-none {
+            display: none !important;
+        }
+    }
+</style>
 
 <div class="blog-modal-content">
     <div class="mb-4 overflow-hidden rounded-lg">
@@ -27,7 +48,10 @@ $date = format_date($post['created_at'], 'F d, Y');
     <div class="d-flex align-items-center mb-3 text-muted fs-14">
         <span class="badge badge-primary mr-3 px-3 py-2 fs-13"><?php echo htmlspecialchars($post['category']); ?></span>
         <span><i class="far fa-calendar-alt mr-2"></i><?php echo $date; ?></span>
-        <span class="ml-auto"><i class="far fa-user mr-2"></i>Admin</span>
+        <span class="ml-3"><i class="far fa-user mr-2"></i>Admin</span>
+        <button onclick="window.print();" class="btn btn-outline-primary btn-sm ml-auto d-print-none">
+            <i class="fas fa-print mr-1"></i> Print PDF
+        </button>
     </div>
     
     <h2 class="fs-32 text-dark font-weight-600 mb-4"><?php echo htmlspecialchars($post['title']); ?></h2>

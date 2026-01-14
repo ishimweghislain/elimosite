@@ -29,7 +29,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'garage' => intval($_POST['garage'] ?? 0),
         'size_sqm' => floatval($_POST['size_sqm'] ?? 0),
         'year_built' => intval($_POST['year_built'] ?? date('Y')),
-        'is_featured' => isset($_POST['is_featured']) ? 1 : 0
+        'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+        // Added fields
+        'prop_id' => clean_input($_POST['prop_id'] ?? ''),
+        'stories' => intval($_POST['stories'] ?? 0),
+        'furnished' => clean_input($_POST['furnished'] ?? ''),
+        'multi_family' => clean_input($_POST['multi_family'] ?? ''),
+        'plot_size' => floatval($_POST['plot_size'] ?? 0),
+        'zoning' => clean_input($_POST['zoning'] ?? ''),
+        'views' => clean_input($_POST['views'] ?? ''),
+        'ideal_for' => clean_input($_POST['ideal_for'] ?? ''),
+        'proximity' => clean_input($_POST['proximity'] ?? ''),
+        'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
+        'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([])
     ];
 
     // Handle image upload
@@ -214,15 +226,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
 
                             <div class="row g-3 mb-4">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
+                                    <label class="form-label">Property ID</label>
+                                    <input type="text" name="prop_id" class="form-control" value="<?php echo htmlspecialchars($property['prop_id'] ?? ''); ?>" placeholder="e.g. P65327">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Stories</label>
+                                    <input type="number" name="stories" class="form-control" value="<?php echo htmlspecialchars($property['stories'] ?? 1); ?>" min="0">
+                                </div>
+                                <div class="col-md-3">
                                     <label class="form-label">Year Built</label>
                                     <input type="number" name="year_built" class="form-control" value="<?php echo htmlspecialchars($property['year_built'] ?? date('Y')); ?>" min="1900" max="<?php echo date('Y') + 10; ?>">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <label class="form-label d-block">&nbsp;</label>
                                     <div class="form-check form-switch mt-2">
                                         <input type="checkbox" name="is_featured" class="form-check-input" id="isFeatured" <?php echo ($property['is_featured'] ?? 0) ? 'checked' : ''; ?>>
-                                        <label class="form-check-label" for="isFeatured">Show as Featured Property</label>
+                                        <label class="form-check-label" for="isFeatured">Featured Property</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <h5 class="mb-4 text-primary fw-bold">Additional Details</h5>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label">Furnished</label>
+                                    <select name="furnished" class="form-select">
+                                        <option value="">Select Option</option>
+                                        <option value="Fully Furnished" <?php echo ($property['furnished'] ?? '') === 'Fully Furnished' ? 'selected' : ''; ?>>Fully Furnished</option>
+                                        <option value="Semi Furnished" <?php echo ($property['furnished'] ?? '') === 'Semi Furnished' ? 'selected' : ''; ?>>Semi Furnished</option>
+                                        <option value="Unfurnished" <?php echo ($property['furnished'] ?? '') === 'Unfurnished' ? 'selected' : ''; ?>>Unfurnished</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Multi-family</label>
+                                    <select name="multi_family" class="form-select">
+                                        <option value="">Select Option</option>
+                                        <option value="Yes" <?php echo ($property['multi_family'] ?? '') === 'Yes' ? 'selected' : ''; ?>>Yes</option>
+                                        <option value="No" <?php echo ($property['multi_family'] ?? '') === 'No' ? 'selected' : ''; ?>>No</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Plot Size (sqm)</label>
+                                    <input type="number" name="plot_size" class="form-control" value="<?php echo htmlspecialchars($property['plot_size'] ?? 0); ?>" min="0">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Zoning</label>
+                                    <input type="text" name="zoning" class="form-control" value="<?php echo htmlspecialchars($property['zoning'] ?? ''); ?>" placeholder="e.g. Permit">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Views</label>
+                                    <input type="text" name="views" class="form-control" value="<?php echo htmlspecialchars($property['views'] ?? ''); ?>" placeholder="e.g. City">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Ideal for on Rentals</label>
+                                    <input type="text" name="ideal_for" class="form-control" value="<?php echo htmlspecialchars($property['ideal_for'] ?? ''); ?>" placeholder="e.g. Single person, Couple">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">In close proximity to</label>
+                                    <textarea name="proximity" class="form-control" rows="1"><?php echo htmlspecialchars($property['proximity'] ?? ''); ?></textarea>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <h5 class="mb-4 text-primary fw-bold">Property Features</h5>
+                                    <?php 
+                                    $features = json_decode($property['features'] ?? '[]', true);
+                                    if (!is_array($features)) $features = [];
+                                    $feature_list = [
+                                        'Air Conditioner', 'Optic Fiber', 'Built in wardrobes', 
+                                        'Proximity to schools', 'Tarmac road', 'Proximity to shops', 
+                                        'Proximity to public transport', 'Water Tank', 'Garden', 'Open Plan Kitchen'
+                                    ];
+                                    ?>
+                                    <div class="row">
+                                        <?php foreach ($feature_list as $feature): ?>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="features[]" value="<?php echo $feature; ?>" id="feat_<?php echo md5($feature); ?>" <?php echo in_array($feature, $features) ? 'checked' : ''; ?>>
+                                                    <label class="form-check-label" for="feat_<?php echo md5($feature); ?>">
+                                                        <?php echo $feature; ?>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="mb-4 text-primary fw-bold">Amenities</h5>
+                                    <?php 
+                                    $amenities = json_decode($property['amenities'] ?? '[]', true);
+                                    if (!is_array($amenities)) $amenities = [];
+                                    $amenity_list = ['Cleaning services', 'Laundry', 'Garbage collection', 'Security'];
+                                    ?>
+                                    <div class="row">
+                                        <?php foreach ($amenity_list as $amenity): ?>
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="amenities[]" value="<?php echo $amenity; ?>" id="amen_<?php echo md5($amenity); ?>" <?php echo in_array($amenity, $amenities) ? 'checked' : ''; ?>>
+                                                    <label class="form-check-label" for="amen_<?php echo md5($amenity); ?>">
+                                                        <?php echo $amenity; ?>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
                                     </div>
                                 </div>
                             </div>

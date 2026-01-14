@@ -139,6 +139,89 @@ $inquiry_result = handle_property_inquiry();
                 </div>
               </div>
 
+              <!-- Additional Details -->
+              <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+                <h3 class="fs-22 text-heading mb-4">Additional Details</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0">
+                            <?php if ($property['prop_id']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Property ID:</strong> <span class="text-primary"><?php echo htmlspecialchars($property['prop_id']); ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($property['stories']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Stories:</strong> <span><?php echo $property['stories']; ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($property['furnished']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Furnished:</strong> <span><?php echo htmlspecialchars($property['furnished']); ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($property['multi_family']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Multi-family:</strong> <span><?php echo htmlspecialchars($property['multi_family']); ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($property['plot_size']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Plot Size:</strong> <span><?php echo (int)$property['plot_size']; ?> m²</span></li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0">
+                            <?php if ($property['zoning']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Zoning:</strong> <span><?php echo htmlspecialchars($property['zoning']); ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($property['views']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Views:</strong> <span><?php echo htmlspecialchars($property['views']); ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($property['ideal_for']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Ideal for:</strong> <span><?php echo htmlspecialchars($property['ideal_for']); ?></span></li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                </div>
+              </div>
+
+              <!-- Features & Amenities -->
+              <div class="row">
+                  <div class="col-md-6">
+                    <div class="bg-white shadow-sm rounded-lg p-6 mb-6 h-100">
+                        <h3 class="fs-20 text-heading mb-4">Features</h3>
+                        <?php 
+                        $features = json_decode($property['features'] ?? '[]', true);
+                        if (!empty($features)): 
+                        ?>
+                            <ul class="list-unstyled row no-gutters">
+                                <?php foreach ($features as $feature): ?>
+                                    <li class="col-md-12 mb-2"><i class="fas fa-check-circle text-primary mr-2"></i><?php echo htmlspecialchars($feature); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="text-muted">No specific features listed.</p>
+                        <?php endif; ?>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="bg-white shadow-sm rounded-lg p-6 mb-6 h-100">
+                        <h3 class="fs-20 text-heading mb-4">Amenities</h3>
+                        <?php 
+                        $amenities = json_decode($property['amenities'] ?? '[]', true);
+                        if (!empty($amenities)): 
+                        ?>
+                            <ul class="list-unstyled row no-gutters">
+                                <?php foreach ($amenities as $amenity): ?>
+                                    <li class="col-md-12 mb-2"><i class="fas fa-star text-warning mr-2"></i><?php echo htmlspecialchars($amenity); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="text-muted">No specific amenities listed.</p>
+                        <?php endif; ?>
+                    </div>
+                  </div>
+              </div>
+
+              <?php if (!empty($property['proximity'])): ?>
+              <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+                <h3 class="fs-20 text-heading mb-4">In close proximity to</h3>
+                <p class="text-muted mb-0"><?php echo htmlspecialchars($property['proximity']); ?></p>
+              </div>
+              <?php endif; ?>
             </div>
 
             <!-- Sidebar -->

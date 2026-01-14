@@ -36,7 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'garage' => !empty($_POST['garage']) ? (int)$_POST['garage'] : 0,
             'size_sqm' => !empty($_POST['size_sqm']) ? (float)$_POST['size_sqm'] : 0,
             'year_built' => !empty($_POST['year_built']) ? (int)$_POST['year_built'] : date('Y'),
-            'is_featured' => isset($_POST['is_featured']) ? 1 : 0
+            'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+            'prop_id' => clean_input($_POST['prop_id'] ?? ''),
+            'stories' => intval($_POST['stories'] ?? 0),
+            'furnished' => clean_input($_POST['furnished'] ?? ''),
+            'multi_family' => clean_input($_POST['multi_family'] ?? ''),
+            'plot_size' => floatval($_POST['plot_size'] ?? 0),
+            'zoning' => clean_input($_POST['zoning'] ?? ''),
+            'views' => clean_input($_POST['views'] ?? ''),
+            'ideal_for' => clean_input($_POST['ideal_for'] ?? ''),
+            'proximity' => clean_input($_POST['proximity'] ?? ''),
+            'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
+            'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([])
         ];
         
         // Handle image upload
