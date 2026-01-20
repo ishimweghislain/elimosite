@@ -2,10 +2,20 @@
 require_once 'includes/config.php';
 
 try {
-    // Add 'draft' to properties status enum
-    $pdo->exec("ALTER TABLE properties MODIFY COLUMN status ENUM('for-rent', 'for-sale', 'under-construction', 'sold', 'rented', 'draft') DEFAULT 'for-rent'");
-    echo "Successfully updated properties status column.\n";
+    echo "Updating properties table...\n";
+    $pdo->exec("ALTER TABLE properties ADD COLUMN youtube_url VARCHAR(255) DEFAULT NULL;");
+    $pdo->exec("ALTER TABLE properties ADD COLUMN instagram_url VARCHAR(255) DEFAULT NULL;");
+    $pdo->exec("ALTER TABLE properties ADD COLUMN video VARCHAR(255) DEFAULT NULL;");
+    echo "Properties table updated.\n";
 } catch (PDOException $e) {
-    echo "Error updating properties table: " . $e->getMessage() . "\n";
+    echo "Notice: Column may already exist or error in properties table: " . $e->getMessage() . "\n";
+}
+
+try {
+    echo "Updating blog_posts table...\n";
+    $pdo->exec("ALTER TABLE blog_posts ADD COLUMN video VARCHAR(255) DEFAULT NULL;");
+    echo "Blog_posts table updated.\n";
+} catch (PDOException $e) {
+    echo "Notice: Column may already exist or error in blog_posts table: " . $e->getMessage() . "\n";
 }
 ?>

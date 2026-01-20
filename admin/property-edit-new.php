@@ -41,8 +41,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'ideal_for' => clean_input($_POST['ideal_for'] ?? ''),
         'proximity' => clean_input($_POST['proximity'] ?? ''),
         'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
-        'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([])
+        'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([]),
+        'youtube_url' => clean_input($_POST['youtube_url'] ?? ''),
+        'instagram_url' => clean_input($_POST['instagram_url'] ?? '')
     ];
+
+    // Handle video upload
+    if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
+        $upload_result = upload_file($_FILES['video'], '../images/', ['video/mp4', 'video/webm', 'video/ogg'], 20 * 1024 * 1024); // 20MB max
+        if ($upload_result['success']) {
+            $data['video'] = $upload_result['filename'];
+        }
+    }
 
     // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -493,6 +503,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         endif; ?>
                                     </div>
                                     <div id="removed-images-container"></div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <h5 class="mb-4 text-primary fw-bold">Social Media & Video</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">YouTube URL</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
+                                        <input type="url" name="youtube_url" class="form-control" value="<?php echo htmlspecialchars($property['youtube_url'] ?? ''); ?>" placeholder="https://www.youtube.com/watch?v=...">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Instagram URL</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-instagram text-primary"></i></span>
+                                        <input type="url" name="instagram_url" class="form-control" value="<?php echo htmlspecialchars($property['instagram_url'] ?? ''); ?>" placeholder="https://www.instagram.com/reels/...">
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <label class="form-label">Property Video (Direct Upload)</label>
+                                    <input type="file" name="video" class="form-control" accept="video/mp4,video/webm">
+                                    <?php if ($edit_mode && !empty($property['video'])): ?>
+                                        <div class="mt-2 p-2 border rounded bg-light">
+                                            <i class="fas fa-video me-2"></i>Current Video: 
+                                            <a href="../images/<?php echo htmlspecialchars($property['video']); ?>" target="_blank" class="ms-2">View Video</a>
+                                            <div class="small text-muted mt-1">Leave blank to keep current video.</div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 

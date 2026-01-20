@@ -4,15 +4,20 @@
  * Database and application settings
  */
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 // Database configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'elimo_real_estate');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_HOST', 'localhost'); 
+define('DB_NAME', 'elimo_elimonew'); 
+define('DB_USER', 'elimo_elimonewuser'); 
+define('DB_PASS', '9(3xIw7&pRF}'); 
 
 // Application settings
 define('SITE_NAME', 'Elimo Real Estate');
-define('SITE_URL', 'http://localhost/elimosite');
+define('SITE_URL', 'https://elimo.rw/V2'); // Removed trailing slash to avoid double slashes
 define('ADMIN_URL', SITE_URL . '/admin');
 define('UPLOAD_PATH', __DIR__ . '/../images/uploads/');
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
@@ -20,7 +25,7 @@ define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
 // Session security settings
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_only_cookies', 1);
-ini_set('session.cookie_secure', 0); // Set to 1 if using HTTPS
+ini_set('session.cookie_secure', 1); // Set to 1 because you are using HTTPS
 
 // Start session
 if (session_status() === PHP_SESSION_NONE) {

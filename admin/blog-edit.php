@@ -25,6 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'status' => $status
     ];
 
+    // Handle video upload
+    if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
+        $upload_result = upload_file($_FILES['video'], '../images/', ['video/mp4', 'video/webm', 'video/ogg'], 20 * 1024 * 1024); // 20MB max
+        if ($upload_result['success']) {
+            $data['video'] = $upload_result['filename'];
+        }
+    }
+
     // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $upload_result = upload_file($_FILES['image'], '../images/', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 2 * 1024 * 1024); // 2MB
@@ -262,6 +270,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         endif; ?>
                                     </div>
                                     <div id="removed-images-container"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Blog Video (Direct Upload)</label>
+                                    <input type="file" name="video" class="form-control" accept="video/mp4,video/webm">
+                                    <?php if ($edit_mode && !empty($blog_post['video'])): ?>
+                                        <div class="mt-2 p-2 border rounded bg-light">
+                                            <i class="fas fa-video me-2"></i>Current Video: 
+                                            <a href="../images/<?php echo htmlspecialchars($blog_post['video']); ?>" target="_blank" class="ms-2">View Video</a>
+                                            <div class="small text-muted mt-1">Leave blank to keep current video.</div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 

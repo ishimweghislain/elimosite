@@ -118,6 +118,17 @@ $date = format_date($post['created_at'], 'F d, Y');
     </div>
     
     <h2 class="fs-32 text-dark font-weight-600 mb-4"><?php echo htmlspecialchars($post['title']); ?></h2>
+
+    <?php if (!empty($post['video'])): ?>
+    <div class="mb-5">
+        <div class="video-container rounded-lg overflow-hidden bg-black shadow-sm" style="position: relative; padding-bottom: 56.25%; height: 0;">
+            <video controls class="w-100 h-100 position-absolute border-0" style="left: 0; top: 0; object-fit: cover;">
+                <source src="images/<?php echo htmlspecialchars($post['video']); ?>" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+    <?php endif; ?>
     
     <div class="blog-main-content fs-16 lh-18 line-height-2 text-gray-light mb-5">
         <?php echo nl2br($post['content']); ?>

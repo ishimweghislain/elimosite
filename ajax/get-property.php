@@ -119,7 +119,52 @@ if (!is_array($amenities)) $amenities = [];
             <button class="slider-nav-btn slider-next"><i class="fas fa-chevron-right"></i></button>
         <?php endif; ?>
     </div>
-    
+
+    <!-- YouTube & Instagram Links -->
+    <?php if (!empty($property['youtube_url']) || !empty($property['instagram_url']) || !empty($property['video'])): ?>
+    <div class="row g-3 mb-4">
+        <?php if (!empty($property['youtube_url'])): ?>
+        <div class="col-md-6">
+            <a href="<?php echo fix_url($property['youtube_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-red-opacity-01 border border-red text-red text-decoration-none hover-shine">
+                <div class="icon-circle bg-red text-white mr-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <i class="fab fa-youtube"></i>
+                </div>
+                <div>
+                    <h5 class="fs-15 mb-0 font-weight-600">Watch on YouTube</h5>
+                    <span class="fs-12 opacity-07">Property Video Tour</span>
+                </div>
+            </a>
+        </div>
+        <?php endif; ?>
+        
+        <?php if (!empty($property['instagram_url'])): ?>
+        <div class="col-md-6">
+            <a href="<?php echo fix_url($property['instagram_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-primary-opacity-01 border border-primary text-primary text-decoration-none hover-shine">
+                <div class="icon-circle bg-primary text-white mr-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <div>
+                    <h5 class="fs-15 mb-0 font-weight-600">View on Instagram</h5>
+                    <span class="fs-12 opacity-07">Property Reel/Post</span>
+                </div>
+            </a>
+        </div>
+        <?php endif; ?>
+
+        <?php if (!empty($property['video'])): ?>
+        <div class="col-12 mt-3">
+            <h5 class="fs-16 mb-2">Property Video Tour</h5>
+            <div class="video-container rounded-lg overflow-hidden bg-black shadow-sm" style="position: relative; padding-bottom: 56.25%; height: 0;">
+                <video controls class="w-100 h-100 position-absolute border-0" style="left: 0; top: 0; object-fit: cover;">
+                    <source src="images/<?php echo htmlspecialchars($property['video']); ?>" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <div class="d-flex align-items-center justify-content-between mb-2">
         <h2 class="fs-22 mb-0"><?php echo htmlspecialchars($property['title']); ?></h2>
         <div class="d-flex align-items-center">
