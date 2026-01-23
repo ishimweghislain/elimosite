@@ -72,25 +72,62 @@ $inquiry_result = handle_property_inquiry();
               
               <!-- Description -->
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-                <!-- YouTube & Instagram Links -->
-                <?php if (!empty($property['youtube_url']) || !empty($property['instagram_url']) || !empty($property['video'])): ?>
-                <div class="row g-3 mb-6">
+                <!-- YouTube Video Embed & Instagram Link -->
+                <?php if (!empty($property['youtube_url']) || !empty($property['instagram_url'])): ?>
+                <div class="mb-6">
                     <?php if (!empty($property['youtube_url'])): ?>
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <a href="<?php echo fix_url($property['youtube_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-red-opacity-01 border border-red text-red text-decoration-none hover-shine">
-                            <div class="icon-circle bg-red text-white mr-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; border-radius: 50%;">
-                                <i class="fab fa-youtube"></i>
+                    <div class="mb-4">
+                        <h5 class="fs-18 mb-3 text-heading font-weight-600">
+                            <i class="fab fa-youtube text-danger me-2"></i>Property Video Tour
+                        </h5>
+                        <?php
+                        // Extract YouTube video ID from URL
+                        $youtube_url = $property['youtube_url'];
+                        $video_id = '';
+                        
+                        // Handle different YouTube URL formats
+                        if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $youtube_url, $id)) {
+                            $video_id = $id[1];
+                        } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $youtube_url, $id)) {
+                            $video_id = $id[1];
+                        } elseif (preg_match('/youtu\.be\/([^\&\?\/]+)/', $youtube_url, $id)) {
+                            $video_id = $id[1];
+                        } elseif (preg_match('/youtube\.com\/v\/([^\&\?\/]+)/', $youtube_url, $id)) {
+                            $video_id = $id[1];
+                        }
+                        
+                        if ($video_id): ?>
+                            <!-- YouTube Embed Player -->
+                            <div class="video-container rounded-lg overflow-hidden shadow-sm" style="position: relative; padding-bottom: 56.25%; height: 0; background: #000;">
+                                <iframe 
+                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                                    src="https://www.youtube.com/embed/<?php echo htmlspecialchars($video_id); ?>?rel=0&modestbranding=1" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                                </iframe>
                             </div>
-                            <div>
-                                <h5 class="fs-15 mb-0 font-weight-600">Watch on YouTube</h5>
-                                <span class="fs-12 opacity-07">Property Video Tour</span>
-                            </div>
-                        </a>
+                            <p class="text-muted small mt-2 mb-0">
+                                <i class="fas fa-info-circle me-1"></i>Video hosted on YouTube - 
+                                <a href="<?php echo htmlspecialchars($youtube_url); ?>" target="_blank" class="text-primary">Watch on YouTube</a>
+                            </p>
+                        <?php else: ?>
+                            <!-- Fallback if video ID can't be extracted -->
+                            <a href="<?php echo fix_url($property['youtube_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-red-opacity-01 border border-red text-red text-decoration-none hover-shine">
+                                <div class="icon-circle bg-red text-white mr-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; border-radius: 50%;">
+                                    <i class="fab fa-youtube"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fs-15 mb-0 font-weight-600">Watch on YouTube</h5>
+                                    <span class="fs-12 opacity-07">Property Video Tour</span>
+                                </div>
+                            </a>
+                        <?php endif; ?>
                     </div>
                     <?php endif; ?>
                     
                     <?php if (!empty($property['instagram_url'])): ?>
-                    <div class="col-md-6">
+                    <div class="mb-3">
                         <a href="<?php echo fix_url($property['instagram_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-primary-opacity-01 border border-primary text-primary text-decoration-none hover-shine">
                             <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; border-radius: 50%;">
                                 <i class="fab fa-instagram"></i>
@@ -103,19 +140,7 @@ $inquiry_result = handle_property_inquiry();
                     </div>
                     <?php endif; ?>
 
-                    <?php if (!empty($property['video'])): ?>
-                    <div class="col-12 mt-4">
-                        <h5 class="fs-18 mb-3 text-heading font-weight-600">Property Video Tour</h5>
-                        <div class="video-container rounded-lg overflow-hidden bg-black shadow-sm" style="position: relative; padding-bottom: 56.25%; height: 0;">
-                            <video controls class="w-100 h-100 position-absolute border-0" style="left: 0; top: 0; object-fit: cover;">
-                                <source src="images/<?php echo htmlspecialchars($property['video']); ?>" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-
-                    <div class="col-12"><hr class="my-4"></div>
+                    <hr class="my-4">
                 </div>
                 <?php endif; ?>
 

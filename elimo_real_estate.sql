@@ -284,7 +284,36 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `full_name`, `role`, `phone`, `created_at`, `updated_at`) VALUES
 (2, 'admin', 'admin@elimo.rw', '$2y$10$JKqLuyu/GPlqS3BDLB2AreVuU97P8rl0Di/4OZ659rv11bgme/Fim', 'Administrator', 'admin', NULL, '2026-01-12 12:17:09', '2026-01-12 12:17:09');
+CREATE TABLE IF NOT EXISTS `property_features_master` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `type` enum('feature','amenity') NOT NULL DEFAULT 'feature',
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_name_type` (`name`, `type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Insert default features
+INSERT INTO `property_features_master` (`name`, `type`, `is_active`) VALUES
+('Air Conditioner', 'feature', 1),
+('Optic Fiber', 'feature', 1),
+('Built in wardrobes', 'feature', 1),
+('Proximity to schools', 'feature', 1),
+('Tarmac road', 'feature', 1),
+('Proximity to shops', 'feature', 1),
+('Proximity to public transport', 'feature', 1),
+('Water Tank', 'feature', 1),
+('Garden', 'feature', 1),
+('Open Plan Kitchen', 'feature', 1);
+
+-- Insert default amenities
+INSERT INTO `property_features_master` (`name`, `type`, `is_active`) VALUES
+('Cleaning services', 'amenity', 1),
+('Laundry', 'amenity', 1),
+('Garbage collection', 'amenity', 1),
+('Security', 'amenity', 1);
 --
 -- Indexes for dumped tables
 --

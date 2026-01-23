@@ -120,25 +120,55 @@ if (!is_array($amenities)) $amenities = [];
         <?php endif; ?>
     </div>
 
-    <!-- YouTube & Instagram Links -->
-    <?php if (!empty($property['youtube_url']) || !empty($property['instagram_url']) || !empty($property['video'])): ?>
+    <!-- YouTube Video Tour & Instagram Links -->
+    <?php if (!empty($property['youtube_url']) || !empty($property['instagram_url'])): ?>
     <div class="row g-3 mb-4">
         <?php if (!empty($property['youtube_url'])): ?>
-        <div class="col-md-6">
-            <a href="<?php echo fix_url($property['youtube_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-red-opacity-01 border border-red text-red text-decoration-none hover-shine">
-                <div class="icon-circle bg-red text-white mr-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                    <i class="fab fa-youtube"></i>
+        <div class="col-12 mb-4">
+            <h5 class="fs-18 mb-3 text-heading font-weight-600">
+                <i class="fab fa-youtube text-danger mr-2"></i>Property Video Tour
+            </h5>
+            <?php
+            // Extract YouTube video ID
+            $youtube_url = $property['youtube_url'];
+            $video_id = '';
+            if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $youtube_url, $id)) {
+                $video_id = $id[1];
+            } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $youtube_url, $id)) {
+                $video_id = $id[1];
+            } elseif (preg_match('/youtu\.be\/([^\&\?\/]+)/', $youtube_url, $id)) {
+                $video_id = $id[1];
+            }
+            
+            if ($video_id): ?>
+                <div class="video-container rounded-lg overflow-hidden shadow-sm bg-black mb-3" style="position: relative; padding-bottom: 56.25%; height: 0;">
+                    <iframe 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                        src="https://www.youtube.com/embed/<?php echo htmlspecialchars($video_id); ?>?rel=0&modestbranding=1" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
                 </div>
-                <div>
-                    <h5 class="fs-15 mb-0 font-weight-600">Watch on YouTube</h5>
-                    <span class="fs-12 opacity-07">Property Video Tour</span>
-                </div>
-            </a>
+                <a href="<?php echo fix_url($property['youtube_url']); ?>" target="_blank" class="btn btn-outline-danger btn-sm">
+                    <i class="fab fa-youtube mr-1"></i> Watch on YouTube
+                </a>
+            <?php else: ?>
+                <a href="<?php echo fix_url($property['youtube_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-red-opacity-01 border border-red text-red text-decoration-none hover-shine">
+                    <div class="icon-circle bg-red text-white mr-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <div>
+                        <h5 class="fs-15 mb-0 font-weight-600">Watch on YouTube</h5>
+                        <span class="fs-12 opacity-07">Property Video Tour</span>
+                    </div>
+                </a>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
         
         <?php if (!empty($property['instagram_url'])): ?>
-        <div class="col-md-6">
+        <div class="col-md-6 mb-3">
             <a href="<?php echo fix_url($property['instagram_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-primary-opacity-01 border border-primary text-primary text-decoration-none hover-shine">
                 <div class="icon-circle bg-primary text-white mr-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
                     <i class="fab fa-instagram"></i>
@@ -148,18 +178,6 @@ if (!is_array($amenities)) $amenities = [];
                     <span class="fs-12 opacity-07">Property Reel/Post</span>
                 </div>
             </a>
-        </div>
-        <?php endif; ?>
-
-        <?php if (!empty($property['video'])): ?>
-        <div class="col-12 mt-3">
-            <h5 class="fs-16 mb-2">Property Video Tour</h5>
-            <div class="video-container rounded-lg overflow-hidden bg-black shadow-sm" style="position: relative; padding-bottom: 56.25%; height: 0;">
-                <video controls class="w-100 h-100 position-absolute border-0" style="left: 0; top: 0; object-fit: cover;">
-                    <source src="images/<?php echo htmlspecialchars($property['video']); ?>" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
         </div>
         <?php endif; ?>
     </div>

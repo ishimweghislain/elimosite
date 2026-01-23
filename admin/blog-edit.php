@@ -22,16 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'category' => clean_input($_POST['category'] ?? 'creative'),
         'excerpt' => clean_input($_POST['excerpt'] ?? ''),
         'content' => $_POST['content'] ?? '', // Don't clean HTML content
-        'status' => $status
+        'status' => $status,
+        'youtube_url' => clean_input($_POST['youtube_url'] ?? '')
     ];
 
-    // Handle video upload
-    if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
-        $upload_result = upload_file($_FILES['video'], '../images/', ['video/mp4', 'video/webm', 'video/ogg'], 20 * 1024 * 1024); // 20MB max
-        if ($upload_result['success']) {
-            $data['video'] = $upload_result['filename'];
-        }
-    }
+    // Video upload removed - using YouTube URL only
 
     // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -272,15 +267,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div id="removed-images-container"></div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Blog Video (Direct Upload)</label>
-                                    <input type="file" name="video" class="form-control" accept="video/mp4,video/webm">
-                                    <?php if ($edit_mode && !empty($blog_post['video'])): ?>
-                                        <div class="mt-2 p-2 border rounded bg-light">
-                                            <i class="fas fa-video me-2"></i>Current Video: 
-                                            <a href="../images/<?php echo htmlspecialchars($blog_post['video']); ?>" target="_blank" class="ms-2">View Video</a>
-                                            <div class="small text-muted mt-1">Leave blank to keep current video.</div>
-                                        </div>
-                                    <?php endif; ?>
+                                    <label class="form-label">YouTube URL</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
+                                        <input type="url" name="youtube_url" class="form-control" value="<?php echo htmlspecialchars($blog_post['youtube_url'] ?? ''); ?>" placeholder="https://www.youtube.com/watch?v=...">
+                                    </div>
+                                    <small class="text-muted d-block mt-1"><i class="fas fa-info-circle"></i> Paste the full YouTube video URL for this blog post</small>
+                                    <div id="youtube-preview" class="mt-3"></div>
                                 </div>
                             </div>
 
@@ -335,6 +328,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ['view', ['fullscreen', 'codeview', 'help']]
                 ]
             });
+
+            // YouTube Preview Logic
+            const youtubeInput = document.querySelector('input[name="youtube_url"]');
+            const youtubePreviewContainer = document.getElementById('youtube-preview');
+            
+            if (youtubeInput.value) {
+                updateYoutubePreview(youtubeInput.value);
+            }
+            
+            youtubeInput.addEventListener('input', function() {
+                updateYoutubePreview(this.value);
+            });
+
+            function updateYoutubePreview(url) {
+                const videoId = extractYoutubeId(url);
+                if (videoId) {
+                    youtubePreviewContainer.innerHTML = `
+                        <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm" style="max-width: 100%;">
+                            <iframe src="https://www.youtube.com/embed/${videoId}" title="YouTube video preview" allowfullscreen></iframe>
+                        </div>
+                    `;
+                } else {
+                    youtubePreviewContainer.innerHTML = '';
+                }
+            }
+
+            function extractYoutubeId(url) {
+                 if (!url) return null;
+                 var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                 var match = url.match(regExp);
+                 if (match && match[2].length == 11) {
+                     return match[2];
+                 }
+                 return null;
+            }
         });
 
         var currentStatus = '<?php echo $blog_post['status'] ?? 'draft'; ?>';

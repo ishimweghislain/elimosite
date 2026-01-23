@@ -119,14 +119,34 @@ $date = format_date($post['created_at'], 'F d, Y');
     
     <h2 class="fs-32 text-dark font-weight-600 mb-4"><?php echo htmlspecialchars($post['title']); ?></h2>
 
-    <?php if (!empty($post['video'])): ?>
+    <?php if (!empty($post['youtube_url'])): ?>
     <div class="mb-5">
-        <div class="video-container rounded-lg overflow-hidden bg-black shadow-sm" style="position: relative; padding-bottom: 56.25%; height: 0;">
-            <video controls class="w-100 h-100 position-absolute border-0" style="left: 0; top: 0; object-fit: cover;">
-                <source src="images/<?php echo htmlspecialchars($post['video']); ?>" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
+        <h5 class="fs-18 mb-3 text-dark font-weight-600">
+            <i class="fab fa-youtube text-danger mr-2"></i>Post Video
+        </h5>
+        <?php
+        // Extract YouTube video ID
+        $youtube_url = $post['youtube_url'];
+        $video_id = '';
+        if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $youtube_url, $id)) {
+            $video_id = $id[1];
+        } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $youtube_url, $id)) {
+            $video_id = $id[1];
+        } elseif (preg_match('/youtu\.be\/([^\&\?\/]+)/', $youtube_url, $id)) {
+            $video_id = $id[1];
+        }
+        
+        if ($video_id): ?>
+            <div class="video-container rounded-lg overflow-hidden shadow-sm bg-black" style="position: relative; padding-bottom: 56.25%; height: 0;">
+                <iframe 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                    src="https://www.youtube.com/embed/<?php echo htmlspecialchars($video_id); ?>?rel=0&modestbranding=1" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
     

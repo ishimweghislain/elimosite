@@ -281,6 +281,9 @@ if (!empty($_GET['search'])) {
                                         <input type="email" class="form-control form-control-lg border-0 bg-gray-01 shadow-none" name="email" placeholder="Email Address" required>
                                     </div>
                                     <div class="form-group mb-4">
+                                        <input type="tel" class="form-control form-control-lg border-0 bg-gray-01 shadow-none" name="phone" placeholder="Phone Number">
+                                    </div>
+                                    <div class="form-group mb-4">
                                         <textarea class="form-control border-0 bg-gray-01 shadow-none" name="message" rows="4" placeholder="Message" required></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-lg btn-block shadow-none">Send Inquiry</button>

@@ -9,10 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $property_id = isset($_POST['property_id']) ? (int)$_POST['property_id'] : 0;
 $full_name = clean_input($_POST['full_name'] ?? '');
 $email = clean_input($_POST['email'] ?? '');
+$phone = clean_input($_POST['phone'] ?? '');
 $message = clean_input($_POST['message'] ?? '');
 
 if (empty($full_name) || empty($email) || empty($message)) {
-    echo json_encode(['success' => false, 'message' => 'All fields are required.']);
+    echo json_encode(['success' => false, 'message' => 'Name, email, and message are required.']);
     exit;
 }
 
@@ -25,8 +26,9 @@ $data = [
     'property_id' => $property_id,
     'name' => $full_name,
     'email' => $email,
+    'phone' => $phone,
     'message' => $message,
-    'status' => 'new' // Assuming 'new' is the default status
+    'status' => 'new'
 ];
 
 // Insert into property_inquiries table

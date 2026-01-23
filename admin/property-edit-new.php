@@ -46,13 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'instagram_url' => clean_input($_POST['instagram_url'] ?? '')
     ];
 
-    // Handle video upload
-    if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
-        $upload_result = upload_file($_FILES['video'], '../images/', ['video/mp4', 'video/webm', 'video/ogg'], 20 * 1024 * 1024); // 20MB max
-        if ($upload_result['success']) {
-            $data['video'] = $upload_result['filename'];
-        }
-    }
+    // Video upload removed - using YouTube URL only
 
     // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -417,23 +411,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php 
                                     $features = json_decode($property['features'] ?? '[]', true);
                                     if (!is_array($features)) $features = [];
-                                    $feature_list = [
-                                        'Air Conditioner', 'Optic Fiber', 'Built in wardrobes', 
-                                        'Proximity to schools', 'Tarmac road', 'Proximity to shops', 
-                                        'Proximity to public transport', 'Water Tank', 'Garden', 'Open Plan Kitchen'
-                                    ];
+                                    
+                                    // Load features from database
+                                    global $pdo;
+                                    $stmt = $pdo->query("SELECT * FROM property_features_master WHERE type = 'feature' AND is_active = 1 ORDER BY name ASC");
+                                    $feature_list = $stmt->fetchAll();
                                     ?>
                                     <div class="row">
-                                        <?php foreach ($feature_list as $feature): ?>
-                                            <div class="col-md-6 mb-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="features[]" value="<?php echo $feature; ?>" id="feat_<?php echo md5($feature); ?>" <?php echo in_array($feature, $features) ? 'checked' : ''; ?>>
-                                                    <label class="form-check-label" for="feat_<?php echo md5($feature); ?>">
-                                                        <?php echo $feature; ?>
-                                                    </label>
+                                        <?php if (!empty($feature_list)): ?>
+                                            <?php foreach ($feature_list as $feature): ?>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="features[]" value="<?php echo htmlspecialchars($feature['name']); ?>" id="feat_<?php echo $feature['id']; ?>" <?php echo in_array($feature['name'], $features) ? 'checked' : ''; ?>>
+                                                        <label class="form-check-label" for="feat_<?php echo $feature['id']; ?>">
+                                                            <?php echo htmlspecialchars($feature['name']); ?>
+                                                        </label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        <?php endforeach; ?>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <p class="text-muted small">No features available. <a href="manage-features.php">Add features</a></p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -441,19 +439,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php 
                                     $amenities = json_decode($property['amenities'] ?? '[]', true);
                                     if (!is_array($amenities)) $amenities = [];
-                                    $amenity_list = ['Cleaning services', 'Laundry', 'Garbage collection', 'Security'];
+                                    
+                                    // Load amenities from database
+                                    global $pdo;
+                                    $stmt = $pdo->query("SELECT * FROM property_features_master WHERE type = 'amenity' AND is_active = 1 ORDER BY name ASC");
+                                    $amenity_list = $stmt->fetchAll();
                                     ?>
                                     <div class="row">
-                                        <?php foreach ($amenity_list as $amenity): ?>
-                                            <div class="col-md-6 mb-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="amenities[]" value="<?php echo $amenity; ?>" id="amen_<?php echo md5($amenity); ?>" <?php echo in_array($amenity, $amenities) ? 'checked' : ''; ?>>
-                                                    <label class="form-check-label" for="amen_<?php echo md5($amenity); ?>">
-                                                        <?php echo $amenity; ?>
-                                                    </label>
+                                        <?php if (!empty($amenity_list)): ?>
+                                            <?php foreach ($amenity_list as $amenity): ?>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="amenities[]" value="<?php echo htmlspecialchars($amenity['name']); ?>" id="amen_<?php echo $amenity['id']; ?>" <?php echo in_array($amenity['name'], $amenities) ? 'checked' : ''; ?>>
+                                                        <label class="form-check-label" for="amen_<?php echo $amenity['id']; ?>">
+                                                            <?php echo htmlspecialchars($amenity['name']); ?>
+                                                        </label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        <?php endforeach; ?>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <p class="text-muted small">No amenities available. <a href="manage-features.php">Add amenities</a></p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -515,6 +521,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
                                         <input type="url" name="youtube_url" class="form-control" value="<?php echo htmlspecialchars($property['youtube_url'] ?? ''); ?>" placeholder="https://www.youtube.com/watch?v=...">
                                     </div>
+                                    <small class="text-muted d-block mt-1"><i class="fas fa-info-circle"></i> Paste the full YouTube video URL for this property</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Instagram URL</label>
@@ -522,17 +529,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <span class="input-group-text"><i class="fab fa-instagram text-primary"></i></span>
                                         <input type="url" name="instagram_url" class="form-control" value="<?php echo htmlspecialchars($property['instagram_url'] ?? ''); ?>" placeholder="https://www.instagram.com/reels/...">
                                     </div>
-                                </div>
-                                <div class="col-md-12 mt-3">
-                                    <label class="form-label">Property Video (Direct Upload)</label>
-                                    <input type="file" name="video" class="form-control" accept="video/mp4,video/webm">
-                                    <?php if ($edit_mode && !empty($property['video'])): ?>
-                                        <div class="mt-2 p-2 border rounded bg-light">
-                                            <i class="fas fa-video me-2"></i>Current Video: 
-                                            <a href="../images/<?php echo htmlspecialchars($property['video']); ?>" target="_blank" class="ms-2">View Video</a>
-                                            <div class="small text-muted mt-1">Leave blank to keep current video.</div>
-                                        </div>
-                                    <?php endif; ?>
+                                    <small class="text-muted d-block mt-1"><i class="fas fa-info-circle"></i> Paste the full URL of your Instagram post or reel</small>
                                 </div>
                             </div>
 
@@ -678,5 +675,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 previewContainer.classList.add('d-none');
             }
         });
+        
+        // YouTube Preview Logic
+        const youtubeInput = document.querySelector('input[name="youtube_url"]');
+        const youtubePreviewContainer = document.createElement('div');
+        youtubePreviewContainer.id = 'youtube-preview';
+        youtubePreviewContainer.className = 'mt-3';
+        youtubeInput.parentElement.parentElement.appendChild(youtubePreviewContainer);
+        
+        // Initial load
+        if (youtubeInput.value) {
+            updateYoutubePreview(youtubeInput.value);
+        }
+        
+        youtubeInput.addEventListener('input', function() {
+            updateYoutubePreview(this.value);
+        });
+
+        function updateYoutubePreview(url) {
+            const videoId = extractYoutubeId(url);
+            if (videoId) {
+                youtubePreviewContainer.innerHTML = `
+                    <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm" style="max-width: 400px;">
+                        <iframe src="https://www.youtube.com/embed/${videoId}" title="YouTube video preview" allowfullscreen></iframe>
+                    </div>
+                `;
+            } else {
+                youtubePreviewContainer.innerHTML = '';
+            }
+        }
+
+        function extractYoutubeId(url) {
+             if (!url) return null;
+             var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+             var match = url.match(regExp);
+             if (match && match[2].length == 11) {
+                 return match[2];
+             }
+             return null;
+        }
     </script>
     <?php include 'includes/footer.php'; ?>
