@@ -12,6 +12,16 @@ try {
         echo "'youtube_url' column already exists in 'blog_posts' table.<br>";
     }
 
+    // Add instagram_url column to blog_posts if it doesn't exist
+    $stmt = $pdo->prepare("SHOW COLUMNS FROM blog_posts LIKE 'instagram_url'");
+    $stmt->execute();
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE blog_posts ADD COLUMN instagram_url VARCHAR(255) AFTER youtube_url");
+        echo "Added 'instagram_url' column to 'blog_posts' table.<br>";
+    } else {
+        echo "'instagram_url' column already exists in 'blog_posts' table.<br>";
+    }
+
     echo "Database migration completed successfully!";
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();

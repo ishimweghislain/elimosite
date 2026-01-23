@@ -137,7 +137,7 @@ $date = format_date($post['created_at'], 'F d, Y');
         }
         
         if ($video_id): ?>
-            <div class="video-container rounded-lg overflow-hidden shadow-sm bg-black" style="position: relative; padding-bottom: 56.25%; height: 0;">
+            <div class="video-container rounded-lg overflow-hidden shadow-sm bg-black mb-3" style="position: relative; padding-bottom: 56.25%; height: 0;">
                 <iframe 
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
                     src="https://www.youtube.com/embed/<?php echo htmlspecialchars($video_id); ?>?rel=0&modestbranding=1" 
@@ -147,6 +147,21 @@ $date = format_date($post['created_at'], 'F d, Y');
                 </iframe>
             </div>
         <?php endif; ?>
+        
+        <?php if (!empty($post['instagram_url'])): ?>
+            <a href="<?php echo fix_url($post['instagram_url']); ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="fab fa-instagram mr-1"></i> View on Instagram
+            </a>
+        <?php endif; ?>
+    </div>
+    <?php elseif (!empty($post['instagram_url'])): ?>
+    <div class="mb-5">
+        <h5 class="fs-18 mb-3 text-dark font-weight-600">
+            <i class="fab fa-instagram text-primary mr-2"></i>Post Social
+        </h5>
+        <a href="<?php echo fix_url($post['instagram_url']); ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+            <i class="fab fa-instagram mr-1"></i> View on Instagram
+        </a>
     </div>
     <?php endif; ?>
     

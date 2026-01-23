@@ -23,7 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'excerpt' => clean_input($_POST['excerpt'] ?? ''),
         'content' => $_POST['content'] ?? '', // Don't clean HTML content
         'status' => $status,
-        'youtube_url' => clean_input($_POST['youtube_url'] ?? '')
+        'youtube_url' => clean_input($_POST['youtube_url'] ?? ''),
+        'instagram_url' => clean_input($_POST['instagram_url'] ?? '')
     ];
 
     // Video upload removed - using YouTube URL only
@@ -272,8 +273,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
                                         <input type="url" name="youtube_url" class="form-control" value="<?php echo htmlspecialchars($blog_post['youtube_url'] ?? ''); ?>" placeholder="https://www.youtube.com/watch?v=...">
                                     </div>
-                                    <small class="text-muted d-block mt-1"><i class="fas fa-info-circle"></i> Paste the full YouTube video URL for this blog post</small>
+                                    <small class="text-muted d-block mt-1"><i class="fas fa-info-circle"></i> Paste the full YouTube video URL</small>
                                     <div id="youtube-preview" class="mt-3"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Instagram URL</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-instagram text-primary"></i></span>
+                                        <input type="url" name="instagram_url" class="form-control" value="<?php echo htmlspecialchars($blog_post['instagram_url'] ?? ''); ?>" placeholder="https://www.instagram.com/reels/...">
+                                    </div>
+                                    <small class="text-muted d-block mt-1"><i class="fas fa-info-circle"></i> Paste the full Instagram post or reel URL</small>
                                 </div>
                             </div>
 
