@@ -54,23 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $current_sub_images = array_values($current_sub_images);
     }
 
-    if (isset($_FILES['sub_images'])) {
-        foreach ($_FILES['sub_images']['tmp_name'] as $key => $tmp_name) {
-            if ($_FILES['sub_images']['error'][$key] === UPLOAD_ERR_OK) {
-                $file = [
-                    'name' => $_FILES['sub_images']['name'][$key],
-                    'type' => $_FILES['sub_images']['type'][$key],
-                    'tmp_name' => $_FILES['sub_images']['tmp_name'][$key],
-                    'error' => $_FILES['sub_images']['error'][$key],
-                    'size' => $_FILES['sub_images']['size'][$key]
-                ];
-                $upload_result = upload_file($file, '../images/', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], 5 * 1024 * 1024);
-                if ($upload_result['success']) {
-                    $current_sub_images[] = $upload_result['filename'];
-                }
-            }
+    // Add newly uploaded images from AJAX (stored in hidden field)
+    if (!empty($_POST['uploaded_sub_images'])) {
+        $uploaded_images = json_decode($_POST['uploaded_sub_images'], true);
+        if (is_array($uploaded_images)) {
+            $current_sub_images = array_merge($current_sub_images, $uploaded_images);
         }
     }
+    
     $data['images'] = json_encode($current_sub_images);
 
     if ($edit_mode) {
@@ -249,9 +240,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="small text-muted mb-2"><i class="fas fa-info-circle me-1"></i> Hold <strong>Ctrl</strong> to select multiple images.</div>
                                     <input type="file" name="sub_images[]" id="subImagesInput" class="form-control" accept="image/*" multiple>
                                     
+                                    <!-- Upload Progress Bar -->
+                                    <div id="upload-progress-container" class="mt-3 d-none">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small fw-bold text-primary">Uploading images...</span>
+                                            <span id="upload-percentage" class="small fw-bold text-primary">0%</span>
+                                        </div>
+                                        <div class="progress" style="height: 25px;">
+                                            <div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                <span id="upload-status">0 / 0</span>
+                                            </div>
+                                        </div>
+                                        <div id="upload-message" class="small text-muted mt-2"></div>
+                                    </div>
+                                    
                                     <div id="new-sub-images-preview" class="new-images-preview mt-3 d-none">
                                         <div class="w-100 mb-2 small fw-bold text-success">Newly selected images:</div>
                                     </div>
+                                    
+                                    <!-- Hidden field to store uploaded image filenames -->
+                                    <input type="hidden" name="uploaded_sub_images" id="uploadedSubImages" value="">
 
                                     <div id="sub-images-preview" class="mt-3">
                                         <?php 
@@ -399,7 +407,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // AJAX Image Upload System
+        let uploadedImages = []; // Store successfully uploaded image filenames
+        let isUploading = false;
+
         function submitDraft() {
+            if (isUploading) {
+                alert('Please wait for image uploads to complete before saving.');
+                return false;
+            }
             var form = document.querySelector('form');
             var input = document.createElement('input');
             input.type = 'hidden';
@@ -410,6 +426,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function submitPublish() {
+            if (isUploading) {
+                alert('Please wait for image uploads to complete before publishing.');
+                return false;
+            }
             var form = document.querySelector('form');
             var statusSelect = document.querySelector('select[name="status"]');
             if (statusSelect && statusSelect.value === 'draft') {
@@ -418,28 +438,136 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             form.submit();
         }
 
-        // New Images Preview Logic
         document.getElementById('subImagesInput').addEventListener('change', function() {
-            const previewContainer = document.getElementById('new-sub-images-preview');
-            previewContainer.innerHTML = '<div class="w-100 mb-2 small fw-bold text-success">Newly selected images (to be uploaded):</div>';
+            const files = this.files;
             
-            if (this.files && this.files.length > 0) {
-                previewContainer.classList.remove('d-none');
-                Array.from(this.files).forEach(file => {
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const div = document.createElement('div');
-                            div.className = 'new-img-item';
-                            div.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                            previewContainer.appendChild(div);
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                });
-            } else {
-                previewContainer.classList.add('d-none');
+            if (files && files.length > 0) {
+                // Show preview
+                showImagePreviews(files);
+                
+                // Start upload immediately
+                uploadImagesAjax(files);
             }
         });
+
+        function showImagePreviews(files) {
+            const previewContainer = document.getElementById('new-sub-images-preview');
+            previewContainer.innerHTML = '<div class="w-100 mb-2 small fw-bold text-success">Selected images (uploading...):</div>';
+            previewContainer.classList.remove('d-none');
+            
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'new-img-item';
+                        div.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        previewContainer.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function uploadImagesAjax(files) {
+            isUploading = true;
+            const progressContainer = document.getElementById('upload-progress-container');
+            const progressBar = document.getElementById('upload-progress-bar');
+            const progressPercentage = document.getElementById('upload-percentage');
+            const uploadStatus = document.getElementById('upload-status');
+            const uploadMessage = document.getElementById('upload-message');
+            
+            // Show progress bar
+            progressContainer.classList.remove('d-none');
+            
+            const totalFiles = files.length;
+            let uploadedCount = 0;
+            let failedCount = 0;
+            const batchSize = 5; // Upload 5 images at a time
+            
+            uploadMessage.textContent = `Preparing to upload ${totalFiles} image(s)...`;
+            
+            // Upload in batches
+            uploadBatch(0);
+            
+            function uploadBatch(startIndex) {
+                if (startIndex >= totalFiles) {
+                    // All batches complete
+                    finishUpload();
+                    return;
+                }
+                
+                const endIndex = Math.min(startIndex + batchSize, totalFiles);
+                const batchFiles = Array.from(files).slice(startIndex, endIndex);
+                
+                const formData = new FormData();
+                batchFiles.forEach(file => {
+                    formData.append('images[]', file);
+                });
+                
+                fetch('ajax/upload-images.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.uploaded_files) {
+                        // Store uploaded filenames
+                        data.uploaded_files.forEach(file => {
+                            uploadedImages.push(file.saved_name);
+                        });
+                        uploadedCount += data.uploaded_files.length;
+                    }
+                    
+                    if (data.failed_files) {
+                        failedCount += data.failed_files.length;
+                    }
+                    
+                    // Update progress
+                    const progress = Math.round((uploadedCount + failedCount) / totalFiles * 100);
+                    progressBar.style.width = progress + '%';
+                    progressBar.setAttribute('aria-valuenow', progress);
+                    progressPercentage.textContent = progress + '%';
+                    uploadStatus.textContent = `${uploadedCount} / ${totalFiles}`;
+                    uploadMessage.textContent = `Uploaded ${uploadedCount} of ${totalFiles} image(s)${failedCount > 0 ? ` (${failedCount} failed)` : ''}`;
+                    
+                    // Upload next batch
+                    uploadBatch(endIndex);
+                })
+                .catch(error => {
+                    console.error('Upload error:', error);
+                    failedCount += batchFiles.length;
+                    uploadMessage.textContent = `Error uploading batch. ${failedCount} file(s) failed.`;
+                    uploadMessage.classList.add('text-danger');
+                    
+                    // Continue with next batch despite error
+                    uploadBatch(endIndex);
+                });
+            }
+            
+            function finishUpload() {
+                isUploading = false;
+                
+                // Update hidden field with uploaded images
+                const hiddenField = document.getElementById('uploadedSubImages');
+                hiddenField.value = JSON.stringify(uploadedImages);
+                
+                // Update progress bar to success state
+                if (uploadedCount > 0) {
+                    progressBar.classList.remove('progress-bar-animated');
+                    progressBar.classList.add('bg-success');
+                    uploadMessage.classList.remove('text-muted');
+                    uploadMessage.classList.add('text-success');
+                    uploadMessage.textContent = `✓ Successfully uploaded ${uploadedCount} image(s)${failedCount > 0 ? `. ${failedCount} failed.` : '!'}`;
+                } else {
+                    progressBar.classList.add('bg-danger');
+                    uploadMessage.classList.add('text-danger');
+                    uploadMessage.textContent = `✗ All uploads failed. Please try again.`;
+                }
+                
+                // Clear file input
+                document.getElementById('subImagesInput').value = '';
+            }
+        }
     </script>
     <?php include 'includes/footer.php'; ?>
