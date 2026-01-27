@@ -88,7 +88,7 @@ $inquiry_result = handle_property_inquiry();
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <h3 class="fs-22 text-heading mb-4">Gallery & Video</h3>
                 <div class="row g-3">
-                    <?php if (!empty($dev['youtube_url']) && is_visible('youtube_url', $visibility)): ?>
+                    <?php if (!empty($dev['youtube_url'])): ?>
                     <div class="col-12 mb-4">
                         <div class="rounded-lg overflow-hidden position-relative" style="padding-bottom: 56.25%; height:0;">
                             <?php 
@@ -180,10 +180,18 @@ $inquiry_result = handle_property_inquiry();
                     <div class="bg-white shadow-sm rounded-lg p-6">
                         <h5 class="mb-4 font-weight-600">Project Highlights</h5>
                         <ul class="list-unstyled mb-0 fs-14">
-                            <?php if ($dev['ideal_for'] && is_visible('ideal_for', $visibility)): ?>
-                                <li class="mb-3"><strong>Ideal For:</strong> <span class="d-block text-muted"><?php echo htmlspecialchars($dev['ideal_for']); ?></span></li>
+                            <?php if (!empty($dev['ideal_for'])): ?>
+                                <li class="mb-3">
+                                    <strong>Ideal For:</strong> 
+                                    <span class="d-block text-muted">
+                                        <?php 
+                                        $ideals = json_decode($dev['ideal_for'] ?? '[]', true);
+                                        echo is_array($ideals) ? implode(', ', array_map('htmlspecialchars', $ideals)) : htmlspecialchars($dev['ideal_for']);
+                                        ?>
+                                    </span>
+                                </li>
                             <?php endif; ?>
-                            <?php if ($dev['proximity'] && is_visible('proximity', $visibility)): ?>
+                            <?php if (!empty($dev['proximity'])): ?>
                                 <li class="mb-3"><strong>Proximity:</strong> <span class="d-block text-muted"><?php echo htmlspecialchars($dev['proximity']); ?></span></li>
                             <?php endif; ?>
                         </ul>

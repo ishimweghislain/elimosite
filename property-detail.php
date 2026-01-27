@@ -16,7 +16,7 @@ $inquiry_result = handle_property_inquiry();
 // Development Check
 $development = null;
 if (!empty($property['development_id'])) {
-    $stmt = $pdo->prepare("SELECT id, title FROM developments WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM developments WHERE id = ?");
     $stmt->execute([$property['development_id']]);
     $development = $stmt->fetch();
 }
@@ -52,12 +52,10 @@ if (!empty($property['development_id'])) {
               <p class="mb-0 text-gray-light"><i class="fal fa-map-marker-alt mr-2"></i><?php echo htmlspecialchars($property['location']); ?></p>
             </div>
             <div class="col-md-4 text-md-right mt-4 mt-md-0">
-              <?php if (is_visible('price', $visibility)): ?>
+              <?php if (!empty($property['price']) && $property['price'] > 0): ?>
                 <p class="fs-22 text-heading font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
               <?php endif; ?>
-              <?php if (is_visible('status', $visibility)): ?>
-                <span class="badge badge-primary mt-2"><?php echo ($property['status'] === 'under-construction') ? 'Off-plan Purchase' : ucwords(str_replace('-', ' ', $property['status'])); ?></span>
-              <?php endif; ?>
+              <span class="badge badge-primary mt-2"><?php echo ($property['status'] === 'under-construction') ? 'Off-plan Purchase' : ucwords(str_replace('-', ' ', $property['status'])); ?></span>
             </div>
           </div>
         </div>
@@ -115,7 +113,7 @@ if (!empty($property['development_id'])) {
                     <?php if (!empty($property['youtube_url'])): ?>
                     <div class="mb-4">
                         <h5 class="fs-18 mb-3 text-heading font-weight-600">
-                            <i class="fab fa-youtube text-danger me-2"></i>Property Video Tour
+                            <i class="fab fa-youtube text-danger mr-2"></i>Property Video Tour
                         </h5>
                         <?php
                         // Extract YouTube video ID from URL
@@ -123,14 +121,14 @@ if (!empty($property['development_id'])) {
                         $video_id = '';
                         
                         // Handle different YouTube URL formats
-                        if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $youtube_url, $id)) {
-                            $video_id = $id[1];
-                        } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $youtube_url, $id)) {
-                            $video_id = $id[1];
-                        } elseif (preg_match('/youtu\.be\/([^\&\?\/]+)/', $youtube_url, $id)) {
-                            $video_id = $id[1];
-                        } elseif (preg_match('/youtube\.com\/v\/([^\&\?\/]+)/', $youtube_url, $id)) {
-                            $video_id = $id[1];
+                        if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $youtube_url, $matches)) {
+                            $video_id = $matches[1];
+                        } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $youtube_url, $matches)) {
+                            $video_id = $matches[1];
+                        } elseif (preg_match('/youtu\.be\/([^\&\?\/]+)/', $youtube_url, $matches)) {
+                            $video_id = $matches[1];
+                        } elseif (preg_match('/youtube\.com\/v\/([^\&\?\/]+)/', $youtube_url, $matches)) {
+                            $video_id = $matches[1];
                         }
                         
                         if ($video_id): ?>
@@ -191,7 +189,7 @@ if (!empty($property['development_id'])) {
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <h3 class="fs-22 text-heading mb-4">Property Details</h3>
                 <div class="row">
-                    <?php if (is_visible('bedrooms', $visibility)): ?>
+                    <?php if (!empty($property['bedrooms'])): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-bed"></i></span>
@@ -202,7 +200,7 @@ if (!empty($property['development_id'])) {
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (is_visible('bathrooms', $visibility)): ?>
+                    <?php if (!empty($property['bathrooms'])): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-bath"></i></span>
@@ -213,7 +211,7 @@ if (!empty($property['development_id'])) {
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (is_visible('garage', $visibility)): ?>
+                    <?php if (!empty($property['garage'])): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-car"></i></span>
@@ -224,18 +222,18 @@ if (!empty($property['development_id'])) {
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (is_visible('size_sqm', $visibility)): ?>
+                    <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-ruler-combined"></i></span>
                             <div>
-                                <span class="d-block text-gray-light fs-13">Size</span>
-                                <span class="d-block text-heading font-weight-500"><?php echo $property['size_sqm']; ?> SqM</span>
+                                <span class="d-block text-gray-light fs-13">Build Size</span>
+                                <span class="d-block text-heading font-weight-500"><?php echo $property['size_sqm']; ?> m²</span>
                             </div>
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (is_visible('year_built', $visibility)): ?>
+                    <?php if (!empty($property['year_built'])): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-calendar-alt"></i></span>
@@ -246,6 +244,7 @@ if (!empty($property['development_id'])) {
                         </div>
                     </div>
                     <?php endif; ?>
+                    <?php if (!empty($property['property_type'])): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-home"></i></span>
@@ -255,6 +254,7 @@ if (!empty($property['development_id'])) {
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
                 </div>
               </div>
 
@@ -267,19 +267,16 @@ if (!empty($property['development_id'])) {
                             <?php if ($property['prop_id']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Property ID:</strong> <span class="text-primary"><?php echo htmlspecialchars($property['prop_id']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['prop_id']): ?>
-                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Property ID:</strong> <span class="text-primary"><?php echo htmlspecialchars($property['prop_id']); ?></span></li>
-                            <?php endif; ?>
-                            <?php if ($property['stories']): ?>
+                            <?php if (!empty($property['stories'])): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Floors:</strong> <span><?php echo $property['stories']; ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['furnished']): ?>
+                            <?php if (!empty($property['furnished'])): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Furnished:</strong> <span><?php echo htmlspecialchars($property['furnished']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['multi_family']): ?>
+                            <?php if (!empty($property['multi_family'])): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Multi-family:</strong> <span><?php echo htmlspecialchars($property['multi_family']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['plot_size']): ?>
+                            <?php if (!empty($property['plot_size']) && $property['plot_size'] > 0): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Plot Size:</strong> <span><?php echo (int)$property['plot_size']; ?> m²</span></li>
                             <?php endif; ?>
                         </ul>
@@ -310,7 +307,6 @@ if (!empty($property['development_id'])) {
 
               <!-- Features & Amenities -->
               <div class="row">
-                  <?php if (is_visible('features', $visibility)): ?>
                   <div class="col-md-6">
                     <div class="bg-white shadow-sm rounded-lg p-6 mb-6 h-100">
                         <h3 class="fs-20 text-heading mb-4">Features</h3>
@@ -328,8 +324,6 @@ if (!empty($property['development_id'])) {
                         <?php endif; ?>
                     </div>
                   </div>
-                  <?php endif; ?>
-                  <?php if (is_visible('amenities', $visibility)): ?>
                   <div class="col-md-6">
                     <div class="bg-white shadow-sm rounded-lg p-6 mb-6 h-100">
                         <h3 class="fs-20 text-heading mb-4">Amenities</h3>
@@ -347,10 +341,9 @@ if (!empty($property['development_id'])) {
                         <?php endif; ?>
                     </div>
                   </div>
-                  <?php endif; ?>
               </div>
 
-              <?php if (!empty($property['proximity']) && is_visible('proximity', $visibility)): ?>
+              <?php if (!empty($property['proximity'])): ?>
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <h3 class="fs-20 text-heading mb-4">In close proximity to</h3>
                 <p class="text-muted mb-0"><?php echo htmlspecialchars($property['proximity']); ?></p>
@@ -370,7 +363,7 @@ if (!empty($property['development_id'])) {
                     <form method="POST">
                         <input type="hidden" name="inquiry_form" value="1">
                         <input type="hidden" name="property_id" value="<?php echo $property['id']; ?>">
-                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; // Assuming csrf logic exists or handled by functions ?>"> 
+                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>"> 
                         
                         <div class="form-group mb-4">
                             <input type="text" name="name" class="form-control border-0 bg-gray-01" placeholder="Your Name" required>

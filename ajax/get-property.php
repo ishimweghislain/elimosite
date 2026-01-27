@@ -220,11 +220,11 @@ if (!is_array($amenities)) $amenities = [];
             </div>
         </div>
         <?php endif; ?>
-        <?php if ($property['size_sqm']): ?>
+        <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
         <div class="col-4">
             <div class="p-2 border rounded text-center">
                 <i class="fas fa-ruler-combined text-primary d-block mb-1"></i>
-                <span class="fs-13"><?php echo (int)$property['size_sqm']; ?> m²</span>
+                <span class="fs-13">Build: <?php echo (int)$property['size_sqm']; ?>m²</span>
             </div>
         </div>
         <?php endif; ?>
@@ -249,7 +249,7 @@ if (!is_array($amenities)) $amenities = [];
                 <?php if ($property['multi_family']): ?>
                     <li class="mb-2 d-flex justify-content-between"><strong>Multi-family:</strong> <span><?php echo htmlspecialchars($property['multi_family']); ?></span></li>
                 <?php endif; ?>
-                <?php if ($property['plot_size']): ?>
+                <?php if (!empty($property['plot_size']) && $property['plot_size'] > 0): ?>
                     <li class="mb-2 d-flex justify-content-between"><strong>Plot Size:</strong> <span><?php echo (int)$property['plot_size']; ?> m²</span></li>
                 <?php endif; ?>
                 <?php if ($property['zoning']): ?>
