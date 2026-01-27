@@ -215,7 +215,6 @@ if (!empty($property['development_id'])) {
         </a>
         <?php endif; ?>
     </div>
-锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋
     <!-- Key Specs -->
     <div class="row g-2 mb-4">
         <?php if ($property['bedrooms']): ?>
