@@ -29,6 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (update_record('property_features_master', ['is_active' => $new_status], $id)) {
             $success = 'Status updated successfully!';
         }
+    } elseif (isset($_POST['edit_item'])) {
+        $id = (int)$_POST['id'];
+        $name = clean_input($_POST['name']);
+        $type = clean_input($_POST['type']);
+        
+        if (!empty($name) && in_array($type, ['feature', 'amenity', 'ideal_for'])) {
+            if (update_record('property_features_master', ['name' => $name, 'type' => $type], $id)) {
+                $success = 'Item updated successfully!';
+            } else {
+                $error = 'Failed to update item.';
+            }
+        }
     } elseif (isset($_POST['delete_item'])) {
         $id = (int)$_POST['id'];
         
@@ -144,20 +156,28 @@ $ideal_fors = $stmt->fetchAll();
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?php echo date('M d, Y', strtotime($feature['created_at'])); ?></td>
-                                                <td>
-                                                    <form method="POST" class="d-inline">
-                                                        <input type="hidden" name="id" value="<?php echo $feature['id']; ?>">
-                                                        <input type="hidden" name="current_status" value="<?php echo $feature['is_active']; ?>">
-                                                        <button type="submit" name="toggle_status" class="btn btn-sm btn-outline-<?php echo $feature['is_active'] ? 'warning' : 'success'; ?>" title="Toggle Status">
-                                                            <i class="fas fa-<?php echo $feature['is_active'] ? 'eye-slash' : 'eye'; ?>"></i>
+                                                 <td>
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-item-btn" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#editItemModal"
+                                                                data-item='<?php echo json_encode($feature); ?>'>
+                                                            <i class="fas fa-edit"></i>
                                                         </button>
-                                                    </form>
-                                                    <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this feature?');">
-                                                        <input type="hidden" name="id" value="<?php echo $feature['id']; ?>">
-                                                        <button type="submit" name="delete_item" class="btn btn-sm btn-outline-danger" title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                        <form method="POST" class="d-inline ms-1">
+                                                            <input type="hidden" name="id" value="<?php echo $feature['id']; ?>">
+                                                            <input type="hidden" name="current_status" value="<?php echo $feature['is_active']; ?>">
+                                                            <button type="submit" name="toggle_status" class="btn btn-sm btn-outline-<?php echo $feature['is_active'] ? 'warning' : 'success'; ?>" title="Toggle Status">
+                                                                <i class="fas fa-<?php echo $feature['is_active'] ? 'eye-slash' : 'eye'; ?>"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" class="d-inline ms-1" onsubmit="return confirm('Are you sure you want to delete this feature?');">
+                                                            <input type="hidden" name="id" value="<?php echo $feature['id']; ?>">
+                                                            <button type="submit" name="delete_item" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -202,20 +222,28 @@ $ideal_fors = $stmt->fetchAll();
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?php echo date('M d, Y', strtotime($amenity['created_at'])); ?></td>
-                                                <td>
-                                                    <form method="POST" class="d-inline">
-                                                        <input type="hidden" name="id" value="<?php echo $amenity['id']; ?>">
-                                                        <input type="hidden" name="current_status" value="<?php echo $amenity['is_active']; ?>">
-                                                        <button type="submit" name="toggle_status" class="btn btn-sm btn-outline-<?php echo $amenity['is_active'] ? 'warning' : 'success'; ?>" title="Toggle Status">
-                                                            <i class="fas fa-<?php echo $amenity['is_active'] ? 'eye-slash' : 'eye'; ?>"></i>
+                                                 <td>
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-item-btn" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#editItemModal"
+                                                                data-item='<?php echo json_encode($amenity); ?>'>
+                                                            <i class="fas fa-edit"></i>
                                                         </button>
-                                                    </form>
-                                                    <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this amenity?');">
-                                                        <input type="hidden" name="id" value="<?php echo $amenity['id']; ?>">
-                                                        <button type="submit" name="delete_item" class="btn btn-sm btn-outline-danger" title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                        <form method="POST" class="d-inline ms-1">
+                                                            <input type="hidden" name="id" value="<?php echo $amenity['id']; ?>">
+                                                            <input type="hidden" name="current_status" value="<?php echo $amenity['is_active']; ?>">
+                                                            <button type="submit" name="toggle_status" class="btn btn-sm btn-outline-<?php echo $amenity['is_active'] ? 'warning' : 'success'; ?>" title="Toggle Status">
+                                                                <i class="fas fa-<?php echo $amenity['is_active'] ? 'eye-slash' : 'eye'; ?>"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" class="d-inline ms-1" onsubmit="return confirm('Are you sure you want to delete this amenity?');">
+                                                            <input type="hidden" name="id" value="<?php echo $amenity['id']; ?>">
+                                                            <button type="submit" name="delete_item" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -248,16 +276,24 @@ $ideal_fors = $stmt->fetchAll();
                                             <tr>
                                                 <td><?php echo htmlspecialchars($item['name']); ?></td>
                                                 <td><?php echo $item['is_active'] ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'; ?></td>
-                                                <td>
-                                                    <form method="POST" class="d-inline">
-                                                        <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                                        <input type="hidden" name="current_status" value="<?php echo $item['is_active']; ?>">
-                                                        <button type="submit" name="toggle_status" class="btn btn-sm btn-outline-secondary"><i class="fas fa-sync"></i></button>
-                                                    </form>
-                                                    <form method="POST" class="d-inline" onsubmit="return confirm('Delete?');">
-                                                        <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-                                                        <button type="submit" name="delete_item" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                                                    </form>
+                                                 <td>
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-item-btn" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#editItemModal"
+                                                                data-item='<?php echo json_encode($item); ?>'>
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <form method="POST" class="d-inline ms-1">
+                                                            <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
+                                                            <input type="hidden" name="current_status" value="<?php echo $item['is_active']; ?>">
+                                                            <button type="submit" name="toggle_status" class="btn btn-sm btn-outline-secondary"><i class="fas fa-sync"></i></button>
+                                                        </form>
+                                                        <form method="POST" class="d-inline ms-1" onsubmit="return confirm('Delete?');">
+                                                            <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
+                                                            <button type="submit" name="delete_item" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -274,6 +310,50 @@ $ideal_fors = $stmt->fetchAll();
         </div>
     </div>
 
+    <!-- Edit Item Modal -->
+    <div class="modal fade" id="editItemModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit_item_id">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" id="edit_item_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select name="type" id="edit_item_type" class="form-select" required>
+                            <option value="feature">Property Feature</option>
+                            <option value="amenity">Amenity</option>
+                            <option value="ideal_for">Ideal For Option</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="edit_item" class="btn btn-primary">Update Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editButtons = document.querySelectorAll('.edit-item-btn');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const item = JSON.parse(this.dataset.item);
+                    document.getElementById('edit_item_id').value = item.id;
+                    document.getElementById('edit_item_name').value = item.name;
+                    document.getElementById('edit_item_type').value = item.type;
+                });
+            });
+        });
+    </script>
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>

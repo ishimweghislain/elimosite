@@ -28,10 +28,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get properties (exclude drafts and separate developments)
 // Get properties (Regular users see their own, admins see all published)
-$where_clause = "WHERE status != 'draft' AND category != 'Developments'";
+$search = clean_input($_GET['search'] ?? '');
+$where = [];
+
 if (!is_admin()) {
-    $where_clause = "WHERE created_by = " . (int)$_SESSION['user_id'] . " AND category != 'Developments'";
+    $where[] = "created_by = " . (int)$_SESSION['user_id'];
+} else {
+    $where[] = "status != 'draft'";
 }
+
+$where[] = "category != 'Developments'";
+
+if (!empty($search)) {
+    $where[] = "(title LIKE '%$search%' OR location LIKE '%$search%' OR district LIKE '%$search%')";
+}
+
+$where_clause = !empty($where) ? "WHERE " . implode(' AND ', $where) : "";
 $properties = get_records('properties', $where_clause . " ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
@@ -56,9 +68,20 @@ $properties = get_records('properties', $where_clause . " ORDER BY created_at DE
                         </button>
                         <h1 class="h2 fw-bold text-dark mb-0">Properties Management</h1>
                     </div>
-                    <a href="property-edit-new.php" class="btn btn-primary shadow-sm">
-                        <i class="fas fa-plus me-2"></i>Add Property
-                    </a>
+                    <div class="d-flex">
+                        <form method="GET" class="me-3 d-flex">
+                            <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Search properties..." value="<?php echo htmlspecialchars($search); ?>">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <?php if (!empty($search)): ?>
+                                <a href="properties-new.php" class="btn btn-sm btn-outline-secondary ms-2">Clear</a>
+                            <?php endif; ?>
+                        </form>
+                        <a href="property-edit-new.php" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-plus me-2"></i>Add Property
+                        </a>
+                    </div>
                 </div>
 
                 <?php if (isset($_GET['success'])): ?>

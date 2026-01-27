@@ -39,6 +39,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (isset($_POST['edit_user'])) {
+        $id = (int)$_POST['id'];
+        $username = clean_input($_POST['username']);
+        $email = clean_input($_POST['email']);
+        $full_name = clean_input($_POST['full_name']);
+        $role = clean_input($_POST['role']);
+        $phone = clean_input($_POST['phone']);
+
+        if (empty($username) || empty($email) || empty($full_name)) {
+            $error = "All fields except phone/password are required.";
+        } else {
+            $data = [
+                'username' => $username,
+                'email' => $email,
+                'full_name' => $full_name,
+                'role' => $role,
+                'phone' => $phone
+            ];
+
+            if (!empty($_POST['password'])) {
+                $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            }
+
+            if (update_record('users', $data, $id)) {
+                $message = "User updated successfully!";
+            } else {
+                $error = "Failed to update user.";
+            }
+        }
+    }
+
     if (isset($_POST['delete_user'])) {
         $id = (int)$_POST['id'];
         if ($id == $_SESSION['user_id']) {
@@ -119,17 +150,25 @@ $users = get_records('users', [], 'created_at DESC');
                                                 </span>
                                             </td>
                                             <td><?php echo format_date($user['created_at'], 'M d, Y'); ?></td>
-                                            <td>
-                                                <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                                                    <form method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
-                                                        <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
-                                                        <button type="submit" name="delete_user" class="btn btn-sm btn-outline-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                <?php else: ?>
-                                                    <span class="badge bg-secondary">You</span>
-                                                <?php endif; ?>
+                                             <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-outline-primary edit-user-btn" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#editUserModal"
+                                                            data-user='<?php echo json_encode($user); ?>'>
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                                                        <form method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
+                                                            <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+                                                            <button type="submit" name="delete_user" class="btn btn-sm btn-outline-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-secondary ms-2 align-self-center">You</span>
+                                                    <?php endif; ?>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -187,6 +226,68 @@ $users = get_records('users', [], 'created_at DESC');
         </div>
     </div>
 
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit_user_id">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="full_name" id="edit_full_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" id="edit_username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" id="edit_email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password (Leave blank to keep current)</label>
+                        <input type="password" name="password" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select name="role" id="edit_role" class="form-select">
+                            <option value="user">Regular User (Draft Only)</option>
+                            <option value="admin">Administrator (Full Access)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone (Optional)</label>
+                        <input type="text" name="phone" id="edit_phone" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="edit_user" class="btn btn-primary">Update Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editButtons = document.querySelectorAll('.edit-user-btn');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const user = JSON.parse(this.dataset.user);
+                    document.getElementById('edit_user_id').value = user.id;
+                    document.getElementById('edit_full_name').value = user.full_name;
+                    document.getElementById('edit_username').value = user.username;
+                    document.getElementById('edit_email').value = user.email;
+                    document.getElementById('edit_role').value = user.role;
+                    document.getElementById('edit_phone').value = user.phone || '';
+                });
+            });
+        });
+    </script>
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>

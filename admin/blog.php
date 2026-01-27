@@ -17,10 +17,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get blog posts (exclude drafts)
 // Get blog posts (Regular users see their own, admins see all published/others)
-$where_clause = "WHERE status != 'draft'";
+$search = clean_input($_GET['search'] ?? '');
+$where = [];
+
 if (!is_admin()) {
-    $where_clause = "WHERE created_by = " . (int)$_SESSION['user_id'];
+    $where[] = "created_by = " . (int)$_SESSION['user_id'];
+} else {
+    $where[] = "status != 'draft'";
 }
+
+if (!empty($search)) {
+    $where[] = "(title LIKE '%$search%' OR category LIKE '%$search%')";
+}
+
+$where_clause = !empty($where) ? "WHERE " . implode(' AND ', $where) : "";
 $blog_posts = get_records('blog_posts', $where_clause . " ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
@@ -45,9 +55,20 @@ $blog_posts = get_records('blog_posts', $where_clause . " ORDER BY created_at DE
                         </button>
                         <h1 class="h2 fw-bold text-dark mb-0">Blog Management</h1>
                     </div>
-                    <a href="blog-edit.php" class="btn btn-primary shadow-sm">
-                        <i class="fas fa-plus me-2"></i>Add Blog Post
-                    </a>
+                    <div class="d-flex">
+                        <form method="GET" class="me-3 d-flex">
+                            <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Search blog posts..." value="<?php echo htmlspecialchars($search); ?>">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <?php if (!empty($search)): ?>
+                                <a href="blog.php" class="btn btn-sm btn-outline-secondary ms-2">Clear</a>
+                            <?php endif; ?>
+                        </form>
+                        <a href="blog-edit.php" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-plus me-2"></i>Add Blog Post
+                        </a>
+                    </div>
                 </div>
 
                 <?php if (isset($_GET['success'])): ?>

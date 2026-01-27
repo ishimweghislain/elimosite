@@ -21,11 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get developments
 // Get developments (Regular users see their own, admins see all)
-$where_clause = "ORDER BY created_at DESC";
+$search = clean_input($_GET['search'] ?? '');
+$where = [];
+
 if (!is_admin()) {
-    $where_clause = "WHERE created_by = " . (int)$_SESSION['user_id'] . " ORDER BY created_at DESC";
+    $where[] = "created_by = " . (int)$_SESSION['user_id'];
 }
-$developments = get_records('developments', $where_clause);
+
+if (!empty($search)) {
+    $where[] = "(title LIKE '%$search%' OR location LIKE '%$search%')";
+}
+
+$where_clause = !empty($where) ? "WHERE " . implode(' AND ', $where) : "";
+$developments = get_records('developments', $where_clause . " ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,9 +57,20 @@ $developments = get_records('developments', $where_clause);
                         </button>
                         <h1 class="h2 fw-bold text-dark mb-0">Developments Management</h1>
                     </div>
-                    <a href="development-edit.php" class="btn btn-primary shadow-sm">
-                        <i class="fas fa-plus me-2"></i>Add Development
-                    </a>
+                    <div class="d-flex">
+                        <form method="GET" class="me-3 d-flex">
+                            <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Search developments..." value="<?php echo htmlspecialchars($search); ?>">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <?php if (!empty($search)): ?>
+                                <a href="manage-developments.php" class="btn btn-sm btn-outline-secondary ms-2">Clear</a>
+                            <?php endif; ?>
+                        </form>
+                        <a href="development-edit.php" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-plus me-2"></i>Add Development
+                        </a>
+                    </div>
                 </div>
 
                 <?php if (isset($_GET['success'])): ?>

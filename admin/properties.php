@@ -19,9 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $page = (int)($_GET['page'] ?? 1);
 $per_page = 10;
 // Get properties (Regular users see their own, admins see all)
+$search = clean_input($_GET['search'] ?? '');
 $where = [];
 if (!is_admin()) {
-    $where = ['created_by' => $_SESSION['user_id']];
+    $where['created_by'] = $_SESSION['user_id'];
+}
+if (!empty($search)) {
+    $where['search'] = $search;
 }
 $properties_data = get_properties($where, $page, $per_page);
 $properties = $properties_data['properties'];
@@ -55,7 +59,16 @@ if (isset($_GET['edit'])) {
                         </button>
                         <h1 class="h2 mb-0">Manage Properties</h1>
                     </div>
-                    <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="d-flex align-items-center">
+                        <form method="GET" class="me-3 d-flex">
+                            <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Search properties..." value="<?php echo htmlspecialchars($search); ?>">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <?php if (!empty($search)): ?>
+                                <a href="properties.php" class="btn btn-sm btn-outline-secondary ms-2">Clear</a>
+                            <?php endif; ?>
+                        </form>
                         <div class="btn-group me-2">
                             <a href="properties.php?action=add" class="btn btn-primary">
                                 <i class="fas fa-plus me-1"></i> Add Property

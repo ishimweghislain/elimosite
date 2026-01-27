@@ -222,6 +222,15 @@ function get_properties($filters = [], $page = 1, $per_page = 10) {
         $params[] = $filters['province'];
     }
     
+    if (!empty($filters['search'])) {
+        $sql .= " AND (title LIKE ? OR location LIKE ? OR province LIKE ? OR district LIKE ?)";
+        $search_param = '%' . $filters['search'] . '%';
+        $params[] = $search_param;
+        $params[] = $search_param;
+        $params[] = $search_param;
+        $params[] = $search_param;
+    }
+
     if (!empty($filters['location'])) {
         $sql .= " AND (location LIKE ? OR province LIKE ? OR district LIKE ?)";
         $location_param = '%' . $filters['location'] . '%';
