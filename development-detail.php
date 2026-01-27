@@ -163,11 +163,15 @@ $inquiry_result = handle_property_inquiry();
                         <form method="POST">
                             <input type="hidden" name="inquiry_form" value="1">
                             <input type="hidden" name="development_id" value="<?php echo $id; ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                             <div class="form-group mb-4">
                                 <input type="text" name="name" class="form-control border-0 bg-gray-01" placeholder="Your Name" required>
                             </div>
                             <div class="form-group mb-4">
                                 <input type="email" name="email" class="form-control border-0 bg-gray-01" placeholder="Your Email" required>
+                            </div>
+                            <div class="form-group mb-4">
+                                <input type="tel" name="phone" class="form-control border-0 bg-gray-01" placeholder="Your Phone Number">
                             </div>
                             <div class="form-group mb-4">
                                 <textarea name="message" class="form-control border-0 bg-gray-01" rows="4" placeholder="Request more info about this project..." required></textarea>

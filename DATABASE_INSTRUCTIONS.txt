@@ -39,6 +39,9 @@ ALTER TABLE `property_features_master` MODIFY `type` ENUM('feature','amenity','i
 
 -- 4. Support development inquiries
 ALTER TABLE `property_inquiries` ADD `development_id` INT(11) NULL DEFAULT NULL AFTER `property_id`;
+ALTER TABLE `property_inquiries` MODIFY `property_id` INT(11) NULL DEFAULT NULL;
+ALTER TABLE `property_inquiries` DROP FOREIGN KEY `property_inquiries_ibfk_1`;
+ALTER TABLE `property_inquiries` ADD CONSTRAINT `property_inquiries_ibfk_1` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE;
 
 --- END SQL ---
 

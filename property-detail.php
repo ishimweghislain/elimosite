@@ -16,6 +16,7 @@ $inquiry_result = handle_property_inquiry();
 // Development Check
 $development = null;
 if (!empty($property['development_id'])) {
+    global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM developments WHERE id = ?");
     $stmt->execute([$property['development_id']]);
     $development = $stmt->fetch();
@@ -50,6 +51,14 @@ if (!empty($property['development_id'])) {
             <div class="col-md-8">
               <h1 class="fs-30 lh-1 mb-2 text-primary font-weight-600"><?php echo htmlspecialchars($property['title']); ?></h1>
               <p class="mb-0 text-gray-light"><i class="fal fa-map-marker-alt mr-2"></i><?php echo htmlspecialchars($property['location']); ?></p>
+              <?php if ($development): ?>
+              <div class="mt-4 d-flex align-items-center">
+                  <span class="badge badge-yellow-opacity-01 text-yellow border border-yellow mr-3 px-3 py-2 fs-12 text-uppercase font-weight-700">Project Unit</span>
+                  <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="text-heading font-weight-600 hover-primary">
+                      <i class="fas fa-building mr-1"></i> Part of <?php echo htmlspecialchars($development['title']); ?>
+                  </a>
+              </div>
+              <?php endif; ?>
             </div>
             <div class="col-md-4 text-md-right mt-4 mt-md-0">
               <?php if (!empty($property['price']) && $property['price'] > 0): ?>
