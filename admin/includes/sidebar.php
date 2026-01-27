@@ -188,7 +188,7 @@
                 <i class="fas fa-home"></i> 
                 <span>Properties</span>
             </a>
-            <a href="developments.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'developments.php' ? 'active' : ''; ?>">
+            <a href="manage-developments.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'manage-developments.php' || basename($_SERVER['PHP_SELF']) === 'development-edit.php' ? 'active' : ''; ?>">
                 <i class="fas fa-hard-hat"></i> 
                 <span>Developments</span>
             </a>

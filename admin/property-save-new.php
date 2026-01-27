@@ -47,8 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'ideal_for' => clean_input($_POST['ideal_for'] ?? ''),
             'proximity' => clean_input($_POST['proximity'] ?? ''),
             'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
-            'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([])
+            'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([]),
+            'development_id' => !empty($_POST['development_id']) ? intval($_POST['development_id']) : NULL,
+            'field_visibility' => isset($_POST['visibility']) ? json_encode($_POST['visibility']) : json_encode([])
         ];
+        
+        // Auto-generate Property ID if not set
+        if (!$is_edit && empty($data['prop_id'])) {
+            global $pdo;
+            $stmt = $pdo->query("SELECT MAX(id) as max_id FROM properties");
+            $next_id = ($stmt->fetch()['max_id'] ?? 0) + 1;
+            $data['prop_id'] = 'P' . str_pad($next_id, 5, '0', STR_PAD_LEFT);
+        }
         
         // Handle image upload
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {

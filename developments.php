@@ -1,22 +1,29 @@
 <?php
 require_once 'includes/config.php';
 
-// Get developments (properties with category 'Developments')
+// Get developments from separate table
 $page = (int)($_GET['page'] ?? 1);
 $per_page = 12;
+$offset = ($page - 1) * $per_page;
 
-$filters = ['category' => 'Developments'];
+$where = "WHERE 1=1";
+$params = [];
+
 if (!empty($_GET['province'])) {
-    $filters['province'] = $_GET['province'];
-}
-if (!empty($_GET['status'])) {
-    $filters['status'] = $_GET['status'];
+    $where .= " AND province = ?";
+    $params[] = $_GET['province'];
 }
 
-$developments_data = get_properties($filters, $page, $per_page);
-$developments = $developments_data['properties'];
-$total = $developments_data['total'];
-$total_pages = $developments_data['total_pages'];
+global $pdo;
+$count_stmt = $pdo->prepare("SELECT COUNT(*) FROM developments $where");
+$count_stmt->execute($params);
+$total = $count_stmt->fetchColumn();
+
+$stmt = $pdo->prepare("SELECT * FROM developments $where ORDER BY created_at DESC LIMIT $per_page OFFSET $offset");
+$stmt->execute($params);
+$developments = $stmt->fetchAll();
+
+$total_pages = ceil($total / $per_page);
 ?>
 <!doctype html>
 <html lang="en">
@@ -116,14 +123,6 @@ $total_pages = $developments_data['total_pages'];
                     <option <?php echo ($_GET['province'] ?? '') === 'Western Province' ? 'selected' : ''; ?>>Western Province</option>
                   </select>
                 </div>
-                <div class="form-group mb-2 mb-md-0 mr-md-3 flex-grow-1" style="min-width: 150px;">
-                  <label class="sr-only">Status</label>
-                  <select class="form-control selectpicker w-100" title="Status" name="status">
-                    <option value="" <?php echo empty($_GET['status']) ? 'selected' : ''; ?>>All Status</option>
-                    <option value="for-rent" <?php echo ($_GET['status'] ?? '') === 'for-rent' ? 'selected' : ''; ?>>To Let</option>
-                    <option value="for-sale" <?php echo ($_GET['status'] ?? '') === 'for-sale' ? 'selected' : ''; ?>>For Sale</option>
-                  </select>
-                </div>
                 <button type="submit" class="btn btn-primary px-6 mb-2 mb-md-0">Search</button>
               </form>
             </div>
@@ -140,39 +139,37 @@ $total_pages = $developments_data['total_pages'];
           
           <div class="slick-slider mx-n3" data-slick-options='{"slidesToShow": 3, "slidesToScroll": 1, "autoplay": false, "infinite": true, "arrows": true, "dots": false, "responsive": [{"breakpoint": 1200, "settings": {"slidesToShow": 2}}, {"breakpoint": 768, "settings": {"slidesToShow": 1}}]}'>
             <?php if (!empty($developments)): ?>
-              <?php foreach ($developments as $property): ?>
+              <?php foreach ($developments as $dev): ?>
                 <div class="px-3">
                   <div class="card border-0 shadow-hover-1 card-hover-primary mb-6">
                     <div class="card-img-top position-relative">
-                      <img src="<?php echo !empty($property['image_main']) ? 'images/' . $property['image_main'] : 'images/property-placeholder.jpg'; ?>" 
-                           alt="<?php echo htmlspecialchars($property['title']); ?>">
+                      <img src="<?php echo !empty($dev['image_main']) ? 'images/' . $dev['image_main'] : 'images/property-placeholder.jpg'; ?>" 
+                           alt="<?php echo htmlspecialchars($dev['title']); ?>">
                       <div class="card-img-overlay p-2">
-                        <span class="badge badge-yellow"><?php echo htmlspecialchars($property['status']); ?></span>
+                        <span class="badge badge-primary">Project</span>
                       </div>
-                      <button class="btn btn-primary btn-sm rounded-lg view-details-btn" data-id="<?php echo $property['id']; ?>" data-category="<?php echo htmlspecialchars($property['category']); ?>">
-                          <i class="far fa-eye mr-1"></i> View Details
-                      </button>
+                      <a href="development-detail.php?id=<?php echo $dev['id']; ?>" class="btn btn-primary btn-sm rounded-lg view-project-btn">
+                          <i class="far fa-eye mr-1"></i> View Project
+                      </a>
                     </div>
                     <div class="card-body px-5 pt-3 pb-5">
                       <h3 class="fs-18 text-heading lh-194 mb-1" style="min-height: 54px;">
-                        <a href="property-detail.php?id=<?php echo $property['id']; ?>" class="text-heading hover-primary">
-                          <?php echo htmlspecialchars($property['title']); ?>
+                        <a href="development-detail.php?id=<?php echo $dev['id']; ?>" class="text-heading hover-primary">
+                          <?php echo htmlspecialchars($dev['title']); ?>
                         </a>
                       </h3>
-                      <p class="mb-2 font-weight-500 text-gray-light fs-14"><?php echo htmlspecialchars($property['location']); ?></p>
-                      <p class="mb-3 text-muted fs-14" style="flex-grow: 1; min-height: 52px;"><?php echo truncate_text($property['description'], 120); ?></p>
+                      <p class="mb-2 font-weight-500 text-gray-light fs-14"><i class="fas fa-map-marker-alt mr-2 text-primary"></i><?php echo htmlspecialchars($dev['location']); ?></p>
+                      <p class="mb-3 text-muted fs-14" style="flex-grow: 1; min-height: 52px;"><?php echo truncate_text($dev['description'], 120); ?></p>
                       <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
                         <div class="d-flex flex-wrap">
-                          <?php if ($property['bedrooms']): ?>
-                            <span class="badge badge-light mr-1"><i class="fas fa-bed mr-1 text-primary"></i><?php echo $property['bedrooms']; ?></span>
-                          <?php endif; ?>
-                          <?php if ($property['size_sqm']): ?>
-                            <span class="badge badge-light"><i class="fas fa-ruler-combined mr-1 text-primary"></i><?php echo (int)$property['size_sqm']; ?>m²</span>
-                          <?php endif; ?>
+                            <?php 
+                            global $pdo;
+                            $count = $pdo->prepare("SELECT COUNT(*) FROM properties WHERE development_id = ?");
+                            $count->execute([$dev['id']]);
+                            $units = $count->fetchColumn();
+                            ?>
+                            <span class="badge badge-light p-2"><i class="fas fa-home mr-1 text-primary"></i><?php echo $units; ?> Units Available</span>
                         </div>
-                        <?php if ($property['price']): ?>
-                          <span class="text-primary font-weight-bold"><?php echo format_price($property['price']); ?></span>
-                        <?php endif; ?>
                       </div>
                     </div>
                   </div>

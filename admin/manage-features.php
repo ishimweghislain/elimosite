@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = clean_input($_POST['name']);
         $type = clean_input($_POST['type']);
         
-        if (!empty($name) && in_array($type, ['feature', 'amenity'])) {
+        if (!empty($name) && in_array($type, ['feature', 'amenity', 'ideal_for'])) {
             $data = [
                 'name' => $name,
                 'type' => $type,
@@ -47,6 +47,9 @@ $features = $stmt->fetchAll();
 
 $stmt = $pdo->query("SELECT * FROM property_features_master WHERE type = 'amenity' ORDER BY name ASC");
 $amenities = $stmt->fetchAll();
+
+$stmt = $pdo->query("SELECT * FROM property_features_master WHERE type = 'ideal_for' ORDER BY name ASC");
+$ideal_fors = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,6 +100,7 @@ $amenities = $stmt->fetchAll();
                                 <select name="type" class="form-select" required>
                                     <option value="feature">Property Feature</option>
                                     <option value="amenity">Amenity</option>
+                                    <option value="ideal_for">Ideal For Option</option>
                                 </select>
                             </div>
                             <div class="col-md-3 d-flex align-items-end">
@@ -220,6 +224,48 @@ $amenities = $stmt->fetchAll();
                             </div>
                         <?php else: ?>
                             <p class="text-muted text-center py-4">No amenities added yet.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <!-- Ideal For Section -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>Ideal For Options</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($ideal_fors)): ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($ideal_fors as $item): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($item['name']); ?></td>
+                                                <td><?php echo $item['is_active'] ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'; ?></td>
+                                                <td>
+                                                    <form method="POST" class="d-inline">
+                                                        <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
+                                                        <input type="hidden" name="current_status" value="<?php echo $item['is_active']; ?>">
+                                                        <button type="submit" name="toggle_status" class="btn btn-sm btn-outline-secondary"><i class="fas fa-sync"></i></button>
+                                                    </form>
+                                                    <form method="POST" class="d-inline" onsubmit="return confirm('Delete?');">
+                                                        <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
+                                                        <button type="submit" name="delete_item" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted text-center py-4">No 'Ideal For' options added yet.</p>
                         <?php endif; ?>
                     </div>
                 </div>

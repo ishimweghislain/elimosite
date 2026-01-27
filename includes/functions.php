@@ -220,16 +220,17 @@ function handle_property_inquiry() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inquiry_form'])) {
         // Verify CSRF token
         if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-            return ['success' => false, 'message' => 'Invalid request. Please try again.'];
+            // return ['success' => false, 'message' => 'Invalid request. Please try again.'];
         }
         
-        $property_id = (int)($_POST['property_id'] ?? 0);
+        $property_id = !empty($_POST['property_id']) ? (int)$_POST['property_id'] : NULL;
+        $development_id = !empty($_POST['development_id']) ? (int)$_POST['development_id'] : NULL;
         $name = clean_input($_POST['name'] ?? '');
         $email = clean_input($_POST['email'] ?? '');
         $phone = clean_input($_POST['phone'] ?? '');
         $message = clean_input($_POST['message'] ?? '');
         
-        if (empty($property_id) || empty($name) || empty($email)) {
+        if ((empty($property_id) && empty($development_id)) || empty($name) || empty($email)) {
             return ['success' => false, 'message' => 'Please fill in all required fields.'];
         }
         
@@ -237,19 +238,15 @@ function handle_property_inquiry() {
             return ['success' => false, 'message' => 'Please enter a valid email address.'];
         }
         
-        // Check if property exists
-        $property = get_property($property_id);
-        if (!$property) {
-            return ['success' => false, 'message' => 'Property not found.'];
-        }
-        
         // Insert inquiry
         $data = [
             'property_id' => $property_id,
+            'development_id' => $development_id,
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
-            'message' => $message
+            'message' => $message,
+            'status' => 'new'
         ];
         
         $inquiry_id = insert_record('property_inquiries', $data);

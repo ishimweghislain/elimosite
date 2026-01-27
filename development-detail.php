@@ -1,0 +1,219 @@
+<?php
+require_once 'includes/config.php';
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+global $pdo;
+$stmt = $pdo->prepare("SELECT * FROM developments WHERE id = ?");
+$stmt->execute([$id]);
+$dev = $stmt->fetch();
+
+if (!$dev) {
+    header('Location: developments.php');
+    exit;
+}
+
+// Get visibility
+$visibility = json_decode($dev['field_visibility'] ?? '{}', true) ?: [];
+function is_visible($field, $visibility) {
+    if (in_array($field, ['title', 'location', 'province', 'district', 'description'])) return true;
+    return !isset($visibility[$field]) || $visibility[$field] == '1';
+}
+
+// Fetch units/listings
+$units_stmt = $pdo->prepare("SELECT * FROM properties WHERE development_id = ? AND status != 'draft' ORDER BY created_at DESC");
+$units_stmt->execute([$id]);
+$units = $units_stmt->fetchAll();
+
+// Handle inquiry
+$inquiry_result = handle_property_inquiry();
+?>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="<?php echo truncate_text($dev['description'], 160); ?>">
+    <title><?php echo htmlspecialchars($dev['title']); ?> - Project Details</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="vendors/fontawesome-pro-5/css/all.css">
+    <link rel="stylesheet" href="vendors/bootstrap-select/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="vendors/slick/slick.min.css">
+    <link rel="stylesheet" href="vendors/magnific-popup/magnific-popup.min.css">
+    <link rel="stylesheet" href="vendors/animate.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="icon" href="images/favicon.png">
+    <style>
+        .hero-banner { height: 500px; position: relative; }
+        .hero-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 60px 0; }
+        .unit-card:hover { transform: translateY(-5px); transition: 0.3s; }
+        .gallery-item img { height: 200px; width: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <?php include 'header.php'; ?>
+
+    <main id="content">
+      <!-- Project Hero -->
+      <section class="hero-banner">
+          <img src="images/<?php echo !empty($dev['image_main']) ? $dev['image_main'] : 'property-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($dev['title']); ?>">
+          <div class="hero-overlay">
+              <div class="container text-white">
+                  <span class="badge badge-primary mb-3">Development Project</span>
+                  <h1 class="fs-40 lh-1 mb-2 font-weight-700 text-white"><?php echo htmlspecialchars($dev['title']); ?></h1>
+                  <p class="fs-18 mb-0 opacity-09"><i class="fal fa-map-marker-alt mr-2"></i><?php echo htmlspecialchars($dev['location']); ?>, <?php echo $dev['district']; ?></p>
+              </div>
+          </div>
+      </section>
+
+      <section class="py-12 bg-gray-01">
+        <div class="container">
+          <div class="row">
+            <!-- Left Content -->
+            <div class="col-lg-8">
+              
+              <!-- Tabs / Overview -->
+              <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+                <h3 class="fs-22 text-heading mb-4">About this Project</h3>
+                <div class="text-gray-light lh-2 mb-6">
+                    <?php echo nl2br(htmlspecialchars($dev['description'])); ?>
+                </div>
+
+                <?php if (!empty($dev['about_location']) && is_visible('about_location', $visibility)): ?>
+                <div class="mt-5 pt-5 border-top">
+                    <h5 class="fs-18 mb-3 font-weight-600">The Environment</h5>
+                    <p class="text-muted"><?php echo nl2br(htmlspecialchars($dev['about_location'])); ?></p>
+                </div>
+                <?php endif; ?>
+              </div>
+
+              <!-- Media Section -->
+              <?php if ((!empty($dev['youtube_url']) && is_visible('youtube_url', $visibility)) || (!empty($dev['instagram_url']) && is_visible('instagram_url', $visibility))): ?>
+              <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+                <h3 class="fs-22 text-heading mb-4">Gallery & Video</h3>
+                <div class="row g-3">
+                    <?php if (!empty($dev['youtube_url']) && is_visible('youtube_url', $visibility)): ?>
+                    <div class="col-12 mb-4">
+                        <div class="rounded-lg overflow-hidden position-relative" style="padding-bottom: 56.25%; height:0;">
+                            <?php 
+                            $yt_url = $dev['youtube_url'];
+                            preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $yt_url, $match);
+                            $video_id = $match[1] ?? '';
+                            ?>
+                            <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/<?php echo $video_id; ?>" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php 
+                    $gallery = json_decode($dev['images'] ?? '[]', true);
+                    foreach ($gallery as $img): ?>
+                        <div class="col-md-4 mb-3">
+                            <a href="images/<?php echo $img; ?>" class="gallery-item-link">
+                                <div class="gallery-item"><img src="images/<?php echo $img; ?>"></div>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+              </div>
+              <?php endif; ?>
+
+              <!-- Project Units / Listings -->
+              <div id="listings" class="mb-10">
+                  <h3 class="fs-24 text-heading mb-5">Available Units in this Development</h3>
+                  <div class="row">
+                      <?php if (!empty($units)): ?>
+                          <?php foreach ($units as $unit): ?>
+                              <div class="col-md-6 mb-6">
+                                  <div class="card border-0 shadow-sm unit-card h-100">
+                                      <div class="position-relative">
+                                          <img src="images/<?php echo $unit['image_main'] ?: 'property-placeholder.jpg'; ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                          <div class="card-img-overlay p-2">
+                                              <span class="badge badge-yellow"><?php echo ucfirst($unit['status']); ?></span>
+                                          </div>
+                                      </div>
+                                      <div class="card-body p-4">
+                                          <h5 class="fs-18 mb-1"><a href="property-detail.php?id=<?php echo $unit['id']; ?>" class="text-heading"><?php echo htmlspecialchars($unit['title']); ?></a></h5>
+                                          <p class="text-primary font-weight-bold mb-3"><?php echo format_price($unit['price']); ?></p>
+                                          <div class="d-flex border-top pt-3 text-muted fs-14">
+                                              <?php if($unit['bedrooms']): ?><span class="mr-4"><i class="fas fa-bed mr-2 text-primary"></i><?php echo $unit['bedrooms']; ?> Beds</span><?php endif; ?>
+                                              <?php if($unit['size_sqm']): ?><span><i class="fas fa-ruler-combined mr-2 text-primary"></i><?php echo (int)$unit['size_sqm']; ?> m²</span><?php endif; ?>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          <?php endforeach; ?>
+                      <?php else: ?>
+                          <div class="col-12 py-5 text-center bg-white rounded shadow-sm">
+                              <p class="text-muted mb-0">No units currently listed. Please contact us for more information.</p>
+                          </div>
+                      <?php endif; ?>
+                  </div>
+              </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 100px; z-index: 1;">
+                    <!-- Inquiry Card -->
+                    <div class="bg-white shadow rounded-lg p-6 mb-6">
+                        <h4 class="mb-4">Project Inquiry</h4>
+                        <?php if (isset($inquiry_result)): ?>
+                            <div class="alert alert-<?php echo $inquiry_result['success'] ? 'success' : 'danger'; ?>">
+                                <?php echo $inquiry_result['message']; ?>
+                            </div>
+                        <?php endif; ?>
+                        <form method="POST">
+                            <input type="hidden" name="inquiry_form" value="1">
+                            <input type="hidden" name="development_id" value="<?php echo $id; ?>">
+                            <div class="form-group mb-4">
+                                <input type="text" name="name" class="form-control border-0 bg-gray-01" placeholder="Your Name" required>
+                            </div>
+                            <div class="form-group mb-4">
+                                <input type="email" name="email" class="form-control border-0 bg-gray-01" placeholder="Your Email" required>
+                            </div>
+                            <div class="form-group mb-4">
+                                <textarea name="message" class="form-control border-0 bg-gray-01" rows="4" placeholder="Request more info about this project..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block btn-lg shadow-none">Send Request</button>
+                        </form>
+                    </div>
+
+                    <!-- Project Features Summary -->
+                    <div class="bg-white shadow-sm rounded-lg p-6">
+                        <h5 class="mb-4 font-weight-600">Project Highlights</h5>
+                        <ul class="list-unstyled mb-0 fs-14">
+                            <?php if ($dev['ideal_for'] && is_visible('ideal_for', $visibility)): ?>
+                                <li class="mb-3"><strong>Ideal For:</strong> <span class="d-block text-muted"><?php echo htmlspecialchars($dev['ideal_for']); ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($dev['proximity'] && is_visible('proximity', $visibility)): ?>
+                                <li class="mb-3"><strong>Proximity:</strong> <span class="d-block text-muted"><?php echo htmlspecialchars($dev['proximity']); ?></span></li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <?php include 'includes/footer.php'; ?>
+
+    <script src="vendors/jquery.min.js"></script>
+    <script src="vendors/bootstrap/bootstrap.bundle.js"></script>
+    <script src="vendors/magnific-popup/jquery.magnific-popup.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.gallery-item-link').magnificPopup({
+                type: 'image',
+                gallery: { enabled: true }
+            });
+        });
+    </script>
+  </body>
+</html>

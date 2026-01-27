@@ -1,0 +1,45 @@
+### MANUAL DATABASE UPDATES FOR ELIMO REAL ESTATE ###
+
+Please follow these steps in your cPanel phpMyAdmin:
+
+1. Open your database (elimo_real_estate).
+2. Click on the "SQL" tab at the top.
+3. Copy and paste the following SQL commands and click "Go":
+
+--- BEGIN SQL ---
+
+-- 1. Create the developments table
+CREATE TABLE `developments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `location` varchar(255) NOT NULL,
+  `province` varchar(50) DEFAULT NULL,
+  `district` varchar(50) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `about_location` text DEFAULT NULL,
+  `features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `amenities` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `ideal_for` varchar(255) DEFAULT NULL,
+  `proximity` text DEFAULT NULL,
+  `youtube_url` varchar(255) DEFAULT NULL,
+  `instagram_url` varchar(255) DEFAULT NULL,
+  `image_main` varchar(255) DEFAULT NULL,
+  `images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `field_visibility` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 2. Add development_id to properties table
+ALTER TABLE `properties` ADD `development_id` INT(11) NULL DEFAULT NULL AFTER `id`;
+
+-- 3. Update features master to support more types
+ALTER TABLE `property_features_master` MODIFY `type` ENUM('feature','amenity','ideal_for') NOT NULL DEFAULT 'feature';
+
+-- 4. Support development inquiries
+ALTER TABLE `property_inquiries` ADD `development_id` INT(11) NULL DEFAULT NULL AFTER `property_id`;
+
+--- END SQL ---
+
+4. If you see a success message, the database is ready!

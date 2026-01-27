@@ -6,8 +6,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$property_id = isset($_POST['property_id']) ? (int)$_POST['property_id'] : 0;
-$full_name = clean_input($_POST['full_name'] ?? '');
+$property_id = isset($_POST['property_id']) && !empty($_POST['property_id']) ? (int)$_POST['property_id'] : NULL;
+$development_id = isset($_POST['development_id']) && !empty($_POST['development_id']) ? (int)$_POST['development_id'] : NULL;
+
+$full_name = clean_input($_POST['full_name'] ?? ($_POST['name'] ?? ''));
 $email = clean_input($_POST['email'] ?? '');
 $phone = clean_input($_POST['phone'] ?? '');
 $message = clean_input($_POST['message'] ?? '');
@@ -24,6 +26,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 $data = [
     'property_id' => $property_id,
+    'development_id' => $development_id,
     'name' => $full_name,
     'email' => $email,
     'phone' => $phone,

@@ -12,6 +12,21 @@ if (!$property || $property['status'] === 'draft') {
 // Handle inquiry form
 $inquiry_result = handle_property_inquiry();
 
+// Visibility Logic
+$visibility = json_decode($property['field_visibility'] ?? '{}', true) ?: [];
+function is_visible($field, $visibility) {
+    // Core fields always visible
+    if (in_array($field, ['title', 'location', 'description', 'category'])) return true;
+    return !isset($visibility[$field]) || $visibility[$field] == '1';
+}
+
+// Development Check
+$development = null;
+if (!empty($property['development_id'])) {
+    $stmt = $pdo->prepare("SELECT id, title FROM developments WHERE id = ?");
+    $stmt->execute([$property['development_id']]);
+    $development = $stmt->fetch();
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -44,8 +59,12 @@ $inquiry_result = handle_property_inquiry();
               <p class="mb-0 text-gray-light"><i class="fal fa-map-marker-alt mr-2"></i><?php echo htmlspecialchars($property['location']); ?></p>
             </div>
             <div class="col-md-4 text-md-right mt-4 mt-md-0">
-              <p class="fs-22 text-heading font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
-              <span class="badge badge-primary mt-2"><?php echo ucfirst($property['status']); ?></span>
+              <?php if (is_visible('price', $visibility)): ?>
+                <p class="fs-22 text-heading font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
+              <?php endif; ?>
+              <?php if (is_visible('status', $visibility)): ?>
+                <span class="badge badge-primary mt-2"><?php echo ($property['status'] === 'under-construction') ? 'Off-plan Purchase' : ucwords(str_replace('-', ' ', $property['status'])); ?></span>
+              <?php endif; ?>
             </div>
           </div>
         </div>
@@ -70,6 +89,23 @@ $inquiry_result = handle_property_inquiry();
             <!-- Main Details -->
             <div class="col-lg-8 mb-6 mb-lg-0">
               
+              <?php if ($development): ?>
+              <div class="bg-primary text-white rounded-lg p-5 mb-8 d-flex align-items-center shadow-lg animate__animated animate__pulse animate__infinite">
+                  <div class="mr-4">
+                      <i class="fas fa-city fa-3x"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                      <h4 class="text-white mb-1 font-weight-700">Project Development</h4>
+                      <p class="mb-0 opacity-09">This property is a prime unit within the <strong><?php echo htmlspecialchars($development['title']); ?></strong> project.</p>
+                  </div>
+                  <div class="text-right">
+                      <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-white btn-sm font-weight-600 px-4">
+                          View Project <i class="fas fa-arrow-right ml-2 text-primary"></i>
+                      </a>
+                  </div>
+              </div>
+              <?php endif; ?>
+
               <!-- Description -->
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <!-- YouTube Video Embed & Instagram Link -->
@@ -126,7 +162,7 @@ $inquiry_result = handle_property_inquiry();
                     </div>
                     <?php endif; ?>
                     
-                    <?php if (!empty($property['instagram_url'])): ?>
+                    <?php if (!empty($property['instagram_url']) && is_visible('instagram_url', $visibility)): ?>
                     <div class="mb-3">
                         <a href="<?php echo fix_url($property['instagram_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-primary-opacity-01 border border-primary text-primary text-decoration-none hover-shine">
                             <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; border-radius: 50%;">
@@ -154,6 +190,7 @@ $inquiry_result = handle_property_inquiry();
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <h3 class="fs-22 text-heading mb-4">Property Details</h3>
                 <div class="row">
+                    <?php if (is_visible('bedrooms', $visibility)): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-bed"></i></span>
@@ -163,6 +200,8 @@ $inquiry_result = handle_property_inquiry();
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
+                    <?php if (is_visible('bathrooms', $visibility)): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-bath"></i></span>
@@ -172,15 +211,19 @@ $inquiry_result = handle_property_inquiry();
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
+                    <?php if (is_visible('garage', $visibility)): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-car"></i></span>
                             <div>
-                                <span class="d-block text-gray-light fs-13">Garage</span>
+                                <span class="d-block text-gray-light fs-13">Parking Space</span>
                                 <span class="d-block text-heading font-weight-500"><?php echo $property['garage']; ?></span>
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
+                    <?php if (is_visible('size_sqm', $visibility)): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-ruler-combined"></i></span>
@@ -190,6 +233,8 @@ $inquiry_result = handle_property_inquiry();
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
+                    <?php if (is_visible('year_built', $visibility)): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-calendar-alt"></i></span>
@@ -199,6 +244,8 @@ $inquiry_result = handle_property_inquiry();
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
+                    <?php if (is_visible('property_type', $visibility)): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-home"></i></span>
@@ -208,6 +255,7 @@ $inquiry_result = handle_property_inquiry();
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
                 </div>
               </div>
 
@@ -220,29 +268,29 @@ $inquiry_result = handle_property_inquiry();
                             <?php if ($property['prop_id']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Property ID:</strong> <span class="text-primary"><?php echo htmlspecialchars($property['prop_id']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['stories']): ?>
-                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Stories:</strong> <span><?php echo $property['stories']; ?></span></li>
+                            <?php if ($property['stories'] && is_visible('stories', $visibility)): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Floors:</strong> <span><?php echo $property['stories']; ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['furnished']): ?>
+                            <?php if ($property['furnished'] && is_visible('furnished', $visibility)): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Furnished:</strong> <span><?php echo htmlspecialchars($property['furnished']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['multi_family']): ?>
+                            <?php if ($property['multi_family'] && is_visible('multi_family', $visibility)): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Multi-family:</strong> <span><?php echo htmlspecialchars($property['multi_family']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['plot_size']): ?>
+                            <?php if ($property['plot_size'] && is_visible('plot_size', $visibility)): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Plot Size:</strong> <span><?php echo (int)$property['plot_size']; ?> m²</span></li>
                             <?php endif; ?>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <ul class="list-unstyled mb-0">
-                            <?php if ($property['zoning']): ?>
+                            <?php if ($property['zoning'] && is_visible('zoning', $visibility)): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Zoning:</strong> <span><?php echo htmlspecialchars($property['zoning']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['views']): ?>
+                            <?php if ($property['views'] && is_visible('views', $visibility)): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Views:</strong> <span><?php echo htmlspecialchars($property['views']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['ideal_for']): ?>
+                            <?php if ($property['ideal_for'] && is_visible('ideal_for', $visibility)): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Ideal for:</strong> <span><?php echo htmlspecialchars($property['ideal_for']); ?></span></li>
                             <?php endif; ?>
                         </ul>
@@ -252,6 +300,7 @@ $inquiry_result = handle_property_inquiry();
 
               <!-- Features & Amenities -->
               <div class="row">
+                  <?php if (is_visible('features', $visibility)): ?>
                   <div class="col-md-6">
                     <div class="bg-white shadow-sm rounded-lg p-6 mb-6 h-100">
                         <h3 class="fs-20 text-heading mb-4">Features</h3>
@@ -269,6 +318,8 @@ $inquiry_result = handle_property_inquiry();
                         <?php endif; ?>
                     </div>
                   </div>
+                  <?php endif; ?>
+                  <?php if (is_visible('amenities', $visibility)): ?>
                   <div class="col-md-6">
                     <div class="bg-white shadow-sm rounded-lg p-6 mb-6 h-100">
                         <h3 class="fs-20 text-heading mb-4">Amenities</h3>
@@ -286,9 +337,10 @@ $inquiry_result = handle_property_inquiry();
                         <?php endif; ?>
                     </div>
                   </div>
+                  <?php endif; ?>
               </div>
 
-              <?php if (!empty($property['proximity'])): ?>
+              <?php if (!empty($property['proximity']) && is_visible('proximity', $visibility)): ?>
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <h3 class="fs-20 text-heading mb-4">In close proximity to</h3>
                 <p class="text-muted mb-0"><?php echo htmlspecialchars($property['proximity']); ?></p>
