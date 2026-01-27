@@ -180,18 +180,29 @@
     </div>
     <div class="d-flex flex-column p-0">
         <nav class="nav flex-column">
+            <?php if (is_admin()): ?>
             <a href="index.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : ''; ?>">
                 <i class="fas fa-tachometer-alt"></i> 
                 <span>Dashboard</span>
             </a>
+            <?php endif; ?>
+            
             <a href="properties-new.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'properties-new.php' ? 'active' : ''; ?>">
                 <i class="fas fa-home"></i> 
                 <span>Properties</span>
             </a>
+            
             <a href="manage-developments.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'manage-developments.php' || basename($_SERVER['PHP_SELF']) === 'development-edit.php' ? 'active' : ''; ?>">
                 <i class="fas fa-hard-hat"></i> 
                 <span>Developments</span>
             </a>
+            
+            <a href="blog.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'blog.php' ? 'active' : ''; ?>">
+                <i class="fas fa-newspaper"></i> 
+                <span>Blog</span>
+            </a>
+
+            <?php if (is_admin()): ?>
             <a href="drafts.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'drafts.php' ? 'active' : ''; ?>">
                 <i class="fas fa-file-alt"></i> 
                 <span>Drafts</span>
@@ -199,10 +210,6 @@
             <a href="team.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'team.php' ? 'active' : ''; ?>">
                 <i class="fas fa-users"></i> 
                 <span>Team</span>
-            </a>
-            <a href="blog.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'blog.php' ? 'active' : ''; ?>">
-                <i class="fas fa-newspaper"></i> 
-                <span>Blog</span>
             </a>
             <a href="faqs.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'faqs.php' ? 'active' : ''; ?>">
                 <i class="fas fa-question-circle"></i> 
@@ -220,10 +227,16 @@
                 <i class="fas fa-user-check"></i> 
                 <span>Subscribers</span>
             </a>
+            <a href="users.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'users.php' ? 'active' : ''; ?>">
+                <i class="fas fa-user-shield"></i> 
+                <span>Manage Users</span>
+            </a>
             <a href="settings.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active' : ''; ?>">
                 <i class="fas fa-cogs"></i> 
                 <span>Settings</span>
             </a>
+            <?php endif; ?>
+            
             <div class="mt-3 border-top border-secondary pt-2">
                 <a href="#" class="nav-link text-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                     <i class="fas fa-sign-out-alt"></i> 

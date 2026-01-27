@@ -43,6 +43,12 @@ ALTER TABLE `property_inquiries` MODIFY `property_id` INT(11) NULL DEFAULT NULL;
 ALTER TABLE `property_inquiries` DROP FOREIGN KEY `property_inquiries_ibfk_1`;
 ALTER TABLE `property_inquiries` ADD CONSTRAINT `property_inquiries_ibfk_1` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE;
 
+-- 5. Add status and ownership fields
+ALTER TABLE `developments` ADD `status` ENUM('published','draft') NOT NULL DEFAULT 'published' AFTER `field_visibility`;
+ALTER TABLE `developments` ADD `created_by` INT(11) NULL AFTER `status`;
+ALTER TABLE `properties` ADD `created_by` INT(11) NULL AFTER `updated_at`;
+ALTER TABLE `blog_posts` ADD `created_by` INT(11) NULL AFTER `updated_at`;
+
 --- END SQL ---
 
 4. If you see a success message, the database is ready!

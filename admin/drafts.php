@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/config.php';
-require_admin();
+require_login();
 
 // Handle Delete Draft
 if (isset($_GET['delete']) && isset($_GET['id']) && isset($_GET['type'])) {
@@ -11,18 +11,37 @@ if (isset($_GET['delete']) && isset($_GET['id']) && isset($_GET['type'])) {
     if ($type === 'property') $table = 'properties';
     elseif ($type === 'blog') $table = 'blog_posts';
     elseif ($type === 'team') $table = 'team_members';
+    elseif ($type === 'development') $table = 'developments';
     
     if ($table) {
-        delete_record($table, $id);
-        header('Location: drafts.php?deleted=1');
-        exit;
+        $record = get_record($table, $id);
+        if (is_admin() || ($record && isset($record['created_by']) && $record['created_by'] == $_SESSION['user_id'])) {
+            delete_record($table, $id);
+            header('Location: drafts.php?deleted=1');
+            exit;
+        }
     }
 }
 
 // Get Drafts
-$draft_properties = get_records('properties', ['status' => 'draft'], 'updated_at DESC');
-$draft_blogs = get_records('blog_posts', ['status' => 'draft'], 'updated_at DESC');
-$draft_team = get_records('team_members', ['is_active' => 0], 'updated_at DESC');
+$where_p = ['status' => 'draft'];
+$where_b = ['status' => 'draft'];
+$where_d = ['status' => 'draft'];
+$where_t = ['is_active' => 0];
+
+if (!is_admin()) {
+    $where_p['created_by'] = $_SESSION['user_id'];
+    $where_b['created_by'] = $_SESSION['user_id'];
+    $where_d['created_by'] = $_SESSION['user_id'];
+    // Team drafts are admin only usually, but let's hide for users
+    $draft_team = [];
+} else {
+    $draft_team = get_records('team_members', $where_t, 'updated_at DESC');
+}
+
+$draft_properties = get_records('properties', $where_p, 'updated_at DESC');
+$draft_blogs = get_records('blog_posts', $where_b, 'updated_at DESC');
+$draft_developments = get_records('developments', $where_d, 'updated_at DESC');
 
 ?>
 <!DOCTYPE html>
@@ -56,15 +75,22 @@ $draft_team = get_records('team_members', ['is_active' => 0], 'updated_at DESC')
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="developments-tab" data-bs-toggle="tab" data-bs-target="#developments" type="button" role="tab" aria-selected="false">
+                            Developments <span class="badge bg-secondary ms-1"><?php echo count($draft_developments); ?></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="blogs-tab" data-bs-toggle="tab" data-bs-target="#blogs" type="button" role="tab" aria-selected="false">
                             Blog Posts <span class="badge bg-secondary ms-1"><?php echo count($draft_blogs); ?></span>
                         </button>
                     </li>
+                    <?php if (is_admin()): ?>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="team-tab" data-bs-toggle="tab" data-bs-target="#team" type="button" role="tab" aria-selected="false">
                             Team Members <span class="badge bg-secondary ms-1"><?php echo count($draft_team); ?></span>
                         </button>
                     </li>
+                    <?php endif; ?>
                 </ul>
 
                 <div class="tab-content" id="draftTabsContent">
@@ -103,7 +129,39 @@ $draft_team = get_records('team_members', ['is_active' => 0], 'updated_at DESC')
                         <?php endif; ?>
                     </div>
 
-                    <!-- Blogs Tab -->
+                    <!-- Developments Tab -->
+                    <div class="tab-pane fade" id="developments" role="tabpanel">
+                        <?php if (!empty($draft_developments)): ?>
+                            <div class="card shadow mb-4">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="bg-light">
+                                                <tr><th>Title</th><th>Location</th><th>Last Updated</th><th>Actions</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($draft_developments as $d): ?>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="fw-bold"><?php echo htmlspecialchars($d['title']); ?></div>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($d['location']); ?></td>
+                                                        <td><?php echo format_date($d['updated_at']); ?></td>
+                                                        <td>
+                                                            <a href="development-edit.php?id=<?php echo $d['id']; ?>" class="btn btn-sm btn-primary">Continue Editing</a>
+                                                            <a href="drafts.php?delete=1&type=development&id=<?php echo $d['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this development draft?')">Delete</a>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="alert alert-info">No draft developments found.</div>
+                        <?php endif; ?>
+                    </div>
                     <div class="tab-pane fade" id="blogs" role="tabpanel">
                         <?php if (!empty($draft_blogs)): ?>
                             <div class="card shadow mb-4">
@@ -137,6 +195,7 @@ $draft_team = get_records('team_members', ['is_active' => 0], 'updated_at DESC')
                         <?php endif; ?>
                     </div>
 
+                    <?php if (is_admin()): ?>
                     <!-- Team Tab -->
                     <div class="tab-pane fade" id="team" role="tabpanel">
                         <?php if (!empty($draft_team)): ?>
@@ -170,6 +229,7 @@ $draft_team = get_records('team_members', ['is_active' => 0], 'updated_at DESC')
                             <div class="alert alert-info">No inactive team members found.</div>
                         <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
             </main>
         </div>

@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/config.php';
-require_admin();
+require_login();
 
 $message = '';
 $error = '';
@@ -21,6 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($error)) {
         $status = isset($_POST['save_draft']) ? 'draft' : clean_input($_POST['status']);
         
+        // Enforce draft for non-admins
+        if (!is_admin()) {
+            $status = 'draft';
+        }
+
         $data = [
             'title' => clean_input($_POST['title']),
             'description' => clean_input($_POST['description'] ?? ''),
@@ -51,6 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'development_id' => !empty($_POST['development_id']) ? intval($_POST['development_id']) : NULL,
             'field_visibility' => isset($_POST['visibility']) ? json_encode($_POST['visibility']) : json_encode([])
         ];
+
+        if (!$is_edit) {
+            $data['created_by'] = $_SESSION['user_id'];
+        }
         
         // Auto-generate Property ID if not set
         if (!$is_edit && empty($data['prop_id'])) {

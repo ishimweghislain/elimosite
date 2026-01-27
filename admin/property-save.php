@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/config.php';
-require_admin();
+require_login();
 
 $message = '';
 $error = '';
@@ -19,11 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if (empty($error)) {
+        $status = $_POST['status'];
+        if (!is_admin()) {
+            $status = 'draft';
+        }
+
         $data = [
             'title' => clean_input($_POST['title']),
             'category' => $_POST['category'],
             'property_type' => $_POST['property_type'],
-            'status' => $_POST['status'],
+            'status' => $status,
             'price' => !empty($_POST['price']) ? (float)$_POST['price'] : null,
             'location' => clean_input($_POST['location']),
             'province' => clean_input($_POST['province'] ?? ''),
@@ -37,6 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
             'updated_at' => date('Y-m-d H:i:s')
         ];
+
+        if (!$is_edit) {
+            $data['created_by'] = $_SESSION['user_id'];
+        }
         
         // Handle file upload
         if (isset($_FILES['image_main']) && $_FILES['image_main']['error'] === UPLOAD_ERR_OK) {

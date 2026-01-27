@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/config.php';
-require_admin();
+require_login();
 
 // Handle add/edit/delete operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

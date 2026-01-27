@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/config.php';
-require_admin();
+require_login();
 
 // Handle property actions
 $message = '';
@@ -18,7 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Get properties with pagination
 $page = (int)($_GET['page'] ?? 1);
 $per_page = 10;
-$properties_data = get_properties([], $page, $per_page);
+// Get properties (Regular users see their own, admins see all)
+$where = [];
+if (!is_admin()) {
+    $where = ['created_by' => $_SESSION['user_id']];
+}
+$properties_data = get_properties($where, $page, $per_page);
 $properties = $properties_data['properties'];
 $total_pages = $properties_data['total_pages'];
 $current_page = $properties_data['page'];

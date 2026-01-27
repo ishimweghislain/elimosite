@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_login'])) {
                     echo json_encode([
                         'success' => true,
                         'message' => 'Login successful',
-                        'redirect' => $user['role'] === 'admin' ? ADMIN_URL : 'index.php'
+                        'redirect' => (in_array($user['role'], ['admin', 'user'])) ? ADMIN_URL : 'index.php'
                     ]);
                 } else {
                     error_log("Password verification failed");

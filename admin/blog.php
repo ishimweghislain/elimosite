@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/config.php';
 
-require_admin();
+require_login();
 
 // Handle blog operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -16,7 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get blog posts (exclude drafts)
-$blog_posts = get_records('blog_posts', "WHERE status != 'draft' ORDER BY created_at DESC");
+// Get blog posts (Regular users see their own, admins see all published/others)
+$where_clause = "WHERE status != 'draft'";
+if (!is_admin()) {
+    $where_clause = "WHERE created_by = " . (int)$_SESSION['user_id'];
+}
+$blog_posts = get_records('blog_posts', $where_clause . " ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
 <html lang="en">

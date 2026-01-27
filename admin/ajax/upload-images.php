@@ -6,7 +6,7 @@
 
 require_once '../../includes/upload-config.php';
 require_once '../../includes/config.php';
-require_admin();
+require_login();
 
 header('Content-Type: application/json');
 

@@ -2,9 +2,14 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-/*
 require_once '../includes/config.php';
-require_admin();
+require_login();
+
+// Redirect non-admins away from dashboard
+if (!is_admin()) {
+    header('Location: properties-new.php');
+    exit;
+}
 
 // Get dashboard statistics
 $stats = get_property_stats();
@@ -13,7 +18,6 @@ $total_inquiries = count_records('property_inquiries', ['status' => 'new']);
 $total_subscribers = count_records('newsletter_subscribers', ['is_active' => 1]);
 $recent_properties = get_recent_properties(5);
 $recent_contacts = get_records('contact_messages', [], 'created_at DESC', 5);
-*/
 ?>
 <!DOCTYPE html>
 <html lang="en">

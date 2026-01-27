@@ -1,11 +1,19 @@
 <?php
 require_once '../includes/config.php';
 
-require_admin();
+require_login();
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $edit_mode = ($id > 0);
 $development = $edit_mode ? get_record('developments', $id) : null;
+
+// Permission Check: If user is not admin, they can only edit their own drafts
+if (!is_admin() && $edit_mode) {
+    if ($development['created_by'] != $_SESSION['user_id'] || $development['status'] !== 'draft') {
+        header('Location: manage-developments.php?error=unauthorized');
+        exit;
+    }
+}
 
 if ($edit_mode && !$development) {
     header('Location: manage-developments.php?error=not_found');
@@ -26,6 +34,13 @@ $districts_json = json_encode([
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $status = isset($_POST['save_draft']) ? 'draft' : clean_input($_POST['status'] ?? 'published');
+    
+    // Regular users can only save as draft
+    if (!is_admin()) {
+        $status = 'draft';
+    }
+
     $data = [
         'title' => clean_input($_POST['title'] ?? ''),
         'location' => clean_input($_POST['location'] ?? ''),
@@ -38,8 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'instagram_url' => clean_input($_POST['instagram_url'] ?? ''),
         'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
         'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([]),
-        'ideal_for' => isset($_POST['ideal_fors']) ? json_encode($_POST['ideal_fors']) : json_encode([])
+        'ideal_for' => isset($_POST['ideal_fors']) ? json_encode($_POST['ideal_fors']) : json_encode([]),
+        'status' => $status
     ];
+
+    if (!$edit_mode) {
+        $data['created_by'] = $_SESSION['user_id'];
+    }
 
     // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -348,10 +368,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
-                        <button type="submit" class="btn btn-primary btn-lg px-5 shadow">
-                            <i class="fas fa-save me-2"></i>Save & Publish Development
-                        </button>
+                    <div class="card shadow mb-4">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-primary">Publication Status</label>
+                                    <select name="status" class="form-select" <?php echo !is_admin() ? 'disabled' : ''; ?>>
+                                        <option value="published" <?php echo ($development['status'] ?? '') === 'published' ? 'selected' : ''; ?>>Published</option>
+                                        <option value="draft" <?php echo ($development['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Draft</option>
+                                    </select>
+                                    <?php if (!is_admin()): ?>
+                                        <input type="hidden" name="status" value="draft">
+                                        <small class="text-muted"><i class="fas fa-info-circle"></i> Only administrators can publish. Your work will be saved as draft.</small>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="submit" name="save_draft" value="1" class="btn btn-outline-primary btn-lg px-4">
+                                            <i class="fas fa-file-alt me-2"></i>Save as Draft
+                                        </button>
+                                        <?php if (is_admin()): ?>
+                                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow">
+                                                <i class="fas fa-save me-2"></i>Save & Publish
+                                            </button>
+                                        <?php else: ?>
+                                            <button type="button" class="btn btn-primary btn-lg px-5 shadow disabled" title="Only administrators can publish">
+                                                <i class="fas fa-lock me-2"></i>Publish
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </main>

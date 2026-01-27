@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/config.php';
 
-require_admin();
+require_login();
 
 $property = null;
 $edit_mode = false;
@@ -10,16 +10,31 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
     $property = get_record('properties', $id);
     $edit_mode = true;
+    
+    // Permission Check: If user is not admin, they can only edit their own drafts
+    if (!is_admin()) {
+        if ($property['created_by'] != $_SESSION['user_id'] || $property['status'] !== 'draft') {
+            header('Location: properties-new.php?error=unauthorized');
+            exit;
+        }
+    }
 }
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $status = isset($_POST['save_draft']) ? 'draft' : clean_input($_POST['status'] ?? 'for-rent');
+    
+    // Regular users can only save as draft
+    if (!is_admin()) {
+        $status = 'draft';
+    }
+
     $data = [
         'title' => clean_input($_POST['title'] ?? ''),
         'description' => clean_input($_POST['description'] ?? ''),
         'category' => clean_input($_POST['category'] ?? 'Residential'),
         'property_type' => clean_input($_POST['property_type'] ?? 'Apartment'),
-        'status' => isset($_POST['save_draft']) ? 'draft' : clean_input($_POST['status'] ?? 'for-rent'),
+        'status' => $status,
         'price' => floatval($_POST['price'] ?? 0),
         'location' => clean_input($_POST['location'] ?? ''),
         'province' => clean_input($_POST['province'] ?? ''),
@@ -39,6 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'instagram_url' => clean_input($_POST['instagram_url'] ?? ''),
         'development_id' => !empty($_POST['development_id']) ? intval($_POST['development_id']) : NULL
     ];
+
+    if (!$edit_mode) {
+        $data['created_by'] = $_SESSION['user_id'];
+    }
 
     // Auto-generate Property ID if not set
     if (!$edit_mode && empty($data['prop_id'])) {
@@ -264,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Status *</label>
-                                    <select name="status" id="statusSelect" class="form-select" required>
+                                    <select name="status" id="statusSelect" class="form-select" required <?php echo !is_admin() ? 'disabled' : ''; ?>>
                                         <option value="draft" <?php echo ($property['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Draft</option>
                                         <option value="for-rent" <?php echo ($property['status'] ?? '') === 'for-rent' ? 'selected' : ''; ?>>For Rent</option>
                                         <option value="for-sale" <?php echo ($property['status'] ?? '') === 'for-sale' ? 'selected' : ''; ?>>For Sale</option>
@@ -272,6 +291,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <option value="sold" <?php echo ($property['status'] ?? '') === 'sold' ? 'selected' : ''; ?>>Sold</option>
                                         <option value="rented" <?php echo ($property['status'] ?? '') === 'rented' ? 'selected' : ''; ?>>Rented</option>
                                     </select>
+                                    <?php if (!is_admin()): ?>
+                                        <input type="hidden" name="status" value="draft">
+                                        <small class="text-muted"><i class="fas fa-info-circle"></i> Only admins can publish listings.</small>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
@@ -587,9 +610,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <button type="submit" name="save_draft" value="1" class="btn btn-outline-primary">
                                     <i class="fas fa-file-alt me-2"></i>Save as Draft
                                 </button>
-                                <button type="button" class="btn btn-primary px-4" onclick="handlePublishClick()">
-                                    <i class="fas fa-save me-2"></i><?php echo $edit_mode ? 'Update Property' : 'Publish Property'; ?>
-                                </button>
+                                <?php if (is_admin()): ?>
+                                   <button type="button" class="btn btn-primary px-4" onclick="handlePublishClick()">
+                                       <i class="fas fa-save me-2"></i><?php echo $edit_mode ? 'Update Property' : 'Publish Property'; ?>
+                                   </button>
+                                <?php else: ?>
+                                   <button type="button" class="btn btn-primary px-4 disabled">
+                                       <i class="fas fa-lock me-2"></i>Publish
+                                   </button>
+                                <?php endif; ?>
                             </div>
                         </form>
                     </div>

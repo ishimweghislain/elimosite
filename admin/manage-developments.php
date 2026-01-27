@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/config.php';
 
-require_admin();
+require_login();
 
 // Handle development operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -20,7 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get developments
-$developments = get_records('developments', "ORDER BY created_at DESC");
+// Get developments (Regular users see their own, admins see all)
+$where_clause = "ORDER BY created_at DESC";
+if (!is_admin()) {
+    $where_clause = "WHERE created_by = " . (int)$_SESSION['user_id'] . " ORDER BY created_at DESC";
+}
+$developments = get_records('developments', $where_clause);
 ?>
 <!DOCTYPE html>
 <html lang="en">

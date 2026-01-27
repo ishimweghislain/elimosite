@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/config.php';
 
-require_admin();
+require_login();
 
 $blog_post = null;
 $edit_mode = false;
@@ -10,11 +10,24 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
     $blog_post = get_record('blog_posts', $id);
     $edit_mode = true;
+    
+    // Permission Check: If user is not admin, they can only edit their own drafts
+    if (!is_admin()) {
+        if ($blog_post['created_by'] != $_SESSION['user_id'] || $blog_post['status'] !== 'draft') {
+            header('Location: blog.php?error=unauthorized');
+            exit;
+        }
+    }
 }
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $status = isset($_POST['save_draft']) ? 'draft' : clean_input($_POST['status'] ?? 'draft');
+    $status = isset($_POST['save_draft']) ? 'draft' : clean_input($_POST['status'] ?? 'published');
+
+    // Regular users can only save as draft
+    if (!is_admin()) {
+        $status = 'draft';
+    }
 
     $data = [
         'title' => clean_input($_POST['title'] ?? ''),
@@ -26,6 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'youtube_url' => clean_input($_POST['youtube_url'] ?? ''),
         'instagram_url' => clean_input($_POST['instagram_url'] ?? '')
     ];
+
+    if (!$edit_mode) {
+        $data['created_by'] = $_SESSION['user_id'];
+    }
 
     // Video upload removed - using YouTube URL only
 
@@ -220,10 +237,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label class="form-label">Publish Status</label>
-                                    <select name="status" class="form-select">
+                                    <select name="status" class="form-select" <?php echo !is_admin() ? 'disabled' : ''; ?>>
                                         <option value="draft" <?php echo ($blog_post['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Draft</option>
                                         <option value="published" <?php echo ($blog_post['status'] ?? '') === 'published' ? 'selected' : ''; ?>>Published</option>
                                     </select>
+                                    <?php if (!is_admin()): ?>
+                                        <input type="hidden" name="status" value="draft">
+                                        <small class="text-muted"><i class="fas fa-info-circle"></i> Only administrators can publish.</small>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Featured Main Image</label>
@@ -294,15 +315,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-end gap-2 mt-5">
-                                <a href="blog.php" class="btn btn-outline-secondary">Cancel</a>
-                                <button type="submit" name="save_draft" value="1" class="btn btn-outline-primary">
-                                    <i class="fas fa-file-alt me-2"></i>Save as Draft
-                                </button>
-                                <button type="button" class="btn btn-primary px-4" onclick="handlePublishClick()">
-                                    <i class="fas fa-save me-2"></i><?php echo $edit_mode ? 'Update Post' : 'Publish Post'; ?>
-                                </button>
-                            </div>
+                             <div class="d-flex justify-content-end gap-2 mt-5">
+                                 <a href="blog.php" class="btn btn-outline-secondary">Cancel</a>
+                                 <button type="submit" name="save_draft" value="1" class="btn btn-outline-primary">
+                                     <i class="fas fa-file-alt me-2"></i>Save as Draft
+                                 </button>
+                                 <?php if (is_admin()): ?>
+                                    <button type="button" class="btn btn-primary px-4" onclick="handlePublishClick()">
+                                        <i class="fas fa-save me-2"></i><?php echo $edit_mode ? 'Update Post' : 'Publish Post'; ?>
+                                    </button>
+                                 <?php else: ?>
+                                    <button type="button" class="btn btn-primary px-4 disabled">
+                                        <i class="fas fa-lock me-2"></i>Publish
+                                    </button>
+                                 <?php endif; ?>
+                             </div>
                         </form>
                     </div>
                 </div>

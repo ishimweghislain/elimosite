@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/config.php';
 
-require_admin();
+require_login();
 
 // Handle property operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,7 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get properties (exclude drafts and separate developments)
-$properties = get_records('properties', "WHERE status != 'draft' AND category != 'Developments' ORDER BY created_at DESC");
+// Get properties (Regular users see their own, admins see all published)
+$where_clause = "WHERE status != 'draft' AND category != 'Developments'";
+if (!is_admin()) {
+    $where_clause = "WHERE created_by = " . (int)$_SESSION['user_id'] . " AND category != 'Developments'";
+}
+$properties = get_records('properties', $where_clause . " ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
 <html lang="en">
