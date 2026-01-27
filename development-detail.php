@@ -13,12 +13,6 @@ if (!$dev) {
     exit;
 }
 
-// Get visibility
-$visibility = json_decode($dev['field_visibility'] ?? '{}', true) ?: [];
-function is_visible($field, $visibility) {
-    if (in_array($field, ['title', 'location', 'province', 'district', 'description'])) return true;
-    return !isset($visibility[$field]) || $visibility[$field] == '1';
-}
 
 // Fetch units/listings
 $units_stmt = $pdo->prepare("SELECT * FROM properties WHERE development_id = ? AND status != 'draft' ORDER BY created_at DESC");
@@ -81,7 +75,7 @@ $inquiry_result = handle_property_inquiry();
                     <?php echo nl2br(htmlspecialchars($dev['description'])); ?>
                 </div>
 
-                <?php if (!empty($dev['about_location']) && is_visible('about_location', $visibility)): ?>
+                <?php if (!empty($dev['about_location'])): ?>
                 <div class="mt-5 pt-5 border-top">
                     <h5 class="fs-18 mb-3 font-weight-600">The Environment</h5>
                     <p class="text-muted"><?php echo nl2br(htmlspecialchars($dev['about_location'])); ?></p>
@@ -90,7 +84,7 @@ $inquiry_result = handle_property_inquiry();
               </div>
 
               <!-- Media Section -->
-              <?php if ((!empty($dev['youtube_url']) && is_visible('youtube_url', $visibility)) || (!empty($dev['instagram_url']) && is_visible('instagram_url', $visibility))): ?>
+              <?php if (!empty($dev['youtube_url']) || !empty($dev['instagram_url'])): ?>
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <h3 class="fs-22 text-heading mb-4">Gallery & Video</h3>
                 <div class="row g-3">

@@ -12,13 +12,6 @@ if (!$property || $property['status'] === 'draft') {
 // Handle inquiry form
 $inquiry_result = handle_property_inquiry();
 
-// Visibility Logic
-$visibility = json_decode($property['field_visibility'] ?? '{}', true) ?: [];
-function is_visible($field, $visibility) {
-    // Core fields always visible
-    if (in_array($field, ['title', 'location', 'description', 'category'])) return true;
-    return !isset($visibility[$field]) || $visibility[$field] == '1';
-}
 
 // Development Check
 $development = null;
@@ -90,18 +83,26 @@ if (!empty($property['development_id'])) {
             <div class="col-lg-8 mb-6 mb-lg-0">
               
               <?php if ($development): ?>
-              <div class="bg-primary text-white rounded-lg p-5 mb-8 d-flex align-items-center shadow-lg animate__animated animate__pulse animate__infinite">
-                  <div class="mr-4">
-                      <i class="fas fa-city fa-3x"></i>
-                  </div>
-                  <div class="flex-grow-1">
-                      <h4 class="text-white mb-1 font-weight-700">Project Development</h4>
-                      <p class="mb-0 opacity-09">This property is a prime unit within the <strong><?php echo htmlspecialchars($development['title']); ?></strong> project.</p>
-                  </div>
-                  <div class="text-right">
-                      <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-white btn-sm font-weight-600 px-4">
-                          View Project <i class="fas fa-arrow-right ml-2 text-primary"></i>
-                      </a>
+              <div class="card border-0 shadow-sm rounded-lg mb-8 overflow-hidden animate__animated animate__fadeInUp">
+                  <div class="row no-gutters">
+                      <div class="col-md-4">
+                          <img src="images/<?php echo $development['image_main'] ?: 'property-placeholder.jpg'; ?>" class="w-100 h-100 object-fit-cover" style="min-height: 180px;">
+                      </div>
+                      <div class="col-md-8">
+                          <div class="card-body p-6">
+                              <div class="d-flex justify-content-between align-items-start mb-2">
+                                  <div>
+                                      <span class="badge badge-primary mb-2">Development Project</span>
+                                      <h4 class="fs-20 font-weight-700 mb-1"><?php echo htmlspecialchars($development['title']); ?></h4>
+                                  </div>
+                                  <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-primary btn-sm rounded-pill px-4">View Project</a>
+                              </div>
+                              <p class="text-muted fs-14 mb-0"><?php echo truncate_text($development['description'], 150); ?></p>
+                              <div class="mt-3 fs-13 text-primary">
+                                  <i class="fas fa-map-marker-alt mr-1"></i> <?php echo htmlspecialchars($development['location']); ?>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
               <?php endif; ?>
@@ -162,7 +163,7 @@ if (!empty($property['development_id'])) {
                     </div>
                     <?php endif; ?>
                     
-                    <?php if (!empty($property['instagram_url']) && is_visible('instagram_url', $visibility)): ?>
+                    <?php if (!empty($property['instagram_url'])): ?>
                     <div class="mb-3">
                         <a href="<?php echo fix_url($property['instagram_url']); ?>" target="_blank" class="d-flex align-items-center p-3 rounded-lg bg-primary-opacity-01 border border-primary text-primary text-decoration-none hover-shine">
                             <div class="icon-circle bg-primary text-white mr-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; border-radius: 50%;">
@@ -245,7 +246,6 @@ if (!empty($property['development_id'])) {
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (is_visible('property_type', $visibility)): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
                             <span class="text-primary fs-20 mr-3"><i class="fal fa-home"></i></span>
@@ -255,7 +255,6 @@ if (!empty($property['development_id'])) {
                             </div>
                         </div>
                     </div>
-                    <?php endif; ?>
                 </div>
               </div>
 
@@ -268,30 +267,41 @@ if (!empty($property['development_id'])) {
                             <?php if ($property['prop_id']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Property ID:</strong> <span class="text-primary"><?php echo htmlspecialchars($property['prop_id']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['stories'] && is_visible('stories', $visibility)): ?>
+                            <?php if ($property['prop_id']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Property ID:</strong> <span class="text-primary"><?php echo htmlspecialchars($property['prop_id']); ?></span></li>
+                            <?php endif; ?>
+                            <?php if ($property['stories']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Floors:</strong> <span><?php echo $property['stories']; ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['furnished'] && is_visible('furnished', $visibility)): ?>
+                            <?php if ($property['furnished']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Furnished:</strong> <span><?php echo htmlspecialchars($property['furnished']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['multi_family'] && is_visible('multi_family', $visibility)): ?>
+                            <?php if ($property['multi_family']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Multi-family:</strong> <span><?php echo htmlspecialchars($property['multi_family']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['plot_size'] && is_visible('plot_size', $visibility)): ?>
+                            <?php if ($property['plot_size']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Plot Size:</strong> <span><?php echo (int)$property['plot_size']; ?> m²</span></li>
                             <?php endif; ?>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <ul class="list-unstyled mb-0">
-                            <?php if ($property['zoning'] && is_visible('zoning', $visibility)): ?>
+                            <?php if ($property['zoning']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Zoning:</strong> <span><?php echo htmlspecialchars($property['zoning']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['views'] && is_visible('views', $visibility)): ?>
+                            <?php if ($property['views']): ?>
                                 <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Views:</strong> <span><?php echo htmlspecialchars($property['views']); ?></span></li>
                             <?php endif; ?>
-                            <?php if ($property['ideal_for'] && is_visible('ideal_for', $visibility)): ?>
-                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2"><strong>Ideal for:</strong> <span><?php echo htmlspecialchars($property['ideal_for']); ?></span></li>
+                            <?php if ($property['ideal_for']): ?>
+                                <li class="mb-3 d-flex justify-content-between border-bottom pb-2">
+                                    <strong>Ideal for:</strong> 
+                                    <span>
+                                        <?php 
+                                        $ideals = json_decode($property['ideal_for'] ?? '[]', true);
+                                        echo is_array($ideals) ? implode(', ', array_map('htmlspecialchars', $ideals)) : htmlspecialchars($property['ideal_for']);
+                                        ?>
+                                    </span>
+                                </li>
                             <?php endif; ?>
                         </ul>
                     </div>

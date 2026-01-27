@@ -31,21 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'year_built' => intval($_POST['year_built'] ?? date('Y')),
         'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
         // Added fields
-        'prop_id' => clean_input($_POST['prop_id'] ?? ''),
-        'stories' => intval($_POST['stories'] ?? 0),
-        'furnished' => clean_input($_POST['furnished'] ?? ''),
-        'multi_family' => clean_input($_POST['multi_family'] ?? ''),
-        'plot_size' => floatval($_POST['plot_size'] ?? 0),
-        'zoning' => clean_input($_POST['zoning'] ?? ''),
-        'views' => clean_input($_POST['views'] ?? ''),
-        'ideal_for' => clean_input($_POST['ideal_for'] ?? ''),
         'proximity' => clean_input($_POST['proximity'] ?? ''),
         'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
         'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([]),
+        'ideal_for' => isset($_POST['ideal_fors']) ? json_encode($_POST['ideal_fors']) : json_encode([]),
         'youtube_url' => clean_input($_POST['youtube_url'] ?? ''),
         'instagram_url' => clean_input($_POST['instagram_url'] ?? ''),
-        'development_id' => !empty($_POST['development_id']) ? intval($_POST['development_id']) : NULL,
-        'field_visibility' => isset($_POST['visibility']) ? json_encode($_POST['visibility']) : json_encode([])
+        'development_id' => !empty($_POST['development_id']) ? intval($_POST['development_id']) : NULL
     ];
 
     // Auto-generate Property ID if not set
@@ -120,19 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Helper to render visibility toggle
-function render_visibility_toggle($field_name, $visibility_data) {
-    if (in_array($field_name, ['title', 'location', 'province', 'district', 'description', 'category'])) {
-        return ''; // Mandatory fields
-    }
-    $is_visible = !isset($visibility_data[$field_name]) || $visibility_data[$field_name] == '1';
-    $checked = $is_visible ? 'checked' : '';
-    return '
-    <div class="form-check form-switch visibility-toggle" title="Visible to users">
-        <input type="hidden" name="visibility['.$field_name.']" value="0">
-        <input class="form-check-input" type="checkbox" name="visibility['.$field_name.']" value="1" '.$checked.'>
-    </div>';
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -253,7 +232,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Price (RWF) *</label>
-                                    <?php echo render_visibility_toggle('price', $visibility); ?>
                                     <input type="number" name="price" class="form-control" value="<?php echo htmlspecialchars($property['price'] ?? ''); ?>" required min="0" placeholder="0.00">
                                 </div>
                             </div>
@@ -273,7 +251,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Property Type *</label>
-                                    <?php echo render_visibility_toggle('property_type', $visibility); ?>
                                     <select name="property_type" class="form-select" required>
                                         <option value="Apartment" <?php echo ($property['property_type'] ?? '') === 'Apartment' ? 'selected' : ''; ?>>Apartment</option>
                                         <option value="House" <?php echo ($property['property_type'] ?? '') === 'House' ? 'selected' : ''; ?>>House</option>
@@ -287,7 +264,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Status *</label>
-                                    <?php echo render_visibility_toggle('status', $visibility); ?>
                                     <select name="status" id="statusSelect" class="form-select" required>
                                         <option value="draft" <?php echo ($property['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Draft</option>
                                         <option value="for-rent" <?php echo ($property['status'] ?? '') === 'for-rent' ? 'selected' : ''; ?>>For Rent</option>
@@ -334,7 +310,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                             <div class="row g-3 mb-4">
                                 <div class="col-md-3">
                                     <label class="form-label">Bedrooms</label>
-                                    <?php echo render_visibility_toggle('bedrooms', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-bed"></i></span>
                                         <input type="number" name="bedrooms" class="form-control" value="<?php echo htmlspecialchars($property['bedrooms'] ?? 0); ?>" min="0">
@@ -342,7 +317,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Bathrooms</label>
-                                    <?php echo render_visibility_toggle('bathrooms', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-bath"></i></span>
                                         <input type="number" name="bathrooms" class="form-control" value="<?php echo htmlspecialchars($property['bathrooms'] ?? 0); ?>" min="0">
@@ -350,7 +324,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Parking Space</label>
-                                    <?php echo render_visibility_toggle('garage', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-car"></i></span>
                                         <input type="number" name="garage" class="form-control" value="<?php echo htmlspecialchars($property['garage'] ?? 0); ?>" min="0">
@@ -358,7 +331,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Size (sqm)</label>
-                                    <?php echo render_visibility_toggle('size_sqm', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-ruler-combined"></i></span>
                                         <input type="number" name="size_sqm" class="form-control" value="<?php echo htmlspecialchars($property['size_sqm'] ?? 0); ?>" min="0">
@@ -373,12 +345,10 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Floors</label>
-                                    <?php echo render_visibility_toggle('stories', $visibility); ?>
                                     <input type="number" name="stories" class="form-control" value="<?php echo htmlspecialchars($property['stories'] ?? 1); ?>" min="0">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Year Built</label>
-                                    <?php echo render_visibility_toggle('year_built', $visibility); ?>
                                     <input type="number" name="year_built" class="form-control" value="<?php echo htmlspecialchars($property['year_built'] ?? date('Y')); ?>" min="1900" max="<?php echo date('Y') + 10; ?>">
                                 </div>
                                 <div class="col-md-3">
@@ -396,7 +366,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                             <div class="row g-3 mb-4">
                                 <div class="col-md-3">
                                     <label class="form-label">Furnished</label>
-                                    <?php echo render_visibility_toggle('furnished', $visibility); ?>
                                     <select name="furnished" class="form-select">
                                         <option value="">Select Option</option>
                                         <option value="Fully Furnished" <?php echo ($property['furnished'] ?? '') === 'Fully Furnished' ? 'selected' : ''; ?>>Fully Furnished</option>
@@ -406,7 +375,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Multi-family</label>
-                                    <?php echo render_visibility_toggle('multi_family', $visibility); ?>
                                     <select name="multi_family" class="form-select">
                                         <option value="">Select Option</option>
                                         <option value="Yes" <?php echo ($property['multi_family'] ?? '') === 'Yes' ? 'selected' : ''; ?>>Yes</option>
@@ -415,12 +383,10 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Plot Size (sqm)</label>
-                                    <?php echo render_visibility_toggle('plot_size', $visibility); ?>
                                     <input type="number" name="plot_size" class="form-control" value="<?php echo htmlspecialchars($property['plot_size'] ?? 0); ?>" min="0">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Zoning</label>
-                                    <?php echo render_visibility_toggle('zoning', $visibility); ?>
                                     <input type="text" name="zoning" class="form-control" value="<?php echo htmlspecialchars($property['zoning'] ?? ''); ?>" placeholder="e.g. Permit">
                                 </div>
                             </div>
@@ -428,26 +394,27 @@ function render_visibility_toggle($field_name, $visibility_data) {
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
                                     <label class="form-label">Views</label>
-                                    <?php echo render_visibility_toggle('views', $visibility); ?>
                                     <input type="text" name="views" class="form-control" value="<?php echo htmlspecialchars($property['views'] ?? ''); ?>" placeholder="e.g. City">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Ideal For</label>
-                                    <?php echo render_visibility_toggle('ideal_for', $visibility); ?>
-                                    <select name="ideal_for" class="form-select">
-                                        <option value="">Select Option</option>
+                                    <div class="border rounded p-3" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
                                         <?php 
+                                        $selected_ideals = json_decode($property['ideal_for'] ?? '[]', true);
+                                        if (!is_array($selected_ideals)) $selected_ideals = [];
                                         $opts = $pdo->query("SELECT name FROM property_features_master WHERE type = 'ideal_for' AND is_active = 1 ORDER BY name ASC")->fetchAll();
-                                        foreach ($opts as $opt) {
-                                            $selected = ($property['ideal_for'] ?? '') === $opt['name'] ? 'selected' : '';
-                                            echo "<option value=\"{$opt['name']}\" $selected>{$opt['name']}</option>";
-                                        }
-                                        ?>
-                                    </select>
+                                        foreach ($opts as $opt): ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="ideal_fors[]" value="<?php echo htmlspecialchars($opt['name']); ?>" id="ideal_<?php echo md5($opt['name']); ?>" <?php echo in_array($opt['name'], $selected_ideals) ? 'checked' : ''; ?>>
+                                                <label class="form-check-label" for="ideal_<?php echo md5($opt['name']); ?>">
+                                                    <?php echo htmlspecialchars($opt['name']); ?>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">In close proximity to</label>
-                                    <?php echo render_visibility_toggle('proximity', $visibility); ?>
                                     <textarea name="proximity" class="form-control" rows="1"><?php echo htmlspecialchars($property['proximity'] ?? ''); ?></textarea>
                                 </div>
                             </div>
@@ -473,7 +440,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <h5 class="mb-4 text-primary fw-bold">Property Features</h5>
-                                    <?php echo render_visibility_toggle('features', $visibility); ?>
                                     <?php 
                                     $features = json_decode($property['features'] ?? '[]', true);
                                     if (!is_array($features)) $features = [];
@@ -502,7 +468,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-6">
                                     <h5 class="mb-4 text-primary fw-bold">Amenities</h5>
-                                    <?php echo render_visibility_toggle('amenities', $visibility); ?>
                                     <?php 
                                     $amenities = json_decode($property['amenities'] ?? '[]', true);
                                     if (!is_array($amenities)) $amenities = [];
@@ -601,7 +566,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">YouTube URL</label>
-                                    <?php echo render_visibility_toggle('youtube_url', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
                                         <input type="url" name="youtube_url" class="form-control" value="<?php echo htmlspecialchars($property['youtube_url'] ?? ''); ?>" placeholder="https://www.youtube.com/watch?v=...">
@@ -610,7 +574,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Instagram URL</label>
-                                    <?php echo render_visibility_toggle('instagram_url', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fab fa-instagram text-primary"></i></span>
                                         <input type="url" name="instagram_url" class="form-control" value="<?php echo htmlspecialchars($property['instagram_url'] ?? ''); ?>" placeholder="https://www.instagram.com/reels/...">

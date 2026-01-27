@@ -33,13 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'district' => clean_input($_POST['district'] ?? ''),
         'description' => clean_input($_POST['description'] ?? ''),
         'about_location' => clean_input($_POST['about_location'] ?? ''),
-        'ideal_for' => clean_input($_POST['ideal_for'] ?? ''),
         'proximity' => clean_input($_POST['proximity'] ?? ''),
         'youtube_url' => clean_input($_POST['youtube_url'] ?? ''),
         'instagram_url' => clean_input($_POST['instagram_url'] ?? ''),
         'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
         'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([]),
-        'field_visibility' => isset($_POST['visibility']) ? json_encode($_POST['visibility']) : json_encode([])
+        'ideal_for' => isset($_POST['ideal_fors']) ? json_encode($_POST['ideal_fors']) : json_encode([])
     ];
 
     // Handle image upload
@@ -115,17 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Helper to render visibility toggle
-function render_visibility_toggle($field_name, $visibility_data) {
-    if (in_array($field_name, ['title', 'location', 'description'])) return '';
-    $is_visible = !isset($visibility_data[$field_name]) || $visibility_data[$field_name] == '1';
-    $checked = $is_visible ? 'checked' : '';
-    return '
-    <div class="form-check form-switch visibility-toggle" title="Show on Website">
-        <input type="hidden" name="visibility['.$field_name.']" value="0">
-        <input class="form-check-input" type="checkbox" name="visibility['.$field_name.']" value="1" '.$checked.'>
-    </div>';
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -159,7 +147,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                 <?php if ($error): ?><div class="alert alert-danger"><?php echo $error; ?></div><?php endif; ?>
 
                 <form method="POST" enctype="multipart/form-data">
-                    <?php $visibility = json_decode($development['field_visibility'] ?? '{}', true) ?: []; ?>
                     
                     <div class="card shadow mb-4">
                         <div class="card-header bg-white py-3"><h5 class="mb-0 text-primary fw-bold">Primary Details</h5></div>
@@ -204,26 +191,27 @@ function render_visibility_toggle($field_name, $visibility_data) {
                             <div class="row g-3">
                                 <div class="col-12">
                                     <label class="form-label">Environmental Highlights</label>
-<?php echo render_visibility_toggle('about_location', $visibility); ?>
                                     <textarea name="about_location" class="form-control" rows="3" placeholder="Environment details..."><?php echo htmlspecialchars($development['about_location'] ?? ''); ?></textarea>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Ideal For Project</label>
-                                    <?php echo render_visibility_toggle('ideal_for', $visibility); ?>
-                                    <select name="ideal_for" class="form-select">
-                                        <option value="">Select Option</option>
+                                    <div class="border rounded p-3" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
                                         <?php 
+                                        $selected_ideals = json_decode($development['ideal_for'] ?? '[]', true);
+                                        if (!is_array($selected_ideals)) $selected_ideals = [];
                                         $opts = $pdo->query("SELECT name FROM property_features_master WHERE type = 'ideal_for' AND is_active = 1 ORDER BY name ASC")->fetchAll();
-                                        foreach ($opts as $opt) {
-                                            $selected = ($development['ideal_for'] ?? '') === $opt['name'] ? 'selected' : '';
-                                            echo "<option value=\"{$opt['name']}\" $selected>{$opt['name']}</option>";
-                                        }
-                                        ?>
-                                    </select>
+                                        foreach ($opts as $opt): ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="ideal_fors[]" value="<?php echo htmlspecialchars($opt['name']); ?>" id="ideal_<?php echo md5($opt['name']); ?>" <?php echo in_array($opt['name'], $selected_ideals) ? 'checked' : ''; ?>>
+                                                <label class="form-check-label" for="ideal_<?php echo md5($opt['name']); ?>">
+                                                    <?php echo htmlspecialchars($opt['name']); ?>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">In Close Proximity to</label>
-                                    <?php echo render_visibility_toggle('proximity', $visibility); ?>
                                     <textarea name="proximity" class="form-control" rows="1"><?php echo htmlspecialchars($development['proximity'] ?? ''); ?></textarea>
                                 </div>
                             </div>
@@ -237,7 +225,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                             <div class="row">
                                 <div class="col-md-6 border-end">
                                     <label class="form-label fw-bold mb-3">Project Features</label>
-                                    <?php echo render_visibility_toggle('features', $visibility); ?>
                                     <div class="row row-cols-1 row-cols-sm-2">
                                         <?php 
                                         $current_features = json_decode($development['features'] ?? '[]', true);
@@ -254,7 +241,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-6 ps-md-4">
                                     <label class="form-label fw-bold mb-3">Project Amenities</label>
-                                    <?php echo render_visibility_toggle('amenities', $visibility); ?>
                                     <div class="row row-cols-1 row-cols-sm-2">
                                         <?php 
                                         $current_amenities = json_decode($development['amenities'] ?? '[]', true);
@@ -315,7 +301,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-6 mt-4">
                                     <label class="form-label">YouTube URL</label>
-                                    <?php echo render_visibility_toggle('youtube_url', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
                                         <input type="url" name="youtube_url" class="form-control" value="<?php echo htmlspecialchars($development['youtube_url'] ?? ''); ?>" placeholder="https://youtube.com/...">
@@ -323,7 +308,6 @@ function render_visibility_toggle($field_name, $visibility_data) {
                                 </div>
                                 <div class="col-md-6 mt-4">
                                     <label class="form-label">Instagram URL</label>
-                                    <?php echo render_visibility_toggle('instagram_url', $visibility); ?>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fab fa-instagram text-primary"></i></span>
                                         <input type="url" name="instagram_url" class="form-control" value="<?php echo htmlspecialchars($development['instagram_url'] ?? ''); ?>" placeholder="https://instagram.com/...">
@@ -522,6 +506,38 @@ function render_visibility_toggle($field_name, $visibility_data) {
                 btn.parentElement.remove();
             }
         }
+
+        // YouTube Preview Logic
+        const youtubeInput = document.querySelector('input[name="youtube_url"]');
+        const youtubePreviewContainer = document.createElement('div');
+        youtubePreviewContainer.id = 'youtube-preview';
+        youtubePreviewContainer.className = 'mt-3';
+        youtubeInput.parentElement.parentElement.appendChild(youtubePreviewContainer);
+        
+        if (youtubeInput.value) updateYoutubePreview(youtubeInput.value);
+        youtubeInput.addEventListener('input', function() { updateYoutubePreview(this.value); });
+
+        function updateYoutubePreview(url) {
+            const videoId = extractYoutubeId(url);
+            if (videoId) {
+                youtubePreviewContainer.innerHTML = `<div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm" style="max-width: 400px;"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
+            } else {
+                youtubePreviewContainer.innerHTML = '';
+            }
+        }
+
+        function extractYoutubeId(url) {
+             if (!url) return null;
+             var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+             var match = url.match(regExp);
+             if (match && match[2].length == 11) return match[2];
+             return null;
+        }
+
+        // Init districts
+        const currentProvince = "<?php echo $development['province'] ?? ''; ?>";
+        const currentDistrict = "<?php echo $development['district'] ?? ''; ?>";
+        if (currentProvince) populateDistricts(currentProvince, currentDistrict);
     </script>
     <?php include 'includes/footer.php'; ?>
 </body>

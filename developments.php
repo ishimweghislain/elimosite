@@ -47,7 +47,7 @@ $total_pages = ceil($total / $per_page);
         70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
         100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
       }
-      .view-details-btn {
+      .view-details-btn, .view-project-btn {
         animation: pulse-custom 2s infinite;
         position: absolute;
         bottom: 15px;

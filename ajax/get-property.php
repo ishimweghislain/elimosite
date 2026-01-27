@@ -262,7 +262,15 @@ if (!is_array($amenities)) $amenities = [];
                     <li class="mb-2 d-flex justify-content-between"><strong>Views:</strong> <span><?php echo htmlspecialchars($property['views']); ?></span></li>
                 <?php endif; ?>
                 <?php if ($property['ideal_for']): ?>
-                    <li class="mb-2 d-flex justify-content-between"><strong>Ideal for:</strong> <span><?php echo htmlspecialchars($property['ideal_for']); ?></span></li>
+                    <li class="mb-2 d-flex justify-content-between">
+                        <strong>Ideal for:</strong> 
+                        <span>
+                            <?php 
+                            $ideals = json_decode($property['ideal_for'] ?? '[]', true);
+                            echo is_array($ideals) ? implode(', ', array_map('htmlspecialchars', $ideals)) : htmlspecialchars($property['ideal_for']);
+                            ?>
+                        </span>
+                    </li>
                 <?php endif; ?>
             </ul>
         </div>
