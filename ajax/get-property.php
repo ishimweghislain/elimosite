@@ -26,6 +26,14 @@ if (!is_array($features)) $features = [];
 
 $amenities = json_decode($property['amenities'] ?? '[]', true);
 if (!is_array($amenities)) $amenities = [];
+
+// Development Check
+$development = null;
+if (!empty($property['development_id'])) {
+    $stmt = $pdo->prepare("SELECT * FROM developments WHERE id = ?");
+    $stmt->execute([$property['development_id']]);
+    $development = $stmt->fetch();
+}
 ?>
 <style>
     @media print {
@@ -197,11 +205,17 @@ if (!is_array($amenities)) $amenities = [];
     
     <p class="fs-18 text-primary font-weight-bold mb-3"><?php echo $price; ?></p>
     
-    <div class="mb-4">
-        <span class="badge badge-yellow mr-2 p-2 px-3"><?php echo htmlspecialchars($property['status']); ?></span>
-        <span class="text-gray-light fs-15"><i class="fas fa-map-marker-alt mr-2 text-primary"></i><?php echo htmlspecialchars($property['location']); ?></span>
+    <div class="mb-4 d-flex align-items-center flex-wrap">
+        <span class="badge badge-yellow mr-2 p-2 px-3 mb-1"><?php echo htmlspecialchars($property['status']); ?></span>
+        <span class="text-gray-light fs-15 mb-1 mr-3"><i class="fas fa-map-marker-alt mr-2 text-primary"></i><?php echo htmlspecialchars($property['location']); ?></span>
+        
+        <?php if ($development): ?>
+        <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="badge border border-primary text-primary p-2 px-3 mb-1 text-decoration-none hover-primary">
+            <i class="fas fa-building mr-1"></i> Part of <?php echo htmlspecialchars($development['title']); ?>
+        </a>
+        <?php endif; ?>
     </div>
-
+锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋锋
     <!-- Key Specs -->
     <div class="row g-2 mb-4">
         <?php if ($property['bedrooms']): ?>
@@ -238,10 +252,10 @@ if (!is_array($amenities)) $amenities = [];
                     <li class="mb-2 d-flex justify-content-between"><strong>Property type:</strong> <span><?php echo htmlspecialchars($property['property_type']); ?></span></li>
                 <?php endif; ?>
                 <?php if ($property['stories']): ?>
-                    <li class="mb-2 d-flex justify-content-between"><strong>Stories:</strong> <span><?php echo $property['stories']; ?></span></li>
+                    <li class="mb-2 d-flex justify-content-between"><strong>Floors:</strong> <span><?php echo $property['stories']; ?></span></li>
                 <?php endif; ?>
                 <?php if ($property['garage']): ?>
-                    <li class="mb-2 d-flex justify-content-between"><strong>Garage:</strong> <span><?php echo $property['garage']; ?></span></li>
+                    <li class="mb-2 d-flex justify-content-between"><strong>Parking Space:</strong> <span><?php echo $property['garage']; ?></span></li>
                 <?php endif; ?>
                 <?php if ($property['furnished']): ?>
                     <li class="mb-2 d-flex justify-content-between"><strong>Furnished:</strong> <span><?php echo htmlspecialchars($property['furnished']); ?></span></li>

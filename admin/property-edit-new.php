@@ -330,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label">Size (sqm)</label>
+                                    <label class="form-label">Build Size (m²)</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-ruler-combined"></i></span>
                                         <input type="number" name="size_sqm" class="form-control" value="<?php echo htmlspecialchars($property['size_sqm'] ?? 0); ?>" min="0">

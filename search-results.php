@@ -179,19 +179,19 @@ if (!empty($_GET['search'])) {
                         </li>
                       <?php endif; ?>
                       <?php if ($property['garage']): ?>
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['garage']; ?> Garage">
+                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['garage']; ?> Parking Space">
                           <svg class="icon icon-Garage fs-18 text-primary mr-1">
                             <use xlink:href="#icon-Garage"></use>
                           </svg>
-                          <?php echo $property['garage']; ?> Gr
+                          <?php echo $property['garage']; ?> Pkg
                         </li>
                       <?php endif; ?>
-                      <?php if ($property['size_sqm']): ?>
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Size">
+                      <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
+                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Build Size">
                           <svg class="icon icon-square fs-18 text-primary mr-1">
                             <use xlink:href="#icon-square"></use>
                           </svg>
-                          <?php echo $property['size_sqm']; ?>m²
+                          <?php echo (int)$property['size_sqm']; ?>m²
                         </li>
                       <?php endif; ?>
                     </ul>

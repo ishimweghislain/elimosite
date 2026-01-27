@@ -26,9 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get inquiries with property details
-$sql = "SELECT i.*, p.title as property_title 
+$sql = "SELECT i.*, p.title as property_title, d.title as development_title 
         FROM property_inquiries i 
         LEFT JOIN properties p ON i.property_id = p.id 
+        LEFT JOIN developments d ON i.development_id = d.id
         ORDER BY i.created_at DESC";
 $stmt = $pdo->query($sql);
 $inquiries = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -106,8 +107,24 @@ $inquiries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                     <div class="small text-muted"><?php echo format_date($inquiry['created_at'], 'M d, Y'); ?></div>
                                                 </td>
                                                 <td>
-                                                    <div class="fw-bold text-dark"><?php echo htmlspecialchars($inquiry['property_title'] ?? 'Unknown Property'); ?></div>
-                                                    <div class="small text-muted">ID: #<?php echo $inquiry['property_id']; ?></div>
+                                                    <div class="fw-bold text-dark">
+                                                        <?php 
+                                                        if (!empty($inquiry['property_title'])) {
+                                                            echo htmlspecialchars($inquiry['property_title']);
+                                                        } elseif (!empty($inquiry['development_title'])) {
+                                                            echo '<span class="text-primary">[Development]</span> ' . htmlspecialchars($inquiry['development_title']);
+                                                        } else {
+                                                            echo 'Unknown Property';
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                    <div class="small text-muted">
+                                                        <?php if ($inquiry['property_id']): ?>
+                                                            Property ID: #<?php echo $inquiry['property_id']; ?>
+                                                        <?php elseif ($inquiry['development_id']): ?>
+                                                            Development ID: #<?php echo $inquiry['development_id']; ?>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <div class="fw-bold"><?php echo htmlspecialchars($inquiry['name']); ?></div>

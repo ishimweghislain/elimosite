@@ -140,12 +140,12 @@ if (isset($_GET['edit'])) {
                                                value="<?php echo $edit_property['bathrooms']; ?>" min="0">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label for="garage" class="form-label">Garage</label>
+                                        <label for="garage" class="form-label">Parking Space</label>
                                         <input type="number" class="form-control" id="garage" name="garage" 
                                                value="<?php echo $edit_property['garage']; ?>" min="0">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label for="size_sqm" class="form-label">Size (m²)</label>
+                                        <label for="size_sqm" class="form-label">Build Size (m²)</label>
                                         <input type="number" class="form-control" id="size_sqm" name="size_sqm" 
                                                value="<?php echo $edit_property['size_sqm']; ?>" step="0.01">
                                     </div>

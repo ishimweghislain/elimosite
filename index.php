@@ -643,7 +643,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
                           <?php if ($property['bathrooms']): ?>
                             <span class="badge badge-light mr-1"><i class="fas fa-bath mr-1 text-primary"></i><?php echo $property['bathrooms']; ?></span>
                           <?php endif; ?>
-                          <?php if ($property['size_sqm']): ?>
+                          <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
                             <span class="badge badge-light"><i class="fas fa-ruler-combined mr-1 text-primary"></i><?php echo (int)$property['size_sqm']; ?>m²</span>
                           <?php endif; ?>
                         </div>
