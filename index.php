@@ -860,175 +860,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
 
       <!-- Partners Section -->
       <section class="bg-patten-05">
-        <div class="container container-xxl pt-10 pb-8">
+      <section class="bg-patten-05">
+        <div class="container container-xxl pt-6 pb-12">
           <h2 class="text-dark text-center mxw-751 fs-26 lh-184 px-md-8">
             Trusted by the biggest local and international institutions</h2>
           <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
-          <div class="py-lg-8 py-6">
+          <div class="pt-2 pb-12">
             <div class="slick-slider mx-0 partners"
            data-slick-options='{"slidesToShow": 6, "autoplay":true,"dots":false,"arrows":false,"responsive":[{"breakpoint": 1200,"settings": {"slidesToShow":4}},{"breakpoint": 992,"settings": {"slidesToShow":3}},{"breakpoint": 768,"settings": {"slidesToShow": 3}},{"breakpoint": 576,"settings": {"slidesToShow": 2}}]}'>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/british-high-commission.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/british-high-commission.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/dalberg.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/dalberg.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/usa.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/usa.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/giz.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/giz.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/dallaire.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/dallaire.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/global-health.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/global-health.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/gva.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/gva.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/ihs.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/ihs.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/kics.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/kics.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/un-eca.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/un-eca.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/vipp.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/vipp.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/wfp.jpg"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/wfp.jpg" alt="Partner 1"
-                 class="image">
-                </a>
-              </div>
+              
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item position-relative hover-change-image">
                   <img src="images/newimages/mastercard.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
-                  <img src="images/newimages/mastercard.png" alt="Partner 1"
+                 class="hover-image position-absolute pos-fixed-top" alt="Mastercard">
+                  <img src="images/newimages/mastercard.png" alt="Mastercard"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item position-relative hover-change-image">
                   <img src="images/newimages/sa-embassy.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 2">
-                  <img src="images/newimages/sa-embassy.png" alt="Partner 2"
+                 class="hover-image position-absolute pos-fixed-top" alt="SA Embassy">
+                  <img src="images/newimages/sa-embassy.png" alt="SA Embassy"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item position-relative hover-change-image">
                   <img src="images/newimages/wildlife.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 3">
-                  <img src="images/newimages/wildlife.png" alt="Partner 3"
+                 class="hover-image position-absolute pos-fixed-top" alt="Wildlife">
+                  <img src="images/newimages/wildlife.png" alt="Wildlife"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item">
-                  <img src="images/newimages/british-council.png" alt=""
+                  <img src="images/newimages/british-council.png" alt="British Council"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item position-relative hover-change-image">
                   <img src="images/newimages/care.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="Partner 5">
-                  <img src="images/newimages/care.png" alt="Partner 5"
+                 class="hover-image position-absolute pos-fixed-top" alt="Care">
+                  <img src="images/newimages/care.png" alt="Care"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item">
-                  <img src="images/newimages/canal.png" alt=""
-                 class="image">
-                </a>
-              </div>
-
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item">
-                  <img src="images/newimages/save-the-children.png" alt=""
+                  <img src="images/newimages/canal.png" alt="Canal Plus"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item">
-                  <img src="images/newimages/unhcr.png" alt=""
+                  <img src="images/newimages/save-the-children.png" alt="Save the Children"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item">
-                  <img src="images/newimages/coat-of-arms.png" alt=""
+                  <img src="images/newimages/unhcr.png" alt="UNHCR"
                  class="image">
                 </a>
               </div>
               <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
                 <a href="#" class="item">
-                  <img src="images/newimages/one-acre-fund.png" alt=""
+                  <img src="images/newimages/coat-of-arms.png" alt="Coat of Arms"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item">
+                  <img src="images/newimages/one-acre-fund.png" alt="One Acre Fund"
                  class="image">
                 </a>
               </div>
@@ -1053,13 +958,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
             <div class="py-8">
               <div class="card border-lg-0 shadow-hover-xs-4 hover-change-image" data-animate="flipInX">
                 <div class="card-body text-center pt-6 pb-3 px-3">
-                  <a href="agent-details.php?id=<?php echo $row['id']; ?>" class="d-inline-block mb-2">
+                  <a href="team.php" class="d-inline-block mb-2">
                     <img src="images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>" style="width:120px; height:120px; object-fit:cover; border-radius:50%;">
                   </a>
-                  <a href="agent-details.php?id=<?php echo $row['id']; ?>"
+                  <a href="team.php"
                class="d-block fs-16 lh-1 text-dark mb-0 font-weight-500 hover-primary team-member"><?php echo $row['name']; ?></a>
                   <p class="mb-2 fs-13 text-danger"><?php echo $row['position']; ?></p>
                   
+                   <a href="mailto:<?php echo htmlspecialchars($row['email']); ?>" class="text-body d-block"><?php echo htmlspecialchars($row['email']); ?></a>
+                   <a href="tel:<?php echo htmlspecialchars($row['phone']); ?>" class="text-heading font-weight-600 d-block"><?php echo htmlspecialchars($row['phone']); ?></a>
+
                 </div>
                
               </div>
