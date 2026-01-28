@@ -207,15 +207,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="card shadow mb-4">
-                        <div class="card-header bg-white py-3"><h5 class="mb-0 text-primary fw-bold">Environment & Location</h5></div>
+                        <div class="card-header bg-white py-3"><h5 class="mb-0 text-primary fw-bold">About the location</h5></div>
                         <div class="card-body p-4">
                             <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label">Environmental Highlights</label>
-                                    <textarea name="about_location" class="form-control" rows="3" placeholder="Environment details..."><?php echo htmlspecialchars($development['about_location'] ?? ''); ?></textarea>
+                                <div class="mb-3">
+                                    <label class="form-label">Location Details</label>
+                                    <textarea name="about_location" class="form-control" rows="3" placeholder="Location details..."><?php echo htmlspecialchars($development['about_location'] ?? ''); ?></textarea>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Ideal For Project</label>
+                                    <label class="form-label">Ideal For Development</label>
                                     <div class="border rounded p-3" style="max-height: 150px; overflow-y: auto; background: #f8f9fa;">
                                         <?php 
                                         $selected_ideals = json_decode($development['ideal_for'] ?? '[]', true);

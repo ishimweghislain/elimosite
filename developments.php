@@ -109,7 +109,7 @@ $total_pages = ceil($total / $per_page);
       <section class="pb-6 pt-6 pt-lg-14 page-title shadow bg-primary">
         <div class="container pt-5">
            <h1 class="fs-30 lh-1 mb-0 text-white font-weight-600 text-center">Developments</h1>
-           <h2 class="fs-16 text-white mt-3 text-center">Explore modern development projects across Rwanda</h2>
+           <h2 class="fs-16 text-white mt-3 text-center">Explore modern developments across Rwanda</h2>
             <div class="mt-8 mx-auto" style="max-width: 800px;">
               <form class="bg-white p-4 rounded-lg shadow-sm d-flex flex-wrap align-items-center justify-content-center" action="developments.php" method="GET">
                 <div class="form-group mb-2 mb-md-0 mr-md-3 flex-grow-1" style="min-width: 200px;">
@@ -146,10 +146,10 @@ $total_pages = ceil($total / $per_page);
                       <img src="<?php echo !empty($dev['image_main']) ? 'images/' . $dev['image_main'] : 'images/property-placeholder.jpg'; ?>" 
                            alt="<?php echo htmlspecialchars($dev['title']); ?>">
                       <div class="card-img-overlay p-2">
-                        <span class="badge badge-primary">Project</span>
+                        <span class="badge badge-primary">Development</span>
                       </div>
                       <a href="development-detail.php?id=<?php echo $dev['id']; ?>" class="btn btn-primary btn-sm rounded-lg view-project-btn">
-                          <i class="far fa-eye mr-1"></i> View Project
+                          <i class="far fa-eye mr-1"></i> View Development
                       </a>
                     </div>
                     <div class="card-body px-5 pt-3 pb-5">

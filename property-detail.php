@@ -110,14 +110,50 @@ if (!empty($property['agent_id'])) {
             .prop-prev i, .prop-next i { font-size: 14px !important; }
         }
         .mobile-property-info { display: none; }
-        .prop-prev, .prop-next { border: 1px solid rgba(0,0,0,0.1) !important; }
+        .prop-prev, .prop-next { 
+            border: 1px solid rgba(0,0,0,0.1) !important; 
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 1000 !important;
+        }
+        .prop-prev { left: 30px !important; }
+        .prop-next { right: 30px !important; }
+        .border-white-5 { border-color: rgba(255,255,255,0.05) !important; }
     </style>
     <link rel="icon" href="images/favicon.png">
   </head>
   <body>
-    <?php include 'header.php'; ?>
+    <?php 
+    $header_class = 'main-header m-0 navbar-dark bg-dark header-sticky header-sticky-smart header-mobile-xl';
+    include 'header.php'; 
+    ?>
 
     <main id="content">
+      <!-- Title & Price Section -->
+      <section class="bg-dark py-5 border-top border-white-5">
+        <div class="container container-xxl">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div class="d-flex align-items-center mb-1">
+                <span class="badge badge-primary px-3 py-1 fs-12 text-uppercase mr-3"><?php echo strtoupper(str_replace('-', ' ', $property['status'])); ?></span>
+                <?php if ($development): ?>
+                <span class="badge badge-yellow px-3 py-1 fs-12 text-uppercase font-weight-700">Development Unit</span>
+                <?php endif; ?>
+              </div>
+              <h1 class="fs-40 text-white font-weight-bold mb-1"><?php echo htmlspecialchars($property['title']); ?></h1>
+              <p class="text-white opacity-8 mb-0 fs-18"><i class="fal fa-map-marker-alt mr-2 text-yellow"></i><?php echo htmlspecialchars($property['location']); ?></p>
+            </div>
+            <div class="col-md-4 text-md-right mt-4 mt-md-0">
+              <?php if (!empty($property['price']) && $property['price'] > 0): ?>
+              <div class="text-white-50 mb-1 fs-14">Listing Price</div>
+              <p class="fs-32 text-yellow font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Property Hero Banner (Slider) -->
       <section class="hero-banner position-relative overflow-hidden mb-10" style="background: #000;">
           <?php 
@@ -137,36 +173,10 @@ if (!empty($property['agent_id'])) {
               <?php endif; ?>
           </div>
 
-          <!-- Hero Overlay (Desktop Only) -->
-          <div class="hero-overlay d-none d-md-block" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); padding: 80px 0 40px; pointer-events: none;">
-              <div class="container">
-                  <div class="row align-items-end">
-                      <div class="col-lg-8">
-                          <div class="d-flex align-items-center mb-3">
-                              <span class="badge badge-primary px-3 py-2 fs-12 text-uppercase mr-3"><?php echo strtoupper(str_replace('-', ' ', $property['status'])); ?></span>
-                              <?php if ($development): ?>
-                                  <span class="badge badge-yellow px-3 py-2 fs-12 text-uppercase font-weight-700">Part of <?php echo htmlspecialchars($development['title']); ?></span>
-                              <?php endif; ?>
-                          </div>
-                          <h1 class="fs-45 text-white font-weight-bold mb-2"><?php echo htmlspecialchars($property['title']); ?></h1>
-                          <p class="text-white opacity-8 mb-0 fs-18"><i class="fal fa-map-marker-alt mr-2 text-yellow"></i><?php echo htmlspecialchars($property['location']); ?></p>
-                      </div>
-                      <div class="col-lg-4 text-lg-right mt-4 mt-lg-0">
-                          <?php if (!empty($property['price']) && $property['price'] > 0): ?>
-                              <div class="text-white mb-2 fs-14 opacity-7">Listing Price</div>
-                              <p class="fs-32 text-yellow font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
-                          <?php endif; ?>
-                      </div>
-                  </div>
-              </div>
-          </div>
-
           <!-- Slider Arrows -->
-          <div class="slider-arrows w-100 position-absolute" style="top: 50%; transform: translateY(-50%); z-index: 1000; left: 0; pointer-events: none;">
-             <div class="container-fluid d-flex justify-content-between px-3 px-md-5">
-                <button type="button" class="prop-prev btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer; pointer-events: auto;"><i class="fas fa-chevron-left text-primary"></i></button>
-                <button type="button" class="prop-next btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer; pointer-events: auto;"><i class="fas fa-chevron-right text-primary"></i></button>
-             </div>
+          <div class="slider-arrows">
+             <button type="button" class="prop-prev btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer;"><i class="fas fa-chevron-left text-primary"></i></button>
+             <button type="button" class="prop-next btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer;"><i class="fas fa-chevron-right text-primary"></i></button>
           </div>
       </section>
 
@@ -176,7 +186,7 @@ if (!empty($property['agent_id'])) {
               <div class="d-flex align-items-center mb-2">
                   <span class="badge badge-primary px-2 py-1 fs-10 text-uppercase mr-2"><?php echo strtoupper(str_replace('-', ' ', $property['status'])); ?></span>
                   <?php if ($development): ?>
-                      <span class="badge badge-yellow px-2 py-1 fs-10 text-uppercase font-weight-700">Project Unit</span>
+                      <span class="badge badge-yellow px-2 py-1 fs-10 text-uppercase font-weight-700">Development Unit</span>
                   <?php endif; ?>
               </div>
               <h1 class="fs-24 text-heading font-weight-bold mb-1"><?php echo htmlspecialchars($property['title']); ?></h1>
@@ -196,10 +206,10 @@ if (!empty($property['agent_id'])) {
                           <img src="images/<?php echo $development['image_main'] ?: 'placeholder.jpg'; ?>" class="rounded w-100 h-100 object-fit-cover shadow-sm">
                       </div>
                       <div class="flex-grow-1">
-                          <span class="badge badge-yellow mb-2 fs-10">DEVELOPMENT PROJECT</span>
+                          <span class="badge badge-yellow mb-2 fs-10">DEVELOPMENT</span>
                           <h4 class="fs-20 mb-1 font-weight-700"><?php echo htmlspecialchars($development['title']); ?></h4>
                           <p class="text-muted small mb-0 line-clamp-2"><?php echo truncate_text($development['description'], 150); ?></p>
-                          <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-sm btn-link text-primary font-weight-700 p-0 mt-2">View Full Project <i class="fas fa-arrow-right ml-1"></i></a>
+                          <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-sm btn-link text-primary font-weight-700 p-0 mt-2">View Full Development <i class="fas fa-arrow-right ml-1"></i></a>
                       </div>
                   </div>
                   <?php endif; ?>
@@ -224,10 +234,10 @@ if (!empty($property['agent_id'])) {
                           <div class="card-body p-6">
                               <div class="d-flex justify-content-between align-items-start mb-2">
                                   <div>
-                                      <span class="badge badge-primary mb-2">Development Project</span>
+                                      <span class="badge badge-primary mb-2">Development</span>
                                       <h4 class="fs-20 font-weight-700 mb-1"><?php echo htmlspecialchars($development['title']); ?></h4>
                                   </div>
-                                  <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-primary btn-sm rounded-pill px-4">View Project</a>
+                                  <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-primary btn-sm rounded-pill px-4">View Development</a>
                               </div>
                               <p class="text-muted fs-14 mb-0"><?php echo truncate_text($development['description'], 150); ?></p>
                               <div class="mt-3 fs-13 text-primary">
@@ -562,6 +572,7 @@ if (!empty($property['agent_id'])) {
                     slidesToScroll: 1,
                     arrows: true,
                     fade: true,
+                    infinite: true,
                     prevArrow: $('.prop-prev'),
                     nextArrow: $('.prop-next'),
                     dots: false

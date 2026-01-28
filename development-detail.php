@@ -34,7 +34,7 @@ if (!empty($dev['agent_id'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="<?php echo truncate_text($dev['description'], 160); ?>">
-    <title><?php echo htmlspecialchars($dev['title']); ?> - Project Details</title>
+    <title><?php echo htmlspecialchars($dev['title']); ?> - Development Details</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vendors/fontawesome-pro-5/css/all.css">
@@ -45,60 +45,87 @@ if (!empty($dev['agent_id'])) {
     <link rel="stylesheet" href="css/themes.css">
     <link rel="icon" href="images/favicon.png">
     <style>
-        .hero-banner { height: 500px; position: relative; }
-        .hero-banner img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 60px 0; }
+        .hero-banner { min-height: 600px; position: relative; }
+        .hero-banner img { width: 100%; height: 600px; object-fit: cover; }
+        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); padding: 80px 0 40px; pointer-events: none; }
         .unit-card:hover { transform: translateY(-5px); transition: 0.3s; }
         .gallery-item img { height: 200px; width: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
         
+        .prop-prev, .prop-next { border: 1px solid rgba(0,0,0,0.1) !important; z-index: 1000; }
+        .btn-white { background: #fff; color: #252839; }
+        .btn-white:hover { background: #252839; color: #fff; }
+
         @media (max-width: 768px) {
-            .hero-banner { height: 300px !important; }
+            .hero-banner, .hero-banner img { min-height: 350px !important; height: 350px !important; }
             .hero-overlay { display: none !important; }
             .mobile-project-info { display: block !important; padding: 20px 15px; background: #fff; border-bottom: 1px solid #e5e5e5; }
         }
         .mobile-project-info { display: none; }
-        
-        .development-gallery-slider .slick-prev, .development-gallery-slider .slick-next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            width: 40px;
-            height: 40px;
-            background: #fff;
-            border: none;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
+        .prop-prev, .prop-next { 
+            border: 1px solid rgba(0,0,0,0.1) !important; 
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 1000 !important;
         }
-        .development-gallery-slider .slick-prev { left: 10px; }
-        .development-gallery-slider .slick-next { right: 10px; }
-        .development-gallery-slider .slick-dots { bottom: -30px; }
+        .prop-prev { left: 30px !important; }
+        .prop-next { right: 30px !important; }
+        .border-white-5 { border-color: rgba(255,255,255,0.05) !important; }
     </style>
   </head>
   <body>
-    <?php include 'header.php'; ?>
+    <?php 
+    $header_class = 'main-header m-0 navbar-dark bg-dark header-sticky header-sticky-smart header-mobile-xl';
+    include 'header.php'; 
+    ?>
 
     <main id="content">
-      <!-- Project Hero -->
-      <section class="hero-banner">
-          <img src="images/<?php echo !empty($dev['image_main']) ? $dev['image_main'] : 'property-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($dev['title']); ?>">
-          <div class="hero-overlay">
-              <div class="container text-white">
-                  <span class="badge badge-primary mb-3">Development Project</span>
-                  <h1 class="fs-40 lh-1 mb-2 font-weight-700 text-white"><?php echo htmlspecialchars($dev['title']); ?></h1>
-                  <p class="fs-18 mb-0 opacity-09"><i class="fal fa-map-marker-alt mr-2"></i><?php echo htmlspecialchars($dev['location']); ?>, <?php echo $dev['district']; ?></p>
+      <!-- Title Section -->
+      <section class="bg-dark py-5 border-top border-white-5">
+        <div class="container container-xxl">
+          <div class="row align-items-center">
+            <div class="col-md-12">
+              <div class="d-flex align-items-center mb-1">
+                <span class="badge badge-primary px-3 py-1 fs-12 text-uppercase mr-3">Development</span>
               </div>
+              <h1 class="fs-40 text-white font-weight-bold mb-1"><?php echo htmlspecialchars($dev['title']); ?></h1>
+              <p class="text-white opacity-8 mb-0 fs-18">
+                <i class="fal fa-map-marker-alt mr-2 text-yellow"></i>
+                <?php echo htmlspecialchars($dev['location']); ?>, <?php echo $dev['district']; ?>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Project Hero -->
+      <section class="hero-banner position-relative overflow-hidden mb-10" style="background: #000;">
+          <div class="development-main-slider">
+              <div class="hero-item">
+                  <img src="images/<?php echo !empty($dev['image_main']) ? $dev['image_main'] : 'property-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($dev['title']); ?>" class="w-100 object-fit-cover" style="height: 600px;">
+              </div>
+              <?php 
+              $gallery = json_decode($dev['images'] ?? '[]', true);
+              if (!empty($gallery) && is_array($gallery)):
+                  foreach ($gallery as $img): ?>
+                      <div class="hero-item">
+                          <img src="images/<?php echo $img; ?>" alt="Gallery Image" class="w-100 object-fit-cover" style="height: 600px;">
+                      </div>
+                  <?php endforeach;
+              endif; ?>
+          </div>
+
+          <!-- Slider Arrows -->
+          <div class="slider-arrows">
+             <button type="button" class="prop-prev btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer;"><i class="fas fa-chevron-left text-primary"></i></button>
+             <button type="button" class="prop-next btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer;"><i class="fas fa-chevron-right text-primary"></i></button>
           </div>
       </section>
 
       <!-- Mobile Project Info (Show only on Mobile) -->
       <section class="mobile-project-info">
           <div class="container">
-              <span class="badge badge-primary mb-2 px-2 py-1 fs-10 text-uppercase">Development Project</span>
+              <span class="badge badge-primary mb-2 px-2 py-1 fs-10 text-uppercase">Development</span>
               <h1 class="fs-24 lh-1 mb-2 font-weight-700 text-heading"><?php echo htmlspecialchars($dev['title']); ?></h1>
               <p class="fs-14 mb-0 text-muted"><i class="fal fa-map-marker-alt mr-2 text-primary"></i><?php echo htmlspecialchars($dev['location']); ?>, <?php echo $dev['district']; ?></p>
           </div>
@@ -112,14 +139,14 @@ if (!empty($dev['agent_id'])) {
               
               <!-- Tabs / Overview -->
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-                <h3 class="fs-22 text-heading mb-4">About this Project</h3>
+                <h3 class="fs-22 text-heading mb-4">About this Development</h3>
                 <div class="text-gray-light lh-2 mb-6">
                     <?php echo nl2br(htmlspecialchars($dev['description'])); ?>
                 </div>
 
                 <?php if (!empty($dev['about_location'])): ?>
                 <div class="mt-5 pt-5 border-top">
-                    <h5 class="fs-18 mb-3 font-weight-600">The Environment</h5>
+                    <h5 class="fs-18 mb-3 font-weight-600">About the location</h5>
                     <p class="text-muted"><?php echo nl2br(htmlspecialchars($dev['about_location'])); ?></p>
                 </div>
                 <?php endif; ?>
@@ -127,10 +154,9 @@ if (!empty($dev['agent_id'])) {
 
               <!-- Media Section -->
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6 overflow-hidden">
-                <h3 class="fs-22 text-heading mb-4">Gallery & Video</h3>
-                
+                <h3 class="fs-22 text-heading mb-4">Development Tour</h3>
                 <?php if (!empty($dev['youtube_url'])): ?>
-                <div class="col-12 mb-4 p-0">
+                <div class="col-12 mb-0 p-0">
                     <div class="rounded-lg overflow-hidden position-relative" style="padding-bottom: 56.25%; height:0;">
                         <?php 
                         $yt_url = $dev['youtube_url'];
@@ -140,21 +166,9 @@ if (!empty($dev['agent_id'])) {
                         <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/<?php echo $video_id; ?>" frameborder="0" allowfullscreen></iframe>
                     </div>
                 </div>
+                <?php else: ?>
+                    <p class="text-muted">Explore the development through the images at the top.</p>
                 <?php endif; ?>
-
-                <div class="development-gallery-slider">
-                    <?php 
-                    $gallery = json_decode($dev['images'] ?? '[]', true);
-                    foreach ($gallery as $img): ?>
-                        <div class="px-2">
-                             <a href="images/<?php echo $img; ?>" class="gallery-item-link">
-                                <div class="gallery-item-full rounded-lg overflow-hidden">
-                                    <img src="images/<?php echo $img; ?>" style="height: 350px; width: 100%; object-fit: cover;">
-                                </div>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
               </div>
 
               <!-- Project Units / Listings -->
@@ -197,7 +211,7 @@ if (!empty($dev['agent_id'])) {
                 <div class="sticky-top" style="top: 100px; z-index: 1;">
                     <!-- Inquiry Card -->
                     <div class="bg-white shadow rounded-lg p-6 mb-6">
-                        <h4 class="mb-4">Project Inquiry</h4>
+                        <h4 class="mb-4">Development Inquiry</h4>
                         <?php if ($agent): ?>
                             <div class="mb-4 p-4 bg-gray-01 rounded-lg border-left border-primary border-4">
                                 <div class="d-flex align-items-center mb-3">
@@ -241,7 +255,7 @@ if (!empty($dev['agent_id'])) {
                                 <input type="tel" name="phone" class="form-control border-0 bg-gray-01" placeholder="Your Phone Number">
                             </div>
                             <div class="form-group mb-4">
-                                <textarea name="message" class="form-control border-0 bg-gray-01" rows="4" placeholder="Request more info about this project..." required></textarea>
+                                <textarea name="message" class="form-control border-0 bg-gray-01" rows="4" placeholder="Request more info about this development..." required></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block btn-lg shadow-none">Send Request</button>
                         </form>
@@ -249,7 +263,7 @@ if (!empty($dev['agent_id'])) {
 
                     <!-- Project Features Summary -->
                     <div class="bg-white shadow-sm rounded-lg p-6">
-                        <h5 class="mb-4 font-weight-600">Project Highlights</h5>
+                        <h5 class="mb-4 font-weight-600">Development Highlights</h5>
                         <ul class="list-unstyled mb-0 fs-14">
                             <?php if (!empty($dev['ideal_for'])): ?>
                                 <li class="mb-3">
@@ -288,21 +302,15 @@ if (!empty($dev['agent_id'])) {
                 gallery: { enabled: true }
             });
 
-            $('.development-gallery-slider').slick({
-                slidesToShow: 2,
+            $('.development-main-slider').slick({
+                slidesToShow: 1,
                 slidesToScroll: 1,
                 arrows: true,
-                dots: true,
-                prevArrow: '<button type="button" class="slick-prev"><i class="far fa-chevron-left"></i></button>',
-                nextArrow: '<button type="button" class="slick-next"><i class="far fa-chevron-right"></i></button>',
-                responsive: [
-                    {
-                        breakpoint: 768,
-                        settings: {
-                            slidesToShow: 1
-                        }
-                    }
-                ]
+                fade: true,
+                infinite: true,
+                prevArrow: $('.prop-prev'),
+                nextArrow: $('.prop-next'),
+                dots: false
             });
         });
     </script>

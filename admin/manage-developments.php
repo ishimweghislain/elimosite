@@ -151,7 +151,7 @@ $developments = get_records('developments', $where_clause . " ORDER BY created_a
                                                 <div class="text-muted mb-3">
                                                     <i class="fas fa-city fa-4x mb-3"></i>
                                                     <h5>No developments added yet</h5>
-                                                    <p>Create a project to group properties.</p>
+                                                    <p>Create a development to group properties.</p>
                                                 </div>
                                                 <a href="development-edit.php" class="btn btn-primary">
                                                     <i class="fas fa-plus me-2"></i>Add Development
