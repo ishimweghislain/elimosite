@@ -20,6 +20,12 @@ if (!empty($property['development_id'])) {
     $stmt->execute([$property['development_id']]);
     $development = $stmt->fetch();
 }
+
+// Agent Check
+$agent = null;
+if (!empty($property['agent_id'])) {
+    $agent = get_record('team_members', $property['agent_id']);
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -37,48 +43,139 @@ if (!empty($property['development_id'])) {
     <link rel="stylesheet" href="vendors/jquery-ui/jquery-ui.min.css">
     <link rel="stylesheet" href="vendors/animate.css">
     <link rel="stylesheet" href="css/themes.css">
+    <style>
+        .property-gallery .slick-prev, .property-gallery .slick-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            color: #252839;
+            box-shadow: 0 4px-12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .property-gallery .slick-prev:hover, .property-gallery .slick-next:hover {
+            background: #252839;
+            color: #fff;
+        }
+        .property-gallery .slick-prev { left: 20px; }
+        .property-gallery .slick-next { right: 20px; }
+        
+        .thumbnail-slider .slick-current img {
+            border: 2px solid #252839;
+            opacity: 1;
+        }
+        .thumbnail-slider img {
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        .thumbnail-slider img:hover {
+            opacity: 1;
+        }
+        
+        .agent-card-info {
+            border-left: 3px solid #252839;
+            transition: all 0.3s ease;
+        }
+        .text-yellow { color: #f6b500 !important; }
+        .badge-yellow { background-color: #f6b500; color: #252839; }
+        .opacity-8 { opacity: 0.8; }
+        .opacity-7 { opacity: 0.7; }
+        .border-yellow { border-color: #f6b500 !important; }
+        .border-4 { border-width: 4px !important; }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        .hero-banner { min-height: 600px; }
+        .btn-white { background: #fff; color: #252839; }
+        .btn-white:hover { background: #252839; color: #fff; }
+    </style>
     <link rel="icon" href="images/favicon.png">
   </head>
   <body>
     <?php include 'header.php'; ?>
 
     <main id="content">
-      <!-- Property Hero -->
-      <section class="pt-16 pb-12 page-title shadow" data-animate="fadeInUp">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-8">
-              <h1 class="fs-30 lh-1 mb-2 text-primary font-weight-600"><?php echo htmlspecialchars($property['title']); ?></h1>
-              <p class="mb-0 text-gray-light"><i class="fal fa-map-marker-alt mr-2"></i><?php echo htmlspecialchars($property['location']); ?></p>
-              <?php if ($development): ?>
-              <div class="mt-4 d-flex align-items-center">
-                  <span class="badge badge-yellow mr-3 px-3 py-2 fs-12 text-uppercase font-weight-700">Project Unit</span>
-                  <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="text-primary font-weight-600 hover-underline">
-                      <i class="fas fa-building mr-1"></i> Part of <?php echo htmlspecialchars($development['title']); ?>
-                  </a>
+      <!-- Property Hero Banner (Slider) -->
+      <section class="hero-banner position-relative overflow-hidden mb-10" style="background: #000;">
+          <?php 
+          $main_img = !empty($property['image_main']) ? 'images/' . $property['image_main'] : 'images/property-placeholder.jpg';
+          $sub_images = json_decode($property['images'] ?? '[]', true);
+          ?>
+          <div class="property-main-slider">
+              <div class="hero-item">
+                  <img src="<?php echo $main_img; ?>" alt="<?php echo htmlspecialchars($property['title']); ?>" class="w-100 object-fit-cover" style="height: 600px;">
               </div>
+              <?php if (!empty($sub_images) && is_array($sub_images)): ?>
+                  <?php foreach ($sub_images as $img): ?>
+                      <div class="hero-item">
+                          <img src="images/<?php echo $img; ?>" alt="Gallery Image" class="w-100 object-fit-cover" style="height: 600px;">
+                      </div>
+                  <?php endforeach; ?>
               <?php endif; ?>
-            </div>
-            <div class="col-md-4 text-md-right mt-4 mt-md-0">
-              <?php if (!empty($property['price']) && $property['price'] > 0): ?>
-                <p class="fs-22 text-heading font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
-              <?php endif; ?>
-              <span class="badge badge-primary mt-2"><?php echo ($property['status'] === 'under-construction') ? 'Off-plan Purchase' : ucwords(str_replace('-', ' ', $property['status'])); ?></span>
-            </div>
           </div>
-        </div>
+
+          <!-- Hero Overlay -->
+          <div class="hero-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); padding: 80px 0 40px; pointer-events: none;">
+              <div class="container">
+                  <div class="row align-items-end">
+                      <div class="col-lg-8">
+                          <div class="d-flex align-items-center mb-3">
+                              <span class="badge badge-primary px-3 py-2 fs-12 text-uppercase mr-3"><?php echo strtoupper(str_replace('-', ' ', $property['status'])); ?></span>
+                              <?php if ($development): ?>
+                                  <span class="badge badge-yellow px-3 py-2 fs-12 text-uppercase font-weight-700">Part of <?php echo htmlspecialchars($development['title']); ?></span>
+                              <?php endif; ?>
+                          </div>
+                          <h1 class="fs-45 text-white font-weight-bold mb-2"><?php echo htmlspecialchars($property['title']); ?></h1>
+                          <p class="text-white opacity-8 mb-0 fs-18"><i class="fal fa-map-marker-alt mr-2 text-yellow"></i><?php echo htmlspecialchars($property['location']); ?></p>
+                      </div>
+                      <div class="col-lg-4 text-lg-right mt-4 mt-lg-0">
+                          <?php if (!empty($property['price']) && $property['price'] > 0): ?>
+                              <div class="text-white mb-2 fs-14 opacity-7">Listing Price</div>
+                              <p class="fs-32 text-yellow font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
+                          <?php endif; ?>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Slider Arrows -->
+          <div class="slider-arrows w-100 position-absolute" style="top: 50%; transform: translateY(-50%); z-index: 1000; left: 0; pointer-events: none;">
+             <div class="px-5 d-flex justify-content-between">
+                <button type="button" class="prop-prev btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; cursor: pointer; border: 2px solid #f6b500; pointer-events: auto;"><i class="fas fa-chevron-left fa-2x text-primary"></i></button>
+                <button type="button" class="prop-next btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; cursor: pointer; border: 2px solid #f6b500; pointer-events: auto;"><i class="fas fa-chevron-right fa-2x text-primary"></i></button>
+             </div>
+          </div>
       </section>
 
-      <!-- Property Image -->
-      <section class="mb-10">
-        <div class="container">
-            <div class="rounded-lg overflow-hidden position-relative" style="max-height: 600px;">
-                <?php 
-                $img_src = !empty($property['image_main']) ? 'images/' . $property['image_main'] : 'images/property-placeholder.jpg';
-                ?>
-                <img src="<?php echo $img_src; ?>" alt="<?php echo htmlspecialchars($property['title']); ?>" class="w-100 h-100 object-fit-cover">
-            </div>
-        </div>
+      <section class="container mb-10">
+          <div class="row">
+              <div class="col-lg-8">
+                  <?php if ($development): ?>
+                  <div class="bg-white shadow-sm rounded-lg p-6 mb-6 d-flex align-items-center border-left border-yellow border-4">
+                      <div class="mr-4" style="width: 140px; height: 90px; flex-shrink: 0;">
+                          <img src="images/<?php echo $development['image_main'] ?: 'placeholder.jpg'; ?>" class="rounded w-100 h-100 object-fit-cover shadow-sm">
+                      </div>
+                      <div class="flex-grow-1">
+                          <span class="badge badge-yellow mb-2 fs-10">DEVELOPMENT PROJECT</span>
+                          <h4 class="fs-20 mb-1 font-weight-700"><?php echo htmlspecialchars($development['title']); ?></h4>
+                          <p class="text-muted small mb-0 line-clamp-2"><?php echo truncate_text($development['description'], 150); ?></p>
+                          <a href="development-detail.php?id=<?php echo $development['id']; ?>" class="btn btn-sm btn-link text-primary font-weight-700 p-0 mt-2">View Full Project <i class="fas fa-arrow-right ml-1"></i></a>
+                      </div>
+                  </div>
+                  <?php endif; ?>
+              </div>
+          </div>
       </section>
 
       <!-- Details & Sidebar -->
@@ -361,6 +458,31 @@ if (!empty($property['development_id'])) {
 
             <!-- Sidebar -->
             <div class="col-lg-4">
+                <?php if ($agent): ?>
+                <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+                    <h3 class="fs-18 text-heading mb-4 font-weight-600">Assigned Agent</h3>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="mr-4">
+                            <img src="images/<?php echo $agent['image'] ?: 'property-placeholder.jpg'; ?>" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;" alt="<?php echo htmlspecialchars($agent['name']); ?>">
+                        </div>
+                        <div>
+                            <h5 class="fs-16 mb-0 font-weight-700"><?php echo htmlspecialchars($agent['name']); ?></h5>
+                            <p class="text-primary fs-14 mb-0"><?php echo htmlspecialchars($agent['position']); ?></p>
+                        </div>
+                    </div>
+                    <?php if ($agent['phone']): ?>
+                        <a href="tel:<?php echo $agent['phone']; ?>" class="btn btn-outline-primary btn-block mb-2">
+                            <i class="fas fa-phone-alt mr-2"></i> <?php echo htmlspecialchars($agent['phone']); ?>
+                        </a>
+                    <?php endif; ?>
+                    <?php if ($agent['email']): ?>
+                        <a href="mailto:<?php echo $agent['email']; ?>" class="btn btn-outline-secondary btn-block">
+                            <i class="fas fa-envelope mr-2"></i> Email Agent
+                        </a>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+
                 <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                     <h3 class="fs-22 text-heading mb-4">Interested?</h3>
                     <?php if (isset($inquiry_result)): ?>
@@ -403,6 +525,21 @@ if (!empty($property['development_id'])) {
     <script src="vendors/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="vendors/slick/slick.min.js"></script>
     <script src="vendors/magnific-popup/jquery.magnific-popup.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            if ($('.property-main-slider').length) {
+                $('.property-main-slider').slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: true,
+                    fade: true,
+                    prevArrow: $('.prop-prev'),
+                    nextArrow: $('.prop-next'),
+                    dots: false
+                });
+            }
+        });
+    </script>
     <script src="js/theme.js"></script>
   </body>
 </html>

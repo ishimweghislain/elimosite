@@ -21,6 +21,12 @@ $units = $units_stmt->fetchAll();
 
 // Handle inquiry
 $inquiry_result = handle_property_inquiry();
+
+// Agent Check
+$agent = null;
+if (!empty($dev['agent_id'])) {
+    $agent = get_record('team_members', $dev['agent_id']);
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -44,6 +50,26 @@ $inquiry_result = handle_property_inquiry();
         .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 60px 0; }
         .unit-card:hover { transform: translateY(-5px); transition: 0.3s; }
         .gallery-item img { height: 200px; width: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
+        
+        .development-gallery-slider .slick-prev, .development-gallery-slider .slick-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        .development-gallery-slider .slick-prev { left: 10px; }
+        .development-gallery-slider .slick-next { right: 10px; }
+        .development-gallery-slider .slick-dots { bottom: -30px; }
     </style>
   </head>
   <body>
@@ -84,35 +110,36 @@ $inquiry_result = handle_property_inquiry();
               </div>
 
               <!-- Media Section -->
-              <?php if (!empty($dev['youtube_url']) || !empty($dev['instagram_url'])): ?>
-              <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+              <div class="bg-white shadow-sm rounded-lg p-6 mb-6 overflow-hidden">
                 <h3 class="fs-22 text-heading mb-4">Gallery & Video</h3>
-                <div class="row g-3">
-                    <?php if (!empty($dev['youtube_url'])): ?>
-                    <div class="col-12 mb-4">
-                        <div class="rounded-lg overflow-hidden position-relative" style="padding-bottom: 56.25%; height:0;">
-                            <?php 
-                            $yt_url = $dev['youtube_url'];
-                            preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $yt_url, $match);
-                            $video_id = $match[1] ?? '';
-                            ?>
-                            <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/<?php echo $video_id; ?>" frameborder="0" allowfullscreen></iframe>
-                        </div>
+                
+                <?php if (!empty($dev['youtube_url'])): ?>
+                <div class="col-12 mb-4 p-0">
+                    <div class="rounded-lg overflow-hidden position-relative" style="padding-bottom: 56.25%; height:0;">
+                        <?php 
+                        $yt_url = $dev['youtube_url'];
+                        preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $yt_url, $match);
+                        $video_id = $match[1] ?? '';
+                        ?>
+                        <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/<?php echo $video_id; ?>" frameborder="0" allowfullscreen></iframe>
                     </div>
-                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
 
+                <div class="development-gallery-slider">
                     <?php 
                     $gallery = json_decode($dev['images'] ?? '[]', true);
                     foreach ($gallery as $img): ?>
-                        <div class="col-md-4 mb-3">
-                            <a href="images/<?php echo $img; ?>" class="gallery-item-link">
-                                <div class="gallery-item"><img src="images/<?php echo $img; ?>"></div>
+                        <div class="px-2">
+                             <a href="images/<?php echo $img; ?>" class="gallery-item-link">
+                                <div class="gallery-item-full rounded-lg overflow-hidden">
+                                    <img src="images/<?php echo $img; ?>" style="height: 350px; width: 100%; object-fit: cover;">
+                                </div>
                             </a>
                         </div>
                     <?php endforeach; ?>
                 </div>
               </div>
-              <?php endif; ?>
 
               <!-- Project Units / Listings -->
               <div id="listings" class="mb-10">
@@ -155,6 +182,30 @@ $inquiry_result = handle_property_inquiry();
                     <!-- Inquiry Card -->
                     <div class="bg-white shadow rounded-lg p-6 mb-6">
                         <h4 class="mb-4">Project Inquiry</h4>
+                        <?php if ($agent): ?>
+                            <div class="mb-4 p-4 bg-gray-01 rounded-lg border-left border-primary border-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="images/<?php echo $agent['image'] ?: 'property-placeholder.jpg'; ?>" class="rounded-circle mr-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-0 font-weight-700 fs-16"><?php echo htmlspecialchars($agent['name']); ?></h6>
+                                        <div class="text-primary small font-weight-600"><?php echo htmlspecialchars($agent['position']); ?></div>
+                                    </div>
+                                </div>
+                                <div class="agent-contacts">
+                                    <?php if (!empty($agent['phone'])): ?>
+                                        <a href="tel:<?php echo $agent['phone']; ?>" class="btn btn-primary btn-block btn-sm mb-2 shadow-none">
+                                            <i class="fas fa-phone-alt mr-2"></i> <?php echo htmlspecialchars($agent['phone']); ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($agent['email'])): ?>
+                                        <a href="mailto:<?php echo $agent['email']; ?>" class="btn btn-outline-primary btn-block btn-sm shadow-none">
+                                            <i class="fas fa-envelope mr-2"></i> Message Agent
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                        
                         <?php if (isset($inquiry_result)): ?>
                             <div class="alert alert-<?php echo $inquiry_result['success'] ? 'success' : 'danger'; ?>">
                                 <?php echo $inquiry_result['message']; ?>
@@ -212,12 +263,30 @@ $inquiry_result = handle_property_inquiry();
 
     <script src="vendors/jquery.min.js"></script>
     <script src="vendors/bootstrap/bootstrap.bundle.js"></script>
+    <script src="vendors/slick/slick.min.js"></script>
     <script src="vendors/magnific-popup/jquery.magnific-popup.min.js"></script>
     <script>
         $(document).ready(function() {
             $('.gallery-item-link').magnificPopup({
                 type: 'image',
                 gallery: { enabled: true }
+            });
+
+            $('.development-gallery-slider').slick({
+                slidesToShow: 2,
+                slidesToScroll: 1,
+                arrows: true,
+                dots: true,
+                prevArrow: '<button type="button" class="slick-prev"><i class="far fa-chevron-left"></i></button>',
+                nextArrow: '<button type="button" class="slick-next"><i class="far fa-chevron-right"></i></button>',
+                responsive: [
+                    {
+                        breakpoint: 768,
+                        settings: {
+                            slidesToShow: 1
+                        }
+                    }
+                ]
             });
         });
     </script>

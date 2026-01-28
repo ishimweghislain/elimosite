@@ -52,7 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'ideal_for' => isset($_POST['ideal_fors']) ? json_encode($_POST['ideal_fors']) : json_encode([]),
         'youtube_url' => clean_input($_POST['youtube_url'] ?? ''),
         'instagram_url' => clean_input($_POST['instagram_url'] ?? ''),
-        'development_id' => !empty($_POST['development_id']) ? intval($_POST['development_id']) : NULL
+        'development_id' => !empty($_POST['development_id']) ? intval($_POST['development_id']) : NULL,
+        'agent_id' => !empty($_POST['agent_id']) ? intval($_POST['agent_id']) : NULL
     ];
 
     if (!$edit_mode) {
@@ -443,7 +444,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
 
                             <div class="row g-3 mb-4">
-                                <div class="col-12">
+                                <div class="col-md-6">
                                     <label class="form-label fw-bold">Part of a Development?</label>
                                     <select name="development_id" class="form-select">
                                         <option value="">Not part of a development</option>
@@ -456,6 +457,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         ?>
                                     </select>
                                     <small class="text-muted">Link this property listing to an existing development project.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Assigned Agent</label>
+                                    <select name="agent_id" class="form-select">
+                                        <option value="">No specific agent (Default)</option>
+                                        <?php 
+                                        $agents = $pdo->query("SELECT id, name FROM team_members WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
+                                        foreach ($agents as $agent_row) {
+                                            $selected = ($property['agent_id'] == $agent_row['id']) ? 'selected' : '';
+                                            echo "<option value=\"{$agent_row['id']}\" $selected>{$agent_row['name']}</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                    <small class="text-muted">Choose the agent who will handle inquiries for this property.</small>
                                 </div>
                             </div>
 

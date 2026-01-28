@@ -54,7 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'features' => isset($_POST['features']) ? json_encode($_POST['features']) : json_encode([]),
         'amenities' => isset($_POST['amenities']) ? json_encode($_POST['amenities']) : json_encode([]),
         'ideal_for' => isset($_POST['ideal_fors']) ? json_encode($_POST['ideal_fors']) : json_encode([]),
-        'status' => $status
+        'status' => $status,
+        'agent_id' => !empty($_POST['agent_id']) ? intval($_POST['agent_id']) : NULL
     ];
 
     if (!$edit_mode) {
@@ -371,7 +372,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="card shadow mb-4">
                         <div class="card-body p-4">
                             <div class="row align-items-center">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label fw-bold text-primary">Publication Status</label>
                                     <select name="status" class="form-select" <?php echo !is_admin() ? 'disabled' : ''; ?>>
                                         <option value="published" <?php echo ($development['status'] ?? '') === 'published' ? 'selected' : ''; ?>>Published</option>
@@ -381,6 +382,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <input type="hidden" name="status" value="draft">
                                         <small class="text-muted"><i class="fas fa-info-circle"></i> Only administrators can publish. Your work will be saved as draft.</small>
                                     <?php endif; ?>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-primary">Assigned Agent</label>
+                                    <select name="agent_id" class="form-select">
+                                        <option value="">No specific agent (Default)</option>
+                                        <?php 
+                                        $agents = $pdo->query("SELECT id, name FROM team_members WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
+                                        foreach ($agents as $agent_row) {
+                                            $selected = ($development['agent_id'] == $agent_row['id']) ? 'selected' : '';
+                                            echo "<option value=\"{$agent_row['id']}\" $selected>{$agent_row['name']}</option>";
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                                 <div class="col-md-6 text-md-end mt-3 mt-md-0">
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
