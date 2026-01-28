@@ -5,6 +5,8 @@ require_once 'includes/config.php';
 $featured_properties = get_featured_properties(12);
 $recent_properties = get_recent_properties(12);
 $stats = get_property_stats();
+$blog_posts = get_blog_posts(3);
+$agents = get_team_members();
 
 // Handle search form submission
 $search_results = null;
@@ -604,13 +606,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
           </div>
         </div>
       </section>
-      
-      <!-- Featured Properties Section -->
-      <section class="pt-12 pb-13">
-        <div class="container">
-          <h2 class="text-dark lh-1625 text-center mb-2 fs-22 fs-md-32">Featured Properties</h2>
-          <p class="mxw-751 text-center mb-1 px-8">Discover our handpicked selection of premium properties</p>
-          <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/line-01.png" alt="">
+      <section class="py-lg-12 my-lg-1 py-11">
+        <div class="container container-xxl">
+          <div class="row">
+            <div class="col-md-6">
+              <h2 class="text-heading">Featured Properties</h2>
+              <span class="heading-divider"></span>
+              <p class="mb-7">Top rated properties in Kigali City and other provinces</p>
+            </div>
+            <div class="col-md-6 text-md-right">
+              <a href="search-results.php?label=&category=&type=&district=&beds=&baths=&ref="
+                   class="btn btn-lg btn-primary mb-8">See all properties
+                <i class="far fa-long-arrow-right ml-1"></i>
+              </a>
+            </div>
+          </div>
           
           <?php if (!empty($featured_properties)): ?>
             <div class="slick-slider mx-n3 mt-8" data-slick-options='{"slidesToShow": 3, "slidesToScroll": 1, "autoplay": false, "infinite": true, "arrows": true, "dots": true, "responsive": [{"breakpoint": 1200, "settings": {"slidesToShow": 2}}, {"breakpoint": 768, "settings": {"slidesToShow": 1}}]}'>
@@ -661,6 +671,481 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
               <p class="text-muted">No featured properties added yet.</p>
             </div>
           <?php endif; ?>
+        </div>
+      </section>
+      
+      <!-- Testimonials Section -->
+      <section class="">
+        <div class="bg-single-image pt-lg-13 pb-lg-12 py-11 bg-dark">
+          <div class="container">
+          <div class="row">
+            <div class="col-lg-5 pr-xl-17" data-animate="fadeInLeft">
+              <h2 class="mt-5 text-white">What our clients say about us and our service</h2>
+              <span class="heading-divider"></span>
+              <p class="mb-6 text-white">Customer satisfaction is a primary goal for our company. To that end, we are passionate about meeting and surpassing the expectations of our varied clientele. Don't take our word for it, listen to what our clients have to say.</p>
+              <a href="team.php" class="btn btn-lg btn-primary rmb-8 mb-lg-0">View our team
+                <i class="far fa-long-arrow-right ml-1"></i>
+              </a>
+            </div>
+            <div class="col-lg-7" data-animate="fadeInRight">
+              <div class="slick-slider custom-vertical mx-0"
+             data-slick-options='{"slidesToShow": 1,"vertical":true,"verticalSwiping":true,"centerMode":true,"swipeToSlide":true,"focusOnSelect":true,"centerPadding":"120px","infinite":true,"autoplay":true,"dots":false,"arrows":false,"autoplaySpeed":15000}'>
+             <div class="box px-sm-8">
+                  <div class="card border-0 shadow-lg-3 px-3 pl-md-9 pr-md-9 pt-8 pb-7">
+                    <div class="card-body p-0">
+                      <h5 class="card-title fs-18 text-secondary mb-3 lh-17">Simply Amazing!</h5>
+                      <p class="card-text fs-14 lh-2 text-heading mb-5">
+                        “Grace is an amazing agent. She is very patient and listens carefully to what her customer needs. She took care of the conversation with the respective landlord and negotiated a good price as well as good rental conditions for us. We do highly recommend her to any future customers.“
+                      </p>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <p class="fs-17 lh-1 text-heading font-weight-600 mb-2">Dr. Pascal Lopez</p>
+                          <p class="fs-15 lh-12 mb-0">GIZ</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box px-sm-8">
+                  <div class="card border-0 shadow-lg-3 px-3 pl-md-9 pr-md-9 pt-8 pb-7">
+                    <div class="card-body p-0">
+                      <h5 class="card-title fs-18 text-secondary mb-3 lh-17">Simply Amazing!</h5>
+                      <p class="card-text fs-14 lh-2 text-heading mb-5">
+                        “Grace helped us find a great house in Kigali within just a few days which met all of our requirements.  She understood our requests, gave us realistic options, accommodated repeated viewings, and  then provided hands-on help with negotiating, contracting, and move-in.“
+                      </p>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <p class="fs-17 lh-1 text-heading font-weight-600 mb-2">Zach Raymond</p>
+                          <p class="fs-15 lh-12 mb-0">AB Bank</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box px-sm-8">
+                  <div class="card border-0 shadow-lg-3 px-3 pl-md-9 pr-md-9 pt-8 pb-7">
+                    <div class="card-body p-0">
+                      <h5 class="card-title fs-18 text-secondary mb-3 lh-17">Very Professional!</h5>
+                      <p class="card-text fs-14 lh-2 text-heading mb-5">
+                        “ I have worked with Aristide several times on different Real Estate projects. Aristide has been very professional and he clearly understood what we were looking for. He has a great sense of communication throughout the process. I highly recommend him “
+                      </p>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <p class="fs-17 lh-1 text-heading font-weight-600 mb-2">Aimé</p>
+                          <p class="fs-15 lh-12 mb-0">CANAL+ Rwanda</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box px-sm-8">
+                  <div class="card border-0 shadow-lg-3 px-3 pl-md-9 pr-md-9 pt-8 pb-7">
+                    <div class="card-body p-0">
+                      <h5 class="card-title fs-18 text-secondary mb-3 lh-17">Above and beyond</h5>
+                      <p class="card-text fs-14 lh-2 text-heading mb-5">
+                        “ We've used Elimo on two occasions to find a new rental house, and once to help find a new office for a business. In all instances, Aristide was professional, reliable, and knowledgeable. They went above and beyond to facilitate the transactions. “
+                      </p>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <p class="fs-17 lh-1 text-heading font-weight-600 mb-2">James Setzler</p>
+                          <p class="fs-15 lh-12 mb-0">GAC-R</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box px-sm-8">
+                  <div class="card border-0 shadow-lg-3 px-3 pl-md-9 pr-md-9 pt-8 pb-7">
+                    <div class="card-body p-0">
+                      <h5 class="card-title fs-18 text-secondary mb-3 lh-17">Time saver!</h5>
+                      <p class="card-text fs-14 lh-2 text-heading mb-5">
+                        He thus saved us time, and out of the 3 houses visited with him, two were our top choices of all houses visited (even prior consulting him), and eventually we opted for the house that has become our home.
+                      </p>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <p class="fs-17 lh-1 text-heading font-weight-600 mb-2">Mr Sotirios Bazikamwe</p>
+                          <p class="fs-15 lh-12 mb-0">European Union</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box px-sm-8">
+                  <div class="card border-0 shadow-lg-3 px-3 pl-md-9 pr-md-9 pt-8 pb-7">
+                    <div class="card-body p-0">
+                      <h5 class="card-title fs-18 text-secondary mb-3 lh-17">Efficient experience!</h5>
+                      <p class="card-text fs-14 lh-2 text-heading mb-5">
+                        It was a really good, professional, and efficient experience. Aristide was really keen on understanding what I was specifically looking for and liaised properly with the owner.
+                      </p>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <p class="fs-17 lh-1 text-heading font-weight-600 mb-2">Ana Paula Bedoya</p>
+                          <p class="fs-15 lh-12 mb-0">WFP</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="box px-sm-8">
+                  <div class="card border-0 shadow-lg-3 px-3 pl-md-9 pr-md-9 pt-8 pb-7">
+                    <div class="card-body p-0">
+                      <h5 class="card-title fs-18 text-secondary mb-3 lh-17">Time saver!</h5>
+                      <p class="card-text fs-14 lh-2 text-heading mb-5">
+                        We are very happy and grateful to have found Aristide in Kigali. He reliably and patiently helped us to find a fantastic house in Kimihurura. Moreover, he supported the negotiations with the landlord very efficiently. We fully recommend him.
+                      </p>
+                      <div class="media align-items-center">
+                        <div class="media-body">
+                          <p class="fs-17 lh-1 text-heading font-weight-600 mb-2">DAVID BOERNER</p>
+                          <p class="fs-15 lh-12 mb-0">GIZ Rwanda</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <!-- News Section -->
+      <section class="bg-gray-02 pt-10 pb-10">
+        <div class="container">
+          <p class="text-danger letter-spacing-263 text-uppercase lh-186 text-center mb-0">news & articles</p>
+          <h2 class="text-center lh-1625 text-dark pb-1">
+            Check Out Recent News & Articles
+          </h2>
+          <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
+          <div class="mx-n2">
+            <div class="slick-slider mt-6 mx-n1 slick-dots-mt-0"
+                 data-slick-options='{"slidesToShow": 3, "autoplay":true,"arrows":false,"dots":true,"infinite": true,"responsive":[{"breakpoint": 992,"settings": {"slidesToShow":2}},{"breakpoint": 768,"settings": {"slidesToShow": 2,"autoplay":true}},{"breakpoint": 576,"settings": {"slidesToShow": 1,"arrows":false,"dots":true,"autoplay":true}}]}'>
+              <?php if (!empty($blog_posts)): ?>
+              <?php foreach ($blog_posts as $row): ?>
+              <div class="item py-4" data-animate="fadeInUp">
+                <div class="card border-0 shadow-xxs-3">
+                  <div class="position-relative d-flex align-items-end card-img-top">
+                    <a href="blog.php" class="hover-shine">
+                      <img src="images/<?php echo $row['image']; ?>"
+                                     alt="<?php echo $row['title']; ?>">
+                    </a>
+                  </div>
+                  <div class="card-body px-5 pt-3 pb-5">
+                    <p class="mb-1 fs-13"><?php echo format_date($row['created_at'], 'M d, Y'); ?></p>
+                    <h3 class="fs-18 text-heading lh-15 mb-1">
+                      <a href="blog.php" class="text-heading hover-primary"><?php echo $row['title']; ?></a>
+                    </h3>
+                    <a class="text-heading font-weight-500" href="blog.php">Read more <i
+                                    class="far fa-long-arrow-right text-primary ml-1"></i></a>
+                  </div>
+                </div>
+              </div>
+              <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Report Section -->
+      <section class="py-8 bg-yellow">
+        <div class="container">
+          <h3 class="mb-2 fs-22 lh-15 text-heading">Get first hand information by reading our curated property reports. </h3>
+          <p class="mb-3 pb-1">Pricing, market, location reports that help you make the right decision for your home or investment property.</p>
+          <a href="blog.php" class="btn btn-lg btn-dark rmb-8 mb-lg-0">Learn more
+                <i class="far fa-long-arrow-right ml-1"></i>
+              </a>
+        </div>
+      </section>
+
+      <!-- Partners Section -->
+      <section class="bg-patten-05">
+        <div class="container container-xxl pt-10 pb-8">
+          <h2 class="text-dark text-center mxw-751 fs-26 lh-184 px-md-8">
+            Trusted by the biggest local and international institutions</h2>
+          <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
+          <div class="py-lg-8 py-6">
+            <div class="slick-slider mx-0 partners"
+           data-slick-options='{"slidesToShow": 6, "autoplay":true,"dots":false,"arrows":false,"responsive":[{"breakpoint": 1200,"settings": {"slidesToShow":4}},{"breakpoint": 992,"settings": {"slidesToShow":3}},{"breakpoint": 768,"settings": {"slidesToShow": 3}},{"breakpoint": 576,"settings": {"slidesToShow": 2}}]}'>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/british-high-commission.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/british-high-commission.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/dalberg.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/dalberg.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/usa.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/usa.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/giz.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/giz.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/dallaire.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/dallaire.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/global-health.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/global-health.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/gva.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/gva.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/ihs.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/ihs.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/kics.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/kics.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/un-eca.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/un-eca.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/vipp.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/vipp.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/wfp.jpg"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/wfp.jpg" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/mastercard.png"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 1">
+                  <img src="images/newimages/mastercard.png" alt="Partner 1"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/sa-embassy.png"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 2">
+                  <img src="images/newimages/sa-embassy.png" alt="Partner 2"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/wildlife.png"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 3">
+                  <img src="images/newimages/wildlife.png" alt="Partner 3"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item">
+                  <img src="images/newimages/british-council.png" alt=""
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item position-relative hover-change-image">
+                  <img src="images/newimages/care.png"
+                 class="hover-image position-absolute pos-fixed-top" alt="Partner 5">
+                  <img src="images/newimages/care.png" alt="Partner 5"
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item">
+                  <img src="images/newimages/canal.png" alt=""
+                 class="image">
+                </a>
+              </div>
+
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item">
+                  <img src="images/newimages/save-the-children.png" alt=""
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item">
+                  <img src="images/newimages/unhcr.png" alt=""
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item">
+                  <img src="images/newimages/coat-of-arms.png" alt=""
+                 class="image">
+                </a>
+              </div>
+              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+                <a href="#" class="item">
+                  <img src="images/newimages/one-acre-fund.png" alt=""
+                 class="image">
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Agents Section -->
+      <section class="pt-7 pb-10 pb-xl-6 agents-section bg-primary">
+        <div class="container container-xxl">
+          <p class="text-yellow letter-spacing-263 text-uppercase lh-186 text-center mb-0">Meet our team</p>
+          <h2 class="text-center text-white lh-1625 mxw-940 mb-1">
+            Meet our agents. Experienced professionals with local expertise to help sell your home.
+          </h2>
+           <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
+          <div class="slick-slider slick-dots-mt-0 item-nth-2-active-lg"
+         data-slick-options='{"slidesToShow": 3, "dots":false,"arrows":false,"responsive":[{"breakpoint": 1600,"settings": {"slidesToShow":3,"dots":false}},{"breakpoint": 1200,"settings": {"slidesToShow":4,"dots":false}},{"breakpoint": 992,"settings": {"slidesToShow":3 ,"dots":false}},{"breakpoint": 768,"settings": {"slidesToShow": 2 ,"dots":false}},{"breakpoint": 576,"settings": {"slidesToShow": 1,"dots":false}}]}'>
+            
+            <?php if (!empty($agents)): ?>
+            <?php foreach ($agents as $row): ?> 
+            <div class="py-8">
+              <div class="card border-lg-0 shadow-hover-xs-4 hover-change-image" data-animate="flipInX">
+                <div class="card-body text-center pt-6 pb-3 px-3">
+                  <a href="agent-details.php?id=<?php echo $row['id']; ?>" class="d-inline-block mb-2">
+                    <img src="images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>" style="width:120px; height:120px; object-fit:cover; border-radius:50%;">
+                  </a>
+                  <a href="agent-details.php?id=<?php echo $row['id']; ?>"
+               class="d-block fs-16 lh-1 text-dark mb-0 font-weight-500 hover-primary team-member"><?php echo $row['name']; ?></a>
+                  <p class="mb-2 fs-13 text-danger"><?php echo $row['position']; ?></p>
+                  
+                </div>
+               
+              </div>
+            </div>
+            <?php endforeach; ?>
+            <?php endif; ?>
+            
+          </div>
+          <div class="text-center pb-5" data-animate="fadeInLeft">
+            <a href="team.php" class="btn btn-lg btn-primary rmb-8 mb-lg-0">View our team
+              <i class="far fa-long-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Property Types -->
+      <section class="pt-lg-12 pb-lg-15 py-11">
+        <div class="container container-xxl">
+          <h2 class="text-heading">Property of all types, for all your needs</h2>
+          <span class="heading-divider"></span>
+          <p class="mb-7">We offer a large variety of property to suit your residential, commercial and industrial needs.</p>
+          <div class="slick-slider mx-n2"
+         data-slick-options='{"slidesToShow": 5,"arrows":false, "autoplay":false,"dots":false,"responsive":[{"breakpoint": 1200,"settings": {"slidesToShow":3}},{"breakpoint": 992,"settings": {"slidesToShow":3}},{"breakpoint": 768,"settings": {"slidesToShow": 2}},{"breakpoint": 576,"settings": {"slidesToShow": 1}}]}'>
+            <div class="box px-2" data-animate="fadeInUp">
+              <div class="card text-white bg-overlay-gradient-8 hover-zoom-in">
+                <img src="images/newimages/townhouse.jpg" class="card-img" alt="Town Houses">
+                <div class="card-img-overlay d-flex justify-content-end flex-column p-4">
+                  <h2 class="card-title mb-0 fs-20 lh-182"><a href="search-results.php?label=&category=&type=3&district=&max_price=&beds=&baths=&ref="
+                                                        class="text-white">Town Houses</a></h2>
+                </div>
+              </div>
+            </div>
+            <div class="box px-2" data-animate="fadeInUp">
+              <div class="card text-white bg-overlay-gradient-8 hover-zoom-in">
+                <img src="images/newimages/house.jpg" class="card-img" alt="Houses">
+                <div class="card-img-overlay d-flex justify-content-end flex-column p-4">
+                  <h2 class="card-title mb-0 fs-20 lh-182"><a href="search-results.php?label=&category=&type=2&district=&max_price=&beds=&baths=&ref="
+                                                        class="text-white">Houses</a></h2>
+                </div> 
+              </div>
+            </div>
+            <div class="box px-2" data-animate="fadeInUp">
+              <div class="card text-white bg-overlay-gradient-8 hover-zoom-in">
+                <img src="images/newimages/commercial.jpg" class="card-img" alt="Commercial">
+                <div class="card-img-overlay d-flex justify-content-end flex-column p-4">
+                  <h2 class="card-title mb-0 fs-20 lh-182"><a href="search-results.php?label=&category=2&type=&district=&max_price=&beds=&baths=&ref="
+                                                        class="text-white">Commercial</a></h2>
+                </div>
+              </div>
+            </div>
+            <div class="box px-2" data-animate="fadeInUp">
+              <div class="card text-white bg-overlay-gradient-8 hover-zoom-in">
+                <img src="images/newimages/land.jpg" class="card-img" alt="Vacant Land">
+                <div class="card-img-overlay d-flex justify-content-end flex-column p-4">
+                  <h2 class="card-title mb-0 fs-20 lh-182"><a href="search-results.php?label=&category=4&type=&district=&max_price=&beds=&baths=&ref="
+                                                        class="text-white">Vacant Land</a></h2>
+                </div>
+              </div>
+            </div>
+            <div class="box px-2" data-animate="fadeInUp">
+              <div class="card text-white bg-overlay-gradient-8 hover-zoom-in">
+                <img src="images/newimages/apartment.jpg" class="card-img" alt="Apartments">
+                <div class="card-img-overlay d-flex justify-content-end flex-column p-4">
+                  <h2 class="card-title mb-0 fs-20 lh-182"><a href="search-results.php?label=&category=&type=1&district=&max_price=&beds=&baths=&ref="
+                                                        class="text-white">Apartments</a></h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Banner -->
+      <section class="pt-11 pb-13 bg-cover" style="background-image: url(images/newimages/banner-1.jpg)">
+        <div class="container">
+          <form class="text-center" data-animate="fadeInUp">
+            <h2 class="fs-34 font-weight-normal lh-141 text-white mxw-740">
+             Be the first to view the latest developments and projects under offer. 
+            </h2>
+            <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
+            <div class="text-center mt-8">
+                <a class="btn btn-primary btn-lg" href="developments.php">View Developments</a>
+            </div>
+           
+          </form>
         </div>
       </section>
       
