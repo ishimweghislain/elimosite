@@ -51,6 +51,13 @@ if (!empty($dev['agent_id'])) {
         .unit-card:hover { transform: translateY(-5px); transition: 0.3s; }
         .gallery-item img { height: 200px; width: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
         
+        @media (max-width: 768px) {
+            .hero-banner { height: 300px !important; }
+            .hero-overlay { display: none !important; }
+            .mobile-project-info { display: block !important; padding: 20px 15px; background: #fff; border-bottom: 1px solid #e5e5e5; }
+        }
+        .mobile-project-info { display: none; }
+        
         .development-gallery-slider .slick-prev, .development-gallery-slider .slick-next {
             position: absolute;
             top: 50%;
@@ -85,6 +92,15 @@ if (!empty($dev['agent_id'])) {
                   <h1 class="fs-40 lh-1 mb-2 font-weight-700 text-white"><?php echo htmlspecialchars($dev['title']); ?></h1>
                   <p class="fs-18 mb-0 opacity-09"><i class="fal fa-map-marker-alt mr-2"></i><?php echo htmlspecialchars($dev['location']); ?>, <?php echo $dev['district']; ?></p>
               </div>
+          </div>
+      </section>
+
+      <!-- Mobile Project Info (Show only on Mobile) -->
+      <section class="mobile-project-info">
+          <div class="container">
+              <span class="badge badge-primary mb-2 px-2 py-1 fs-10 text-uppercase">Development Project</span>
+              <h1 class="fs-24 lh-1 mb-2 font-weight-700 text-heading"><?php echo htmlspecialchars($dev['title']); ?></h1>
+              <p class="fs-14 mb-0 text-muted"><i class="fal fa-map-marker-alt mr-2 text-primary"></i><?php echo htmlspecialchars($dev['location']); ?>, <?php echo $dev['district']; ?></p>
           </div>
       </section>
 

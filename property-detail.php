@@ -97,8 +97,20 @@ if (!empty($property['agent_id'])) {
             overflow: hidden;
         }
         .hero-banner { min-height: 600px; }
+        .hero-banner img { height: 600px; }
         .btn-white { background: #fff; color: #252839; }
         .btn-white:hover { background: #252839; color: #fff; }
+
+        @media (max-width: 768px) {
+            .hero-banner, .hero-banner img { min-height: 350px !important; height: 350px !important; }
+            .hero-overlay { display: none !important; }
+            .mobile-property-info { display: block !important; padding: 20px 15px; background: #fff; }
+            .slider-arrows .px-5 { px: 2 !important; }
+            .prop-prev, .prop-next { width: 40px !important; height: 40px !important; }
+            .prop-prev i, .prop-next i { font-size: 14px !important; }
+        }
+        .mobile-property-info { display: none; }
+        .prop-prev, .prop-next { border: 1px solid rgba(0,0,0,0.1) !important; }
     </style>
     <link rel="icon" href="images/favicon.png">
   </head>
@@ -125,8 +137,8 @@ if (!empty($property['agent_id'])) {
               <?php endif; ?>
           </div>
 
-          <!-- Hero Overlay -->
-          <div class="hero-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); padding: 80px 0 40px; pointer-events: none;">
+          <!-- Hero Overlay (Desktop Only) -->
+          <div class="hero-overlay d-none d-md-block" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); padding: 80px 0 40px; pointer-events: none;">
               <div class="container">
                   <div class="row align-items-end">
                       <div class="col-lg-8">
@@ -151,10 +163,27 @@ if (!empty($property['agent_id'])) {
 
           <!-- Slider Arrows -->
           <div class="slider-arrows w-100 position-absolute" style="top: 50%; transform: translateY(-50%); z-index: 1000; left: 0; pointer-events: none;">
-             <div class="px-5 d-flex justify-content-between">
-                <button type="button" class="prop-prev btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; cursor: pointer; border: 2px solid #f6b500; pointer-events: auto;"><i class="fas fa-chevron-left fa-2x text-primary"></i></button>
-                <button type="button" class="prop-next btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; cursor: pointer; border: 2px solid #f6b500; pointer-events: auto;"><i class="fas fa-chevron-right fa-2x text-primary"></i></button>
+             <div class="container-fluid d-flex justify-content-between px-3 px-md-5">
+                <button type="button" class="prop-prev btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer; pointer-events: auto;"><i class="fas fa-chevron-left text-primary"></i></button>
+                <button type="button" class="prop-next btn btn-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; cursor: pointer; pointer-events: auto;"><i class="fas fa-chevron-right text-primary"></i></button>
              </div>
+          </div>
+      </section>
+
+      <!-- Mobile Property Info (Show only on Mobile) -->
+      <section class="mobile-property-info border-bottom">
+          <div class="container">
+              <div class="d-flex align-items-center mb-2">
+                  <span class="badge badge-primary px-2 py-1 fs-10 text-uppercase mr-2"><?php echo strtoupper(str_replace('-', ' ', $property['status'])); ?></span>
+                  <?php if ($development): ?>
+                      <span class="badge badge-yellow px-2 py-1 fs-10 text-uppercase font-weight-700">Project Unit</span>
+                  <?php endif; ?>
+              </div>
+              <h1 class="fs-24 text-heading font-weight-bold mb-1"><?php echo htmlspecialchars($property['title']); ?></h1>
+              <p class="text-muted mb-3 fs-14"><i class="fal fa-map-marker-alt mr-2 text-primary"></i><?php echo htmlspecialchars($property['location']); ?></p>
+              <?php if (!empty($property['price']) && $property['price'] > 0): ?>
+                  <p class="fs-20 text-primary font-weight-bold mb-0">RWF <?php echo number_format($property['price']); ?></p>
+              <?php endif; ?>
           </div>
       </section>
 
