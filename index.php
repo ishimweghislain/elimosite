@@ -860,81 +860,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
 
       <!-- Partners Section -->
       <section class="bg-patten-05">
-      <section class="bg-patten-05">
         <div class="container container-xxl pt-6 pb-12">
           <h2 class="text-dark text-center mxw-751 fs-26 lh-184 px-md-8">
             Trusted by the biggest local and international institutions</h2>
           <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
           <div class="pt-2 pb-12">
             <div class="slick-slider mx-0 partners"
-           data-slick-options='{"slidesToShow": 6, "autoplay":true,"dots":false,"arrows":false,"responsive":[{"breakpoint": 1200,"settings": {"slidesToShow":4}},{"breakpoint": 992,"settings": {"slidesToShow":3}},{"breakpoint": 768,"settings": {"slidesToShow": 3}},{"breakpoint": 576,"settings": {"slidesToShow": 2}}]}'>
+           data-slick-options='{"slidesToShow": 5, "autoplay":true,"dots":false,"arrows":false,"responsive":[{"breakpoint": 1200,"settings": {"slidesToShow":4}},{"breakpoint": 992,"settings": {"slidesToShow":3}},{"breakpoint": 768,"settings": {"slidesToShow": 3}},{"breakpoint": 576,"settings": {"slidesToShow": 2}}]}'>
               
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/mastercard.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="Mastercard">
-                  <img src="images/newimages/mastercard.png" alt="Mastercard"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/sa-embassy.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="SA Embassy">
-                  <img src="images/newimages/sa-embassy.png" alt="SA Embassy"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/wildlife.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="Wildlife">
-                  <img src="images/newimages/wildlife.png" alt="Wildlife"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+              <div class="box">
                 <a href="#" class="item">
-                  <img src="images/newimages/british-council.png" alt="British Council"
-                 class="image">
+                  <img src="images/newimages/mastercard.png" alt="Mastercard" class="image">
                 </a>
               </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
-                <a href="#" class="item position-relative hover-change-image">
-                  <img src="images/newimages/care.png"
-                 class="hover-image position-absolute pos-fixed-top" alt="Care">
-                  <img src="images/newimages/care.png" alt="Care"
-                 class="image">
-                </a>
-              </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+              <div class="box">
                 <a href="#" class="item">
-                  <img src="images/newimages/canal.png" alt="Canal Plus"
-                 class="image">
+                  <img src="images/newimages/sa-embassy.png" alt="SA Embassy" class="image">
                 </a>
               </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+              <div class="box">
                 <a href="#" class="item">
-                  <img src="images/newimages/save-the-children.png" alt="Save the Children"
-                 class="image">
+                  <img src="images/newimages/wildlife.png" alt="Wildlife" class="image">
                 </a>
               </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+              <div class="box">
                 <a href="#" class="item">
-                  <img src="images/newimages/unhcr.png" alt="UNHCR"
-                 class="image">
+                  <img src="images/newimages/british-council.png" alt="British Council" class="image">
                 </a>
               </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+              <div class="box">
                 <a href="#" class="item">
-                  <img src="images/newimages/coat-of-arms.png" alt="Coat of Arms"
-                 class="image">
+                  <img src="images/newimages/care.png" alt="Care" class="image">
                 </a>
               </div>
-              <div class="box d-flex align-items-center justify-content-center" data-animate="fadeInUp">
+              <div class="box">
                 <a href="#" class="item">
-                  <img src="images/newimages/one-acre-fund.png" alt="One Acre Fund"
-                 class="image">
+                  <img src="images/newimages/canal.png" alt="Canal Plus" class="image">
+                </a>
+              </div>
+              <div class="box">
+                <a href="#" class="item">
+                  <img src="images/newimages/save-the-children.png" alt="Save the Children" class="image">
+                </a>
+              </div>
+              <div class="box">
+                <a href="#" class="item">
+                  <img src="images/newimages/unhcr.png" alt="UNHCR" class="image">
+                </a>
+              </div>
+              <div class="box">
+                <a href="#" class="item">
+                  <img src="images/newimages/coat-of-arms.png" alt="Coat of Arms" class="image">
+                </a>
+              </div>
+              <div class="box">
+                <a href="#" class="item">
+                  <img src="images/newimages/one-acre-fund.png" alt="One Acre Fund" class="image">
                 </a>
               </div>
             </div>
