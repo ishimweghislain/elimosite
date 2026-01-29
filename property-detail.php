@@ -32,8 +32,22 @@ if (!empty($property['agent_id'])) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="<?php echo get_setting('site_description'); ?>">
+    <meta name="description" content="<?php echo truncate_text(strip_tags($property['description']), 160); ?>">
     <title><?php echo htmlspecialchars($property['title']); ?> - <?php echo get_setting('site_name'); ?></title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo SITE_URL; ?>property-detail.php?id=<?php echo $id; ?>">
+    <meta property="og:title" content="<?php echo htmlspecialchars($property['title']); ?>">
+    <meta property="og:description" content="<?php echo truncate_text(strip_tags($property['description']), 160); ?>">
+    <meta property="og:image" content="<?php echo SITE_URL; ?>images/<?php echo !empty($property['image_main']) ? $property['image_main'] : 'property-placeholder.jpg'; ?>">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<?php echo SITE_URL; ?>property-detail.php?id=<?php echo $id; ?>">
+    <meta property="twitter:title" content="<?php echo htmlspecialchars($property['title']); ?>">
+    <meta property="twitter:description" content="<?php echo truncate_text(strip_tags($property['description']), 160); ?>">
+    <meta property="twitter:image" content="<?php echo SITE_URL; ?>images/<?php echo !empty($property['image_main']) ? $property['image_main'] : 'property-placeholder.jpg'; ?>">
     
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vendors/fontawesome-pro-5/css/all.css">

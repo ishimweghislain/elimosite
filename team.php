@@ -33,18 +33,16 @@ $team_members = get_team_members();
     <!-- Favicons -->
     <link rel="icon" href="images/favicon.png">
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@">
-    <meta name="twitter:creator" content="@">
-    <meta name="twitter:title" content="Our Team">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Our Team - <?php echo get_setting('site_name'); ?>">
     <meta name="twitter:description" content="<?php echo get_setting('site_description'); ?>">
-    <meta name="twitter:image" content="images/banner-1.jpg">
+    <meta name="twitter:image" content="<?php echo SITE_URL; ?>images/logo.png">
     <!-- Facebook -->
-    <meta property="og:url" content="agents-grid-1.html">
-    <meta property="og:title" content="Our Team">
+    <meta property="og:url" content="<?php echo SITE_URL; ?>team.php">
+    <meta property="og:title" content="Our Team - <?php echo get_setting('site_name'); ?>">
     <meta property="og:description" content="<?php echo get_setting('site_description'); ?>">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="images/banner-1.jpg">
+    <meta property="og:image" content="<?php echo SITE_URL; ?>images/logo.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">

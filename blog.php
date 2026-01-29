@@ -33,19 +33,17 @@ $blog_posts = get_blog_posts(9);
     <!-- Favicons -->
     <link rel="icon" href="images/favicon.png">
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@">
-    <meta name="twitter:creator" content="@">
-    <meta name="twitter:title" content="Blog Grid">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog - <?php echo get_setting('site_name'); ?>">
     <meta name="twitter:description" content="<?php echo get_setting('site_description'); ?>">
-    <meta name="twitter:image" content="images/banner-1.jpg">
+    <meta name="twitter:image" content="<?php echo SITE_URL; ?>images/banner-1.jpg">
     <!-- Facebook -->
-    <meta property="og:url" content="blog-grid.html">
-    <meta property="og:title" content="Blog Grid">
+    <meta property="og:url" content="<?php echo SITE_URL; ?>blog.php">
+    <meta property="og:title" content="Blog - <?php echo get_setting('site_name'); ?>">
     <meta property="og:description" content="<?php echo get_setting('site_description'); ?>">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="images/banner-1.jpg">
-    <meta property="og:image:type" content="image/png">
+    <meta property="og:image" content="<?php echo SITE_URL; ?>images/banner-1.jpg">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <style>

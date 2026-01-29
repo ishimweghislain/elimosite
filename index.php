@@ -54,9 +54,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="<?php echo get_setting('site_description', 'Elimo Real Estate'); ?>">
-    <meta name="author" content="">
-    <meta name="generator" content="Jekyll">
     <title><?php echo get_page_title(); ?></title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo SITE_URL; ?>">
+    <meta property="og:title" content="<?php echo get_page_title(); ?>">
+    <meta property="og:description" content="<?php echo get_setting('site_description', 'Elimo Real Estate'); ?>">
+    <meta property="og:image" content="<?php echo SITE_URL; ?>images/banner-1.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<?php echo SITE_URL; ?>">
+    <meta property="twitter:title" content="<?php echo get_page_title(); ?>">
+    <meta property="twitter:description" content="<?php echo get_setting('site_description', 'Elimo Real Estate'); ?>">
+    <meta property="twitter:image" content="<?php echo SITE_URL; ?>images/banner-1.jpg">
     <!-- Google fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet">
