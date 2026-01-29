@@ -107,148 +107,242 @@ if (!empty($_GET['search'])) {
 
       <section class="pb-9 pb-md-11">
         <div class="container">
-          <?php if (!empty($properties)): ?>
-            <?php foreach ($properties as $property): ?>
-              <div class="media p-4 border rounded-lg shadow-hover-1 pr-lg-8 mb-6 flex-column flex-lg-row no-gutters" data-animate="fadeInUp">
-                <div class="col-lg-4 mr-lg-5 card border-0 hover-change-image bg-hover-overlay">
-                  <img src="<?php echo !empty($property['image_main']) ? 'images/' . $property['image_main'] : 'images/property-placeholder.jpg'; ?>" 
-                       class="card-img" alt="<?php echo htmlspecialchars($property['title']); ?>">
-                  <div class="card-img-overlay p-2 d-flex flex-column">
-                    <div>
-                      <span class="badge badge-yellow"><?php echo htmlspecialchars($property['status']); ?></span>
+          <div class="row">
+            <!-- Properties List -->
+            <div class="col-lg-9 mb-8 mb-lg-0">
+              <?php if (!empty($properties)): ?>
+                <?php foreach ($properties as $property): ?>
+                  <div class="media p-4 border rounded-lg shadow-hover-1 pr-lg-8 mb-6 flex-column flex-lg-row no-gutters" data-animate="fadeInUp">
+                    <div class="col-lg-4 mr-lg-5 card border-0 hover-change-image bg-hover-overlay">
+                      <img src="<?php echo !empty($property['image_main']) ? 'images/' . $property['image_main'] : 'images/property-placeholder.jpg'; ?>" 
+                           class="card-img" alt="<?php echo htmlspecialchars($property['title']); ?>">
+                      <div class="card-img-overlay p-2 d-flex flex-column">
+                        <div>
+                          <span class="badge badge-yellow"><?php echo htmlspecialchars($property['status']); ?></span>
+                        </div>
+                        <div class="mt-auto d-flex hover-image">
+                          <ul class="list-inline mb-0 d-flex align-items-end mr-auto">
+                            <li class="list-inline-item mr-2" data-toggle="tooltip" title="Images">
+                              <a href="#" class="text-white hover-primary">
+                                <i class="far fa-images"></i>
+                              </a>
+                            </li>
+                            <li class="list-inline-item">
+                                    <button class="btn btn-primary btn-sm rounded-lg view-details-btn" data-id="<?php echo $property['id']; ?>" data-toggle="tooltip" title="View Details">
+                                        <i class="far fa-eye mr-1"></i> View Details
+                                    </button>
+                            </li>
+                          </ul>
+                          <ul class="list-inline mb-0 d-flex align-items-end mr-n3">
+                            <li class="list-inline-item mr-3 h-32" data-toggle="tooltip" title="Wishlist">
+                              <a href="#" class="text-white fs-20 hover-primary">
+                                <i class="far fa-heart"></i>
+                              </a>
+                            </li>
+                            <li class="list-inline-item mr-3 h-32" data-toggle="tooltip" title="Compare">
+                              <a href="#" class="text-white fs-20 hover-primary">
+                                <i class="fas fa-exchange-alt"></i>
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
                     </div>
-                    <div class="mt-auto d-flex hover-image">
-                      <ul class="list-inline mb-0 d-flex align-items-end mr-auto">
-                        <li class="list-inline-item mr-2" data-toggle="tooltip" title="Images">
-                          <a href="#" class="text-white hover-primary">
-                            <i class="far fa-images"></i>
+                    <div class="media-body mt-5 mt-lg-0">
+                      <div class="d-lg-flex justify-content-lg-between">
+                        <h2 class="my-0">
+                          <a href="property-detail.php?id=<?php echo $property['id']; ?>" class="fs-18 lh-2 text-dark hover-primary d-block">
+                            <?php echo htmlspecialchars($property['title']); ?>
                           </a>
-                        </li>
-                        <li class="list-inline-item">
-                                <button class="btn btn-primary btn-sm rounded-lg view-details-btn" data-id="<?php echo $property['id']; ?>" data-toggle="tooltip" title="View Details">
-                                    <i class="far fa-eye mr-1"></i> View Details
-                                </button>
-                        </li>
-                      </ul>
-                      <ul class="list-inline mb-0 d-flex align-items-end mr-n3">
-                        <li class="list-inline-item mr-3 h-32" data-toggle="tooltip" title="Wishlist">
-                          <a href="#" class="text-white fs-20 hover-primary">
-                            <i class="far fa-heart"></i>
-                          </a>
-                        </li>
-                        <li class="list-inline-item mr-3 h-32" data-toggle="tooltip" title="Compare">
-                          <a href="#" class="text-white fs-20 hover-primary">
-                            <i class="fas fa-exchange-alt"></i>
-                          </a>
-                        </li>
-                      </ul>
+                        </h2>
+                        <?php if ($property['price']): ?>
+                          <p class="listing-price fs-18 pt-2 font-weight-bold text-heading lh-1 mb-0 pr-lg-3 mb-lg-2 mt-3 mt-lg-0">
+                            <?php echo format_price($property['price']); ?>
+                          </p>
+                        <?php endif; ?>
+                      </div>
+                      <p class="mb-2 font-weight-500 text-gray-light"><?php echo htmlspecialchars($property['location']); ?></p>
+                      <p class="mb-6 mxw-571 ml-0"><?php echo truncate_text($property['description'], 150); ?></p>
+                      <div class="d-lg-flex justify-content-lg-between">
+                        <ul class="list-inline d-flex mb-0 flex-wrap">
+                          <?php if (!empty($property['bedrooms'])): ?>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['bedrooms']; ?> Bedroom">
+                              <svg class="icon icon-bedroom fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-bedroom"></use>
+                              </svg>
+                              <?php echo $property['bedrooms']; ?> Beds
+                            </li>
+                          <?php endif; ?>
+                          <?php if (!empty($property['bathrooms'])): ?>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['bathrooms']; ?> Bathrooms">
+                              <svg class="icon icon-shower fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-shower"></use>
+                              </svg>
+                              <?php echo $property['bathrooms']; ?> Baths
+                            </li>
+                          <?php endif; ?>
+                          <?php if (!empty($property['garage'])): ?>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['garage']; ?> Parking Space">
+                              <svg class="icon icon-Garage fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-Garage"></use>
+                              </svg>
+                              <?php echo $property['garage']; ?> Pkg
+                            </li>
+                          <?php endif; ?>
+                          <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Build Size">
+                              <svg class="icon icon-square fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-square"></use>
+                              </svg>
+                              <?php echo (int)$property['size_sqm']; ?>m²
+                            </li>
+                          <?php endif; ?>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="media-body mt-5 mt-lg-0">
-                  <div class="d-lg-flex justify-content-lg-between">
-                    <h2 class="my-0">
-                      <a href="property-detail.php?id=<?php echo $property['id']; ?>" class="fs-18 lh-2 text-dark hover-primary d-block">
-                        <?php echo htmlspecialchars($property['title']); ?>
-                      </a>
-                    </h2>
-                    <?php if ($property['price']): ?>
-                      <p class="listing-price fs-18 pt-2 font-weight-bold text-heading lh-1 mb-0 pr-lg-3 mb-lg-2 mt-3 mt-lg-0">
-                        <?php echo format_price($property['price']); ?>
-                      </p>
-                    <?php endif; ?>
-                  </div>
-                  <p class="mb-2 font-weight-500 text-gray-light"><?php echo htmlspecialchars($property['location']); ?></p>
-                  <p class="mb-6 mxw-571 ml-0"><?php echo truncate_text($property['description'], 150); ?></p>
-                  <div class="d-lg-flex justify-content-lg-between">
-                    <ul class="list-inline d-flex mb-0 flex-wrap">
-                      <?php if ($property['bedrooms']): ?>
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['bedrooms']; ?> Bedroom">
-                          <svg class="icon icon-bedroom fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-bedroom"></use>
-                          </svg>
-                          <?php echo $property['bedrooms']; ?> Beds
+                <?php endforeach; ?>
+
+                <!-- Pagination -->
+                <?php if ($total_pages > 1): ?>
+                  <nav class="pt-4">
+                    <ul class="pagination rounded-active justify-content-center mb-0">
+                      <?php if ($current_page > 1): ?>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<?php echo $current_page - 1; ?><?php echo !empty($_SERVER['QUERY_STRING']) ? '&' . $_SERVER['QUERY_STRING'] : ''; ?>">
+                            <i class="far fa-angle-double-left"></i>
+                          </a>
                         </li>
                       <?php endif; ?>
-                      <?php if ($property['bathrooms']): ?>
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['bathrooms']; ?> Bathrooms">
-                          <svg class="icon icon-shower fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-shower"></use>
-                          </svg>
-                          <?php echo $property['bathrooms']; ?> Baths
+
+                      <?php 
+                      $start = max(1, $current_page - 2);
+                      $end = min($total_pages, $current_page + 2);
+                      for ($i = $start; $i <= $end; $i++): 
+                      ?>
+                        <li class="page-item <?php echo $i === $current_page ? 'active' : ''; ?>">
+                          <a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($_SERVER['QUERY_STRING']) ? '&' . $_SERVER['QUERY_STRING'] : ''; ?>">
+                            <?php echo $i; ?>
+                          </a>
                         </li>
-                      <?php endif; ?>
-                      <?php if ($property['garage']): ?>
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['garage']; ?> Parking Space">
-                          <svg class="icon icon-Garage fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-Garage"></use>
-                          </svg>
-                          <?php echo $property['garage']; ?> Pkg
-                        </li>
-                      <?php endif; ?>
-                      <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Build Size">
-                          <svg class="icon icon-square fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-square"></use>
-                          </svg>
-                          <?php echo (int)$property['size_sqm']; ?>m²
+                      <?php endfor; ?>
+
+                      <?php if ($current_page < $total_pages): ?>
+                        <li class="page-item">
+                          <a class="page-link" href="?page=<?php echo $current_page + 1; ?><?php echo !empty($_SERVER['QUERY_STRING']) ? '&' . $_SERVER['QUERY_STRING'] : ''; ?>">
+                            <i class="far fa-angle-double-right"></i>
+                          </a>
                         </li>
                       <?php endif; ?>
                     </ul>
+                  </nav>
+                <?php endif; ?>
+
+              <?php else: ?>
+                <div class="text-center py-8">
+                  <div class="mb-4">
+                    <i class="fas fa-search fa-3x text-muted"></i>
+                  </div>
+                  <h3 class="text-muted mb-3">No properties found</h3>
+                  <p class="text-muted">Try adjusting your search criteria or browse our featured properties.</p>
+                  <a href="index.php" class="btn btn-primary">Browse All Properties</a>
+                </div>
+              <?php endif; ?>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-3 primary-sidebar sidebar-sticky" id="sidebar">
+              <div class="primary-sidebar-inner">
+                <!-- Newsletter Sign Up -->
+                <div class="card border-0 mb-6 bg-gray-01">
+                  <div class="card-body p-6">
+                    <h4 class="card-title fs-16 lh-2 text-dark mb-1">Newsletter Sign Up</h4>
+                    <p class="card-text mb-5 lh-15 text-muted">Subscribe to receive exclusive offers and the latest property trends.</p>
+                    
+                    <?php
+                    $sidebar_newsletter = handle_newsletter_subscription();
+                    if ($sidebar_newsletter):
+                    ?>
+                      <div class="alert alert-<?php echo $sidebar_newsletter['success'] ? 'success' : 'danger'; ?> alert-sm">
+                        <?php echo htmlspecialchars($sidebar_newsletter['message']); ?>
+                      </div>
+                    <?php endif; ?>
+
+                    <form method="POST">
+                      <input type="hidden" name="newsletter_form" value="1">
+                      <div class="form-group mb-3">
+                        <label for="sidebar_email" class="sr-only">Email</label>
+                        <input type="email" class="form-control form-control-lg border-0 shadow-none bg-white" id="sidebar_email" name="email" placeholder="Enter your email" required>
+                      </div>
+                      <button type="submit" class="btn btn-primary btn-lg btn-block shadow-none mb-2">
+                        Subscribe
+                      </button>
+                    </form>
                   </div>
                 </div>
+
+                <!-- Latest Posts -->
+                <?php $recent_posts = get_blog_posts(4); ?>
+                <?php if (!empty($recent_posts)): ?>
+                <div class="card border-0">
+                  <div class="card-body p-0 pl-lg-6">
+                    <h4 class="card-title fs-16 lh-2 text-dark mb-3">Latest Posts</h4>
+                    <ul class="list-group list-group-flush">
+                      <?php foreach ($recent_posts as $post): ?>
+                      <li class="list-group-item px-0 pt-0 pb-3 bg-transparent border-0">
+                        <div class="media">
+                          <div class="position-relative mr-3">
+                             <a href="#" class="d-block w-100px rounded blog-view-btn" data-id="<?php echo $post['id']; ?>">
+                                <img src="<?php echo !empty($post['image']) ? 'images/' . $post['image'] : 'images/blog-details.jpg'; ?>" 
+                                     alt="<?php echo htmlspecialchars($post['title']); ?>" 
+                                     class="rounded" style="width: 100px; height: 75px; object-fit: cover;">
+                             </a>
+                          </div>
+                          <div class="media-body">
+                            <h4 class="fs-12 lh-15 mb-1">
+                              <a href="#" class="text-dark hover-primary blog-view-btn" data-id="<?php echo $post['id']; ?>">
+                                <?php echo htmlspecialchars($post['title']); ?>
+                              </a>
+                            </h4>
+                            <div class="text-gray-light fs-12">
+                              <?php echo format_date($post['created_at'], 'M d, Y'); ?>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <?php endforeach; ?>
+                    </ul>
+                  </div>
+                </div>
+                <?php endif; ?>
               </div>
-            <?php endforeach; ?>
-
-            <!-- Pagination -->
-            <?php if ($total_pages > 1): ?>
-              <nav class="pt-4">
-                <ul class="pagination rounded-active justify-content-center mb-0">
-                  <?php if ($current_page > 1): ?>
-                    <li class="page-item">
-                      <a class="page-link" href="?page=<?php echo $current_page - 1; ?><?php echo !empty($_SERVER['QUERY_STRING']) ? '&' . $_SERVER['QUERY_STRING'] : ''; ?>">
-                        <i class="far fa-angle-double-left"></i>
-                      </a>
-                    </li>
-                  <?php endif; ?>
-
-                  <?php 
-                  $start = max(1, $current_page - 2);
-                  $end = min($total_pages, $current_page + 2);
-                  for ($i = $start; $i <= $end; $i++): 
-                  ?>
-                    <li class="page-item <?php echo $i === $current_page ? 'active' : ''; ?>">
-                      <a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($_SERVER['QUERY_STRING']) ? '&' . $_SERVER['QUERY_STRING'] : ''; ?>">
-                        <?php echo $i; ?>
-                      </a>
-                    </li>
-                  <?php endfor; ?>
-
-                  <?php if ($current_page < $total_pages): ?>
-                    <li class="page-item">
-                      <a class="page-link" href="?page=<?php echo $current_page + 1; ?><?php echo !empty($_SERVER['QUERY_STRING']) ? '&' . $_SERVER['QUERY_STRING'] : ''; ?>">
-                        <i class="far fa-angle-double-right"></i>
-                      </a>
-                    </li>
-                  <?php endif; ?>
-                </ul>
-              </nav>
-            <?php endif; ?>
-
-          <?php else: ?>
-            <div class="text-center py-8">
-              <div class="mb-4">
-                <i class="fas fa-search fa-3x text-muted"></i>
-              </div>
-              <h3 class="text-muted mb-3">No properties found</h3>
-              <p class="text-muted">Try adjusting your search criteria or browse our featured properties.</p>
-              <a href="index.php" class="btn btn-primary">Browse All Properties</a>
             </div>
-          <?php endif; ?>
+          </div>
         </div>
       </section>
+
     </main>
     
+    <!-- Blog Details Modal -->
+    <div class="modal fade" id="blogDetailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0 position-relative">
+                    <button type="button" class="close position-absolute t-15 r-15 z-index-10 bg-white rounded-circle p-2 shadow-sm" data-dismiss="modal" aria-label="Close" style="width: 40px; height: 40px; line-height: 20px;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-5 pt-0" id="blogModalContent">
+                    <div class="text-center py-10">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include 'includes/footer.php'; ?>
     <?php include 'includes/login-modal.php'; ?>
 
@@ -380,6 +474,41 @@ if (!empty($_GET['search'])) {
                 },
                 complete: function() {
                     btn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+        // Blog View Click
+        $('.blog-view-btn').on('click', function(e) {
+            e.preventDefault();
+            const postId = $(this).data('id');
+            
+            $('#blogDetailsModal').modal('show');
+            $('#blogModalContent').html('<div class="text-center py-10"><div class="spinner-border text-primary" role="status"></div></div>');
+            
+            $.ajax({
+                url: 'ajax/get-blog-post.php',
+                type: 'GET',
+                data: { id: postId },
+                success: function(response) {
+                    $('#blogModalContent').html(response);
+                    
+                    // Initialize Slider
+                    setTimeout(function() {
+                        if ($('.modal-blog-slider').length) {
+                            $('.modal-blog-slider').slick({
+                                dots: false,
+                                infinite: true,
+                                speed: 300,
+                                slidesToShow: 1,
+                                adaptiveHeight: true,
+                                prevArrow: $('.slider-prev'),
+                                nextArrow: $('.slider-next')
+                            });
+                        }
+                    }, 200);
+                },
+                error: function() {
+                    $('#blogModalContent').html('<div class="alert alert-danger">Error loading blog details. Please try again.</div>');
                 }
             });
         });
