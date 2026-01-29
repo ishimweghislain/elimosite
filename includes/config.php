@@ -17,7 +17,7 @@ define('DB_PASS', '9(3xIw7&pRF}');
 
 // Application settings
 define('SITE_NAME', 'Elimo Real Estate');
-define('SITE_URL', 'https://elimo.rw/V2'); // Removed trailing slash to avoid double slashes
+define('SITE_URL', 'https://elimo.rw/'); // Removed trailing slash to avoid double slashes
 define('ADMIN_URL', SITE_URL . '/admin');
 define('UPLOAD_PATH', __DIR__ . '/../images/uploads/');
 define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
