@@ -215,17 +215,40 @@ $districts = [
                       <p class="mb-2 font-weight-500 text-gray-light fs-14"><?php echo htmlspecialchars($property['location']); ?></p>
                       <p class="mb-3 text-muted fs-14" style="flex-grow: 1; min-height: 52px;"><?php echo truncate_text($property['description'], 120); ?></p>
                       <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
-                        <div class="d-flex flex-wrap">
-                          <?php if ($property['bedrooms']): ?>
-                            <span class="badge badge-light mr-1"><i class="fas fa-bed mr-1 text-primary"></i><?php echo $property['bedrooms']; ?></span>
+                        <ul class="list-inline d-flex mb-0 flex-wrap">
+                          <?php if (!empty($property['bedrooms'])): ?>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['bedrooms']; ?> Bedroom">
+                              <svg class="icon icon-bedroom fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-bedroom"></use>
+                              </svg>
+                              <?php echo $property['bedrooms']; ?> Beds
+                            </li>
                           <?php endif; ?>
-                          <?php if ($property['bathrooms']): ?>
-                            <span class="badge badge-light mr-1"><i class="fas fa-bath mr-1 text-primary"></i><?php echo $property['bathrooms']; ?></span>
+                          <?php if (!empty($property['bathrooms'])): ?>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['bathrooms']; ?> Bathrooms">
+                              <svg class="icon icon-shower fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-shower"></use>
+                              </svg>
+                              <?php echo $property['bathrooms']; ?> Baths
+                            </li>
+                          <?php endif; ?>
+                          <?php if (!empty($property['garage'])): ?>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="<?php echo $property['garage']; ?> Parking Space">
+                              <svg class="icon icon-Garage fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-Garage"></use>
+                              </svg>
+                              <?php echo $property['garage']; ?> Pkg
+                            </li>
                           <?php endif; ?>
                           <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
-                            <span class="badge badge-light"><i class="fas fa-ruler-combined mr-1 text-primary"></i><?php echo (int)$property['size_sqm']; ?>m²</span>
+                            <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Build Size">
+                              <svg class="icon icon-square fs-18 text-primary mr-1">
+                                <use xlink:href="#icon-square"></use>
+                              </svg>
+                              <?php echo (int)$property['size_sqm']; ?>m²
+                            </li>
                           <?php endif; ?>
-                        </div>
+                        </ul>
                         <?php if ($property['price']): ?>
                           <span class="text-primary font-weight-bold"><?php echo format_price($property['price']); ?></span>
                         <?php endif; ?>
@@ -401,5 +424,6 @@ $districts = [
             });
         });
     </script>
+    <?php include 'includes/svg-icons.php'; ?>
   </body>
 </html>

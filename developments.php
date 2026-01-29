@@ -168,7 +168,12 @@ $total_pages = ceil($total / $per_page);
                             $count->execute([$dev['id']]);
                             $units = $count->fetchColumn();
                             ?>
-                            <span class="badge badge-light p-2"><i class="fas fa-home mr-1 text-primary"></i><?php echo $units; ?> Units Available</span>
+                             <span class="badge badge-light p-2 d-flex align-items-center">
+                               <svg class="icon icon-building fs-18 text-primary mr-1" style="height: 18px; width: 18px;">
+                                 <use xlink:href="#icon-building"></use>
+                               </svg>
+                               <?php echo $units; ?> Units Available
+                             </span>
                         </div>
                       </div>
                     </div>
@@ -330,5 +335,6 @@ $total_pages = ceil($total / $per_page);
             });
         });
     </script>
+    <?php include 'includes/svg-icons.php'; ?>
   </body>
 </html>

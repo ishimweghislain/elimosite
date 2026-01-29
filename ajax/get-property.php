@@ -220,7 +220,9 @@ if (!empty($property['development_id'])) {
         <?php if ($property['bedrooms']): ?>
         <div class="col-4">
             <div class="p-2 border rounded text-center">
-                <i class="fas fa-bed text-primary d-block mb-1"></i>
+                <svg class="icon icon-bedroom fs-24 text-primary d-block mb-1 mx-auto" style="height: 24px; width: 24px;">
+                    <use xlink:href="#icon-bedroom"></use>
+                </svg>
                 <span class="fs-13"><?php echo $property['bedrooms']; ?> Beds</span>
             </div>
         </div>
@@ -228,7 +230,9 @@ if (!empty($property['development_id'])) {
         <?php if ($property['bathrooms']): ?>
         <div class="col-4">
             <div class="p-2 border rounded text-center">
-                <i class="fas fa-bath text-primary d-block mb-1"></i>
+                <svg class="icon icon-shower fs-24 text-primary d-block mb-1 mx-auto" style="height: 24px; width: 24px;">
+                    <use xlink:href="#icon-shower"></use>
+                </svg>
                 <span class="fs-13"><?php echo $property['bathrooms']; ?> Baths</span>
             </div>
         </div>
@@ -236,7 +240,9 @@ if (!empty($property['development_id'])) {
         <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
         <div class="col-4">
             <div class="p-2 border rounded text-center">
-                <i class="fas fa-ruler-combined text-primary d-block mb-1"></i>
+                <svg class="icon icon-square fs-24 text-primary d-block mb-1 mx-auto" style="height: 24px; width: 24px;">
+                    <use xlink:href="#icon-square"></use>
+                </svg>
                 <span class="fs-13">Build: <?php echo (int)$property['size_sqm']; ?>m²</span>
             </div>
         </div>

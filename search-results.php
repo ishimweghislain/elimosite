@@ -514,5 +514,6 @@ if (!empty($_GET['search'])) {
         });
     });
     </script>
+    <?php include 'includes/svg-icons.php'; ?>
   </body>
 </html>

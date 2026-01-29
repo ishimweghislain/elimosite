@@ -333,10 +333,14 @@ if (!empty($property['agent_id'])) {
               <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
                 <h3 class="fs-22 text-heading mb-4">Property Details</h3>
                 <div class="row">
-                    <?php if (!empty($property['bedrooms'])): ?>
+                    <?php if ($property['bedrooms']): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
-                            <span class="text-primary fs-20 mr-3"><i class="fal fa-bed"></i></span>
+                            <span class="text-primary fs-24 mr-3">
+                                <svg class="icon icon-bedroom fs-24">
+                                    <use xlink:href="#icon-bedroom"></use>
+                                </svg>
+                            </span>
                             <div>
                                 <span class="d-block text-gray-light fs-13">Bedrooms</span>
                                 <span class="d-block text-heading font-weight-500"><?php echo $property['bedrooms']; ?></span>
@@ -344,10 +348,14 @@ if (!empty($property['agent_id'])) {
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if (!empty($property['bathrooms'])): ?>
+                    <?php if ($property['bathrooms']): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
-                            <span class="text-primary fs-20 mr-3"><i class="fal fa-bath"></i></span>
+                            <span class="text-primary fs-24 mr-3">
+                                <svg class="icon icon-shower fs-24">
+                                    <use xlink:href="#icon-shower"></use>
+                                </svg>
+                            </span>
                             <div>
                                 <span class="d-block text-gray-light fs-13">Bathrooms</span>
                                 <span class="d-block text-heading font-weight-500"><?php echo $property['bathrooms']; ?></span>
@@ -358,7 +366,11 @@ if (!empty($property['agent_id'])) {
                     <?php if (!empty($property['garage'])): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
-                            <span class="text-primary fs-20 mr-3"><i class="fal fa-car"></i></span>
+                            <span class="text-primary fs-24 mr-3">
+                                <svg class="icon icon-Garage fs-24">
+                                    <use xlink:href="#icon-Garage"></use>
+                                </svg>
+                            </span>
                             <div>
                                 <span class="d-block text-gray-light fs-13">Parking Space</span>
                                 <span class="d-block text-heading font-weight-500"><?php echo $property['garage']; ?></span>
@@ -369,7 +381,11 @@ if (!empty($property['agent_id'])) {
                     <?php if (!empty($property['size_sqm']) && $property['size_sqm'] > 0): ?>
                     <div class="col-sm-6 col-lg-4 mb-4">
                         <div class="d-flex align-items-center">
-                            <span class="text-primary fs-20 mr-3"><i class="fal fa-ruler-combined"></i></span>
+                            <span class="text-primary fs-24 mr-3">
+                                <svg class="icon icon-square fs-24">
+                                    <use xlink:href="#icon-square"></use>
+                                </svg>
+                            </span>
                             <div>
                                 <span class="d-block text-gray-light fs-13">Build Size</span>
                                 <span class="d-block text-heading font-weight-500"><?php echo $property['size_sqm']; ?> m²</span>
@@ -581,5 +597,6 @@ if (!empty($property['agent_id'])) {
         });
     </script>
     <script src="js/theme.js"></script>
+    <?php include 'includes/svg-icons.php'; ?>
   </body>
 </html>
