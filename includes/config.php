@@ -92,9 +92,11 @@ function get_logged_in_user() {
 
 // Clean input data
 function clean_input($data) {
+    if ($data === null) return '';
     $data = trim($data);
+    // Stripslashes is kept for legacy environment compatibility if needed, 
+    // but the primary issue was htmlspecialchars encoding data before storage.
     $data = stripslashes($data);
-    $data = htmlspecialchars($data);
     return $data;
 }
 
