@@ -22,265 +22,229 @@ switch($_SESSION['la']){
     include 'include/config.php';
     include 'include/functions.php';
 
-    $searchLabel = "";
-    $searchCategory = "";
-    $searchType = "";
-    $searchDistrict = "";
-    $searchProvince = "";
-    $searchCity = "";
-    $searchMaxPrice = "";
-    $searchBeds = "";
-    $searchBaths = "";
-    $searchRef = "";
+    $property_id = $_REQUEST['id'];
 
-    // Check sale or rent
-    if (isset($_REQUEST['label'] )) {
-
-        if ($_REQUEST['label'] == "for-sale") {
-            $searchLabel = "label = 'For Sale' ";
-            $searchHeading = "for sale";
-        }elseif ($_REQUEST['label'] == "for-rent") {
-            $searchLabel = "label = 'For Rent' ";
-            $searchHeading = "for rent";
-        }else{
-            $searchLabel = "(label = 'For Sale' OR label = 'For Rent') ";
-        }    
-
-    }
-
-    // Check property category
-    if (isset($_REQUEST['category'] )) {
-        if ($_REQUEST['category'] != "") {
-            $searchCategory = " AND category = '" . $_REQUEST['category'] . "' ";
-        }    
-    }
-
-    // Check property type
-    if (isset($_REQUEST['type'] )) {
-        if ($_REQUEST['type'] != "") {
-            $searchType = " AND type = '" . $_REQUEST['type'] . "' ";
-        }    
-    }
-
-    // Check property district
-    if (isset($_REQUEST['district'] )) {
-        if ($_REQUEST['district'] != "") {
-            $searchDistrict = " AND district = '" . $_REQUEST['district'] . "' ";
-        }    
-    }
-
-    // Check property province
-    if (isset($_REQUEST['province'] )) {
-        if ($_REQUEST['province'] != "") {
-            $searchProvince = " AND province = '" . $_REQUEST['province'] . "' ";
-        }    
-    }
-
-    // Check property city
-    if (isset($_REQUEST['city'] )) {
-        if ($_REQUEST['city'] != "") {
-            $searchCity = " AND city = '" . $_REQUEST['city'] . "' ";
-        }    
-    }
-
-    // Check property price range
-    if (isset($_REQUEST['max_price'] )) {
-        if ($_REQUEST['max_price'] != "") {
-        // $searchMaxPrice = " AND (price BETWEEN 1 AND " . $_REQUEST['max_price'] . ")";
-        $searchMaxPrice = " AND price <= '" . $_REQUEST['max_price']."'";
-        }
-    }
-
-    // Check beds
-    if (isset($_REQUEST['beds'] )) {
-        if ($_REQUEST['beds'] != "") {
-            $searchBeds = " AND beds = '" . $_REQUEST['beds'] . "' ";
-        }    
-    }
-
-    // Check baths
-    if (isset($_REQUEST['baths'] )) {
-        if ($_REQUEST['baths'] != "") {
-            $searchBaths = " AND baths = '" . $_REQUEST['baths'] . "' ";
-        }    
-    }
-
-    // Check ref
-    if (isset($_REQUEST['ref'] )) {
-        $searchRef = " AND ref LIKE '%" . $_REQUEST['ref'] . "%'";
-    }
-
-    // switch ($_REQUEST['label']) {
-    //     case 'for-rent':
-    //         $hTitel = $rowLang['lang2'];
-    //         $AllProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND label = 'For Rent'";
-    //         break;
-
-    //     case 'for-sale':
-    //         $hTitel = $rowLang['lang3'];
-    //         $AllProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND label = 'For Sale'";
-    //         break;
-
-    //     case 'search':
-    //         $hTitel = $rowLang['lang20'];
-    //         $AllProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND " . $searchLabel . $searchCategory . $searchType . $searchDistrict . $searchBeds . $searchBaths . $searchBaths;
-    //         break;
-        
-    //     default:
-    //         $hTitel = $rowLang['lang21'];
-    //         $AllProperties = "SELECT * FROM fx_properties WHERE status = 'Active'";
-    //         break;
-    // }
-
-    $AllProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND " . $searchLabel . $searchCategory . $searchType . $searchDistrict . $searchProvince . $searchCity . $searchMaxPrice . $searchBeds . $searchBaths . $searchRef;
-
-
-    // $searchKeyword = " title LIKE '%" . $_REQUEST['global-search'] . "%'";
-    $rec_limit = 30;
-    $page = 1;
-    $offset = 0;
-
+    // Get all properties for navigation
+    $AllProperties = "SELECT id, title, seo_url FROM fx_properties WHERE status = 'Published' ORDER BY id ASC";
     try{
-        $queryCount = $db->query($AllProperties);
-
-        $rec_count = $queryCount->rowCount();
-
-        if( isset($_GET['page'] ) )
-        {
-           $page = $_GET['page'];
-           $offset = $rec_limit * ($page-1) ;
+        $queryAllProps = $db->prepare($AllProperties);
+        $queryAllProps->execute();
+        $queryAllProps->setFetchMode(PDO::FETCH_ASSOC);
+        $allProperties = $queryAllProps->fetchAll();
+        
+        // Find current property index
+        $currentIndex = -1;
+        foreach($allProperties as $index => $property) {
+            if($property['id'] == $property_id) {
+                $currentIndex = $index;
+                break;
+            }
         }
-        else
-        {
-           $page = 1;
-           $offset = 0;
-        } // end if
-
-        $left_rec = $rec_count - ($page * $rec_limit);
-        $pagesNum = ceil($rec_count / 9);
-
-    }
-    catch(PDOException $e) {
+        
+        $prevProperty = ($currentIndex > 0) ? $allProperties[$currentIndex - 1] : null;
+        $nextProperty = ($currentIndex < count($allProperties) - 1) ? $allProperties[$currentIndex + 1] : null;
+        
+    } catch(PDOException $e) {
         die($e->getMessage());
     }
 
-    
-
-    // Select cars
-    // switch ($_REQUEST['label']) {
-    //     case 'for-rent':
-    //         $SqlProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND label = 'For Rent' ORDER BY id DESC LIMIT ". $offset . ", " . $rec_limit;
-    //         break;
-
-    //     case 'for-sale':
-    //         $SqlProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND label = 'For Sale' ORDER BY id DESC LIMIT ". $offset . ", " . $rec_limit;
-    //         break;
-
-    //     case 'search':
-    //         $SqlProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND " . $searchLabel . $searchCategory . $searchType . $searchDistrict . $searchBeds . $searchBaths . $searchBaths . " ORDER BY id DESC LIMIT ". $offset . ", " . $rec_limit;
-    //         break;
+    //Select Post Data
+    $Properties = "SELECT * FROM fx_properties WHERE id = ". $_REQUEST['id'];
         
-    //     default:
-    //         $SqlProperties = "SELECT * FROM fx_properties WHERE status = 1 ORDER BY id DESC LIMIT ". $offset . ", " . $rec_limit;
-    //         break;
-    // }
 
-     $SqlProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND " . $searchLabel . $searchCategory . $searchType . $searchDistrict . $searchProvince . $searchCity . $searchMaxPrice . $searchBeds . $searchBaths . $searchRef . " ORDER BY id DESC LIMIT ". $offset . ", " . $rec_limit;
-
-    // $SqlProperties = "SELECT * FROM fx_properties WHERE status = 'Active' AND " . $searchKeyword . " ORDER BY date_added DESC LIMIT ". $offset . ", " . $rec_limit;
-
-    
     try{
-        $queryProperties = $db->prepare($SqlProperties);
+        $query = $db->prepare($Properties);
 
-        $queryProperties->execute();
+        $query->execute();
 
-        $queryProperties->setFetchMode(PDO::FETCH_ASSOC);
+        $query->setFetchMode(PDO::FETCH_ASSOC);
 
-        $row = $queryProperties->fetch();
+        $row = $query->fetch();
+
+        if ($query->rowCount() < 1) {
+
+            header("Location: 404.php");
+        }
+
+        }
+        catch(PDOException $e) {
+            die($e->getMessage());
+        }
+
+    //Select District Data
+    $Cities = "SELECT * FROM fx_city WHERE id = ". $row['city'];
+
+    try{
+        $queryCities = $db->prepare($Cities);
+
+        $queryCities->execute();
+
+        $queryCities->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowCities = $queryCities->fetch();
 
         }
         catch(PDOException $exd) {
             die($exd->getMessage());
         }
 
-    try{
-      $queryProperty = $db->prepare($SqlProperties);
-
-      $queryProperty->execute();
-
-      $property_count = $queryProperty->rowCount();
-
-      }
-        catch(PDOException $exd) {
-            die($exd->getMessage());
-      }
-
-      //Select Area Data
-    $Area = "SELECT * FROM fx_district";
+    //Select Images
+    $Images = "SELECT * FROM fx_files WHERE property = ". $row['id'];
 
     try{
-        $queryArea = $db->prepare($Area);
+        $queryImages = $db->prepare($Images);
 
-        $queryArea->execute();
+        $queryImages->execute();
 
-        $queryArea->setFetchMode(PDO::FETCH_ASSOC);
+        $queryImages->setFetchMode(PDO::FETCH_ASSOC);
 
-        $rowArea = $queryArea->fetch();
+        $rowImages = $queryImages->fetch();
 
         }
         catch(PDOException $exd) {
             die($exd->getMessage());
         }
 
-    //   /* Get total number of articles */
-    // $SqlAllPosts = "SELECT * FROM fx_posts WHERE status = 'Published'";
-    // $rec_limit = 9;
-    // $page = 1;
-    // $offset = 0;
-    // try{
-    //     $queryCount = $db->prepare($SqlAllPosts);
-
-    //     $queryCount->execute();
-
-    //     $rec_count = $queryCount->rowCount();
-
-    //     if( isset($_GET{'page'} ) )
-    //     {
-    //        $page = $_GET{'page'};
-    //        $offset = $rec_limit * ($page-1) ;
-    //     }
-    //     else
-    //     {
-    //        $page = 1;
-    //        $offset = 0;
-    //     } // end if
-
-    //     $left_rec = $rec_count - ($page * $rec_limit);
-    //     $pagesNum = ceil($rec_count / 9);
-
-    // }
-    // catch(PDOException $e) {
-    //     die($e->getMessage());
-    // }
-
-    // Select posts
-    $posts_limit = 6;
-    $SqlPosts = "SELECT * FROM fx_posts WHERE status = 'Published' ORDER BY post_id DESC LIMIT " . $posts_limit;
+    if ($row['development']>0) {
+   
+    //Property Development
+    $Property_Development = "SELECT * FROM fx_properties WHERE development = ". $row['development'];
 
     try{
-        $queryPost = $db->prepare($SqlPosts);
+        $queryProperty_Development = $db->prepare($Property_Development);
 
-        $queryPost->execute();
+        $queryProperty_Development->execute();
 
-        $queryPost->setFetchMode(PDO::FETCH_ASSOC);
+        $queryProperty_Development->setFetchMode(PDO::FETCH_ASSOC);
 
-        $rowPost = $queryPost->fetch();
+        $rowProperty_Development = $queryProperty_Development->fetch();
 
         }
         catch(PDOException $exd) {
             die($exd->getMessage());
         }
+
+    }
+
+    //Select Type Data
+    $PropertyTypes = "SELECT * FROM fx_property_types WHERE id = ". $row['type'];
+
+    try{
+        $queryTypes = $db->prepare($PropertyTypes);
+
+        $queryTypes->execute();
+
+        $queryTypes->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowTypes = $queryTypes->fetch();
+
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
+
+    //Select Category Data
+    $PropertyCategories = "SELECT * FROM fx_property_category WHERE id = ". $row['category'];
+
+    try{
+        $queryCategories = $db->prepare($PropertyCategories);
+
+        $queryCategories->execute();
+
+        $queryCategories->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowCategories = $queryCategories->fetch();
+
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
+
+    //Select Feature Data
+    $Features = "SELECT * FROM fx_features WHERE property_id = ". $row['id'];
+
+    try{
+        $queryFeatures = $db->prepare($Features);
+
+        $queryFeatures->execute();
+
+        $queryFeatures->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowFeatures = $queryFeatures->fetch();
+
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
+
+    //Select Amenities Data
+    $Amenities = "SELECT * FROM fx_amenities WHERE property_id = ". $row['id'];
+
+    try{
+        $queryAmenities = $db->prepare($Amenities);
+
+        $queryAmenities->execute();
+
+        $queryAmenities->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowAmenities = $queryAmenities->fetch();
+
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
+
+    //Select Amenities Data
+    $Views = "SELECT * FROM fx_property_views WHERE property_id = ". $row['id'];
+
+    try{
+        $queryViews = $db->prepare($Views);
+
+        $queryViews->execute();
+
+        $queryViews->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowViews = $queryViews->fetch();
+
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
+
+    //Select IdealRentals Data
+    $IdealRentals = "SELECT * FROM fx_ideal_rentals WHERE property_id = ". $row['id'];
+
+    try{
+        $queryIdealRentals = $db->prepare($IdealRentals);
+
+        $queryIdealRentals->execute();
+
+        $queryIdealRentals->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowIdealRentals = $queryIdealRentals->fetch();
+
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
+
+    //Select IdealSales Data
+    $IdealSales = "SELECT * FROM fx_ideal_sales WHERE property_id = ". $row['id'];
+
+    try{
+        $queryIdealSales = $db->prepare($IdealSales);
+
+        $queryIdealSales->execute();
+
+        $queryIdealSales->setFetchMode(PDO::FETCH_ASSOC);
+
+        $rowIdealSales = $queryIdealSales->fetch();
+
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
+
     /* Get total number of articles */
     // $SqlAllPosts = "SELECT * FROM fx_posts WHERE status = 'Published'";
     // $rec_limit = 9;
@@ -330,38 +294,21 @@ switch($_SESSION['la']){
     //     }
 
     //Select Author Data
-    // $sqlAuthor = "SELECT * FROM fx_account_details WHERE user_id = ". $row['author'];
+    $sqlAgent = "SELECT * FROM fx_account_details WHERE user_id = ". $row['agent'];
 
-    // try{
-    //     $queryAuthor = $db->prepare($sqlAuthor);
+    try{
+        $queryAgent = $db->prepare($sqlAgent);
 
-    //     $queryAuthor->execute();
+        $queryAgent->execute();
 
-    //     $queryAuthor->setFetchMode(PDO::FETCH_ASSOC);
+        $queryAgent->setFetchMode(PDO::FETCH_ASSOC);
 
-    //     $rowAuthor = $queryAuthor->fetch();
+        $rowAgent = $queryAgent->fetch();
 
-    //     }
-    //     catch(PDOException $exd) {
-    //         die($exd->getMessage());
-    //     }
-
-    //Select Comment Data
-    // $sqlComments = "SELECT * FROM fx_post_comments WHERE post = ". $row['post_id'];
-
-    // try{
-    //     // $queryComments = $db->prepare($sqlComments);
-
-    //     $queryCommCount = $db->prepare($SqlComments);
-
-    //     $queryCommCount->execute();
-
-    //     $comment_count = $queryCommCount->rowCount();
-
-    //     }
-    //     catch(PDOException $exd) {
-    //         die($exd->getMessage());
-    //     }
+        }
+        catch(PDOException $exd) {
+            die($exd->getMessage());
+        }
 
     //Select Category Data
     $sqlCategory = "SELECT * FROM fx_post_categories WHERE category_id = ". $row['category'];
@@ -380,74 +327,40 @@ switch($_SESSION['la']){
             die($exd->getMessage());
         }
 
-
-    //Select District Data
-    $Cities = "SELECT * FROM fx_city WHERE id = ". $row['city'];
+    //Select User Data
+    $AllUsers = "SELECT * FROM fx_users WHERE id = ". $rowAgent['user_id'];
 
     try{
-        $queryCities = $db->prepare($Cities);
+        $queryUsers = $db->prepare($AllUsers);
 
-        $queryCities->execute();
+        $queryUsers->execute();
 
-        $queryCities->setFetchMode(PDO::FETCH_ASSOC);
+        $queryUsers->setFetchMode(PDO::FETCH_ASSOC);
 
-        $rowCities = $queryCities->fetch();
+        $rowUsers = $queryUsers->fetch();
 
         }
         catch(PDOException $exd) {
             die($exd->getMessage());
         }
 
-//Select Category Data
-    $PropertyCategories = "SELECT * FROM fx_property_category";
+        //Select Area Data
+    $Area = "SELECT * FROM fx_district";
 
     try{
-        $queryCategories = $db->prepare($PropertyCategories);
+        $queryArea = $db->prepare($Area);
 
-        $queryCategories->execute();
+        $queryArea->execute();
 
-        $queryCategories->setFetchMode(PDO::FETCH_ASSOC);
+        $queryArea->setFetchMode(PDO::FETCH_ASSOC);
 
-        $rowCategories = $queryCategories->fetch();
+        $rowArea = $queryArea->fetch();
 
         }
         catch(PDOException $exd) {
             die($exd->getMessage());
         }
 
-    //Select Type Data
-    $PropertyTypes = "SELECT * FROM fx_property_types";
-
-    try{
-        $queryTypes = $db->prepare($PropertyTypes);
-
-        $queryTypes->execute();
-
-        $queryTypes->setFetchMode(PDO::FETCH_ASSOC);
-
-        $rowTypes = $queryTypes->fetch();
-
-        }
-        catch(PDOException $exd) {
-            die($exd->getMessage());
-        }
-
-    //Select Location Data
-    $Location = "SELECT * FROM fx_city";
-
-    try{
-        $queryLocation = $db->prepare($Location);
-
-        $queryLocation->execute();
-
-        $queryLocation->setFetchMode(PDO::FETCH_ASSOC);
-
-        $rowLocation = $queryLocation->fetch();
-
-        }
-        catch(PDOException $exd) {
-            die($exd->getMessage());
-        }
     //Select Ads
     // $sqlAds = "SELECT * FROM ads";
         
@@ -505,10 +418,10 @@ switch($_SESSION['la']){
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Elimo Real Estate">
-    <meta name="author" content="">
+    <meta name="description" content="<?php echo $row['title']; ?>">
+    <meta name="author" content="elimo.rw">
     <meta name="generator" content="Jekyll">
-    <title>Properties | Elimo Real Estate</title>
+    <title><?php echo $row['title']; ?> | Elimo Real Estate</title>
     <!-- Google fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet">
@@ -530,17 +443,17 @@ switch($_SESSION['la']){
     <link rel="icon" href="images/favicon.png">
     <!-- Twitter -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@">
+    <meta name="twitter:site" content="https://elimo.rw/property-detail.php?c=<?php echo $row['seo_url']; ?>&id=<?php echo $row['id']; ?>">
     <meta name="twitter:creator" content="@">
-    <meta name="twitter:title" content="Elimo Real Estate">
-    <meta name="twitter:description" content="Elimo Real Estate">
-    <meta name="twitter:image" content="images/homeid-social-logo.png">
+    <meta name="twitter:title" content="<?php echo $row['title']; ?>">
+    <meta name="twitter:description" content="<?php echo $row['description']; ?>">
+    <meta name="twitter:image" content="https://agency.elimo.rw/resource/property-files/<?php echo $row['image']; ?>">
     <!-- Facebook -->
-    <meta property="og:url" content="listing-full-width-list.php">
-    <meta property="og:title" content="Elimo Real Estate">
-    <meta property="og:description" content="Elimo Real Estate">
+    <meta property="og:url" content="https://elimo.rw/property-detail.php?c=<?php echo $row['seo_url']; ?>&id=<?php echo $row['id']; ?>">
+    <meta property="og:title" content="<?php echo $row['title']; ?>">
+    <meta property="og:description" content="<?php echo $row['description']; ?>">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="images/banner-1.jpg">
+    <meta property="og:image" content="https://agency.elimo.rw/resource/property-files/<?php echo $row['image']; ?>">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -571,7 +484,7 @@ switch($_SESSION['la']){
                     <a class="nav-link p-0"href="index.php">Home</a>
                   </li>
                   <li id="navbar-item-home" aria-haspopup="true" aria-expanded="false" class="nav-item py-2 py-xl-5 px-0 px-xl-3">
-                    <a class="nav-link p-0"href="about-us.php">About</a>
+                    <a class="nav-link p-0 active"href="about-us.php">About</a>
                   </li>
                   <li id="navbar-item-home" aria-haspopup="true" aria-expanded="false" class="nav-item py-2 py-xl-5 px-0 px-xl-3">
                     <a class="nav-link p-0"href="developments.php">Developments</a>
@@ -638,267 +551,620 @@ switch($_SESSION['la']){
         </div>
       </div>
     </header>
-    <main id="content">
+    <main id="content" class="property-detail">
       <section class="pb-6 pt-6 pt-lg-10 page-title shadow bg-primary">
         <div class="container">
           <nav aria-label="breadcrumb" class=" pt-10 pt-xl-10 pt-lg-10">
-           <!--  <ol class="breadcrumb pt-6 pt-lg-2 lh-15 pb-5">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active" aria-current="page">Listing</li>
-            </ol> -->
-            <h1 class="fs-30 lh-1 mb-0 text-white font-weight-600">Properties <?php echo $searchHeading; ?></h1>
-            <?php 
-               $queryCh = $db->prepare($SqlProperties);
-                $queryCh->execute();
-                $queryCh->setFetchMode(PDO::FETCH_ASSOC);
-                $rowCh = $queryCh->fetch();
-
-                if ($queryCh->rowCount() < 1) { ?>
-                    <h2 class="fs-16 text-white mt-3">No properties found matching your search criteria</h2>
-               <?php } else { ?>
-                  <h2 class="fs-16 text-white mt-3">We found <span class="text-yellow"><?php echo $property_count; ?></span> properties <?php echo $searchHeading; ?></h2>
-               <?php } ?>
-            
-              
-            <div class="mt-6 form-search-01 search-filter">
-              <form class="form-inline mx-n1" id="accordion-5" action="search-results.php" method="GET">
-                <div class="form-group p-1">
-                  <label for="status" class="sr-only">Sale/Rent</label>
-                  <select class="form-control border-0 shadow-xxs-1 bg-transparent font-weight-600 selectpicker"
-                    title="Sale/Rent" data-style="bg-white"
-                    id="label" name="label" required>
-                    <option value="for-rent">For Rent</option>
-                    <option value="for-sale">For Sale</option>
-                  </select>
-                </div>
-                <div class="form-group p-1">
-                  <label for="type" class="sr-only">Category</label>
-                  <select class="form-control border-0 shadow-xxs-1 bg-transparent font-weight-600 selectpicker"
-                    title="Category" data-style="bg-white"
-                    id="category" name="category">
-                    <?php foreach ($db->query($PropertyCategories) as $key => $category) { ?>
-                        <option value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?></option>
-                      <?php } ?>
-                  </select>
-                </div>
-
-                <div class="form-group p-1">
-                  <label for="type" class="sr-only">Type</label>
-                  <select class="form-control border-0 shadow-xxs-1 bg-transparent font-weight-600 selectpicker"
-                    title="Type" data-style="bg-white"
-                    id="type" name="type">
-                    <?php foreach ($db->query($PropertyTypes) as $key => $property_type) { ?>
-                        <option value="<?php echo $property_type['id']; ?>"><?php echo $property_type['name']; ?></option>
-                      <?php } ?>
-                  </select>
-                </div>
-                <div class="form-group p-1">
-                  <label for="location" class="sr-only">Location</label>
-                  <select class="form-control border-0 shadow-xxs-1 bg-transparent font-weight-600 selectpicker"
-						        title="Location" data-style="bg-white"
-						        id="district" name="district">
-                    <?php foreach ($db->query($Location) as $key => $location) { ?>
-                        <option value="<?php echo $location['id']; ?>"><?php echo $location['name']; ?></option>
-                      <?php } ?>
-                  </select>
-                </div>
-                <div class="form-group p-1">
-                  <label for="any-price" class="sr-only">Max Price</label>
-                  <input type="text" class="form-control border-0 shadow-xxs-1 font-weight-600" placeholder="Enter max price" name="max-price">
-                </div>
-              
-                <div class="form-group p-1">
-                  <label for="room" class="sr-only">Beds</label>
-                  <select class="form-control border-0 shadow-xxs-1 bg-transparent font-weight-600 selectpicker"
-						        title="Beds" data-style="bg-white"
-						        id="beds" name="beds">
-                    <option value="">Any Bedrooms</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                  </select>
-                </div>
-                
-                <div class="form-group p-1">
-                  <button type="submit" class="btn btn-lg btn-primary">Filter Results<i class="far fa-long-arrow-right ml-1"></i></button>
-                </div>
-              </form>
-            </div>
+          
+            <h1 class="fs-30 lh-1 mb-0 text-white font-weight-600"><?php echo $row['title']; ?></h1>
+            <h2 class="fs-16 text-white mt-3"> <a href="search-results.php"><span class="text-yellow"> <i class="far fa-long-arrow-left mr-1"></i>Back to search results</span></a> </h2>
           </nav>
         </div>
       </section>
-
-      <section class="pt-6 pb-7">
-        <div class="container">
-          <div class="row align-items-sm-center">
-            <div class="col-md-6">
-              
-            </div>
-           
-          </div>
-        </div>
-      </section>
-      <section class="pb-9 pb-md-11">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-9 mb-8 mb-lg-0">
-
-              <?php
-                  foreach ($db->query($SqlProperties) as $row) { 
-                    if ($row['category']!='3') { 
-              ?>
-
-                <div class="media p-4 border rounded-lg shadow-hover-1 pr-lg-8 mb-6 flex-column flex-lg-row no-gutters" data-animate="fadeInUp">
-                  <div class="col-lg-4 mr-lg-5 card border-0 hover-change-image bg-hover-overlay">
-                    <a href="property-detail.php?c=<?php echo $row['seo_url']; ?>&id=<?php echo $row['id']; ?>" class="">
-                    <img src="https://agency.elimo.rw/resource/property-files/<?php echo $row['image']; ?>" class="card-img" alt="<?php echo $row['title']; ?>">
-                    <div class="card-img-overlay p-2 d-flex flex-column">
-                      <div>
-                        <span class="badge badge-yellow"><?php echo $row['label']; ?></span>
-                      </div>
-                     
+      <section class="">
+        <div class="container-fluid m-0">
+          <div class="galleries position-relative">
+              <ul class="nav nav-pills position-absolute pos-fixed-top-right z-index-3 pt-4 pr-5 flex-nowrap nav-gallery"
+                  id="pills-tab"
+                  role="tablist">
+                <li class="nav-item mr-2" role="presentation">
+                  <a class="nav-link p-0 active d-flex align-items-center justify-content-center w-48px h-48 bg-white text-heading bg-hover-primary hover-white rounded-circle fs-18" data-toggle="pill" href="#image" role="tab"
+                         aria-selected="true">
+                    <i class="fal fa-camera"></i>
+                  </a>
+                </li>
+                <li class="nav-item mr-2" role="presentation">
+                  <a class="nav-link p-0 d-flex align-items-center justify-content-center w-48px h-48 bg-white text-heading bg-hover-primary hover-white rounded-circle fs-18" href="#property-video" role="tab" aria-selected="false">
+                    <i class="fal fa-play"></i>
+                  </a>
+                </li>
+                <li class="nav-item mr-2" role="presentation">
+                  <a class="nav-link p-0 d-flex align-items-center justify-content-center w-48px h-48 bg-white text-heading bg-hover-primary hover-white rounded-circle fs-18" href="#virtual-tour" role="tab" aria-selected="false">
+                    <i class="fal fa-video"></i>
+                  </a>
+                </li>
+              </ul>
+              <div class="tab-content p-0 shadow-none">
+                <div class="tab-pane fade show active" id="image" role="tabpanel">
+                  <div class="d-flex justify-content-between align-items-center p-3 bg-dark">
+                    <div>
+                      <?php if($prevProperty): ?>
+                        <a href="property-detail.php?id=<?php echo $prevProperty['id']; ?>&c=<?php echo $prevProperty['seo_url']; ?>" class="btn btn-outline-light btn-sm">
+                          <i class="fas fa-chevron-left mr-1"></i> Previous Property
+                        </a>
+                      <?php endif; ?>
                     </div>
-                </a>
+                    
+                    <div class="text-center">
+                      <span class="text-white" id="image-counter">1 / 1</span>
+                    </div>
+                    
+                    <div class="text-right">
+                      <button id="download-current-image" class="btn btn-success btn-sm mr-2" style="position: relative; z-index: 20;">
+                        <i class="fas fa-download mr-1"></i> Download Image
+                      </button>
+                      <?php if($nextProperty): ?>
+                        <a href="property-detail.php?id=<?php echo $nextProperty['id']; ?>&c=<?php echo $nextProperty['seo_url']; ?>" class="btn btn-outline-light btn-sm">
+                          Next Property <i class="fas fa-chevron-right ml-1"></i>
+                        </a>
+                      <?php endif; ?>
+                    </div>
                   </div>
-                  <div class="media-body mt-5 mt-lg-0">
-                    <div class="d-lg-flex justify-content-lg-between">
-                        <h2 class="my-0 d-flex flex-wrap">
-                          <a href="property-detail.php?c=<?php echo $row['seo_url']; ?>&id=<?php echo $row['id']; ?>" class="fs-16 lh-2 text-dark hover-primary d-block"><?php echo $row['title']; ?></a>
-                        </h2>
-                        <p class="listing-price fs-16 pt-2 font-weight-bold text-heading lh-1 mb-0 pr-lg-3 mb-lg-2 mt-3 mt-lg-0">
-                        <?php echo $row['currency']; ?> <?php echo number_format((float)$row['price'], 0, '.', ',');?>
-                       <!--  <span class="fs-18 font-weight-500 text-gray-light"> /month</span> -->
-                        </p>
+                  
+                  <div class="slick-slider dots-white arrow-inner" data-slick-options='{"slidesToShow": 1, "autoplay":false}' id="property-gallery">
+
+                    <div class="box" data-image-url="https://agency.elimo.rw/resource/property-files/<?php echo $row['image']; ?>">
+                      <div class="item item-size-3-2">
+                        <div class="card p-0">
+                          <a href="http://agency.elimo.rw/resource/property-files/<?php echo $row['image']; ?>" class="card-img"
+                                         data-gtf-mfp="true"
+                                         data-gallery-id="03"
+                                         style="background-image:url('https://agency.elimo.rw/resource/property-files/<?php echo $row['image']; ?>')">
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                    <p class="mb-2 font-weight-500 text-gray-light"><?php echo districtName($row['district']); ?></p>
-                    <p class="mb-2 mxw-571 ml-0 brief-description"><?php echo $row['description']; ?></p>
-                    <div class="d-lg-flex justify-content-lg-between">
-                      <ul class="list-inline d-flex mb-0 flex-wrap">
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="3 Bedroom">
-                          <svg class="icon icon-bedroom fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-bedroom"></use>
-                          </svg>
-                          <?php echo $row['beds']; ?> Beds
-                        </li>
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="3 Bathrooms">
-                          <svg class="icon icon-shower fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-shower"></use>
-                          </svg>
-                          <?php echo $row['baths']; ?> Baths
-                        </li>
-                        <!-- <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Size">
-                          <svg class="icon icon-square fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-square"></use>
-                          </svg>
-                          2300 Sq.Ft
-                        </li> -->
-                        <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="1 Garage">
-                          <svg class="icon icon-Garage fs-18 text-primary mr-1">
-                            <use xlink:href="#icon-Garage"></use>
-                          </svg>
-                          <?php echo $row['garages']; ?> Garages
-                        </li>
-                       
-                        
-                      </ul>
-                      <!-- <p class="fs-22 font-weight-bold text-heading lh-1 mb-0 pr-lg-3 mb-lg-2 mt-3 mt-lg-0">
-                        $1,500
-                        <span class="fs-18 font-weight-500 text-gray-light"> /month</span>
-                      </p> -->
+
+                     <?php
+                          foreach ($db->query($Images) as $img) { 
+                      ?>
+
+                    <div class="box" data-image-url="https://agency.elimo.rw/resource/property-files/<?php echo $img['path']; ?><?php echo $img['file_name']; ?>">
+                      <div class="item item-size-3-2">
+                        <div class="card p-0">
+                          <a href="https://agency.elimo.rw/resource/property-files/<?php echo $img['path']; ?><?php echo $img['file_name']; ?>" class="card-img"
+                                         data-gtf-mfp="true"
+                                         data-gallery-id="03"
+                                         style="background-image:url('https://agency.elimo.rw/resource/property-files/<?php echo $img['path']; ?><?php echo $img['file_name']; ?>')">
+                          </a>
+                        </div>
+                      </div>
                     </div>
+
+                  <?php } ?>
+                    
                   </div>
                 </div>
-
-              <?php } } ?>
-
-               <!--  <nav class="pt-4">
-                  <ul class="pagination rounded-active justify-content-center mb-0">
-                    <li class="page-item"><a class="page-link" href="#"><i class="far fa-angle-double-left"></i></a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item d-none d-sm-block"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">...</li>
-                    <li class="page-item"><a class="page-link" href="#">6</a></li>
-                    <li class="page-item"><a class="page-link" href="#"><i
-                  class="far fa-angle-double-right"></i></a></li>
-                  </ul>
-                </nav> -->
+                <!-- <div class="tab-pane fade" id="map-view" role="tabpanel">
+                  <div id="map-01" style="height:620px;" class="mapbox-gl"
+                           data-mapbox-access-token="pk.eyJ1IjoiZHVvbmdsaCIsImEiOiJjanJnNHQ4czExMzhyNDVwdWo5bW13ZmtnIn0.f1bmXQsS6o4bzFFJc8RCcQ"
+                           data-mapbox-options='{"center":[-73.981566, 40.739011],"setLngLat":[-73.981566, 40.739011],"container":"map-01"}'></div>
+                </div> -->
               </div>
-            
-              <div class="col-lg-3 primary-sidebar sidebar-sticky" id="sidebar">
-              <div class="primary-sidebar-inner" style="position: static; left: auto; width: 370px;">
-                <div class="card border-0 mb-6">
-                  <div class="card-body px-0 pl-lg-6 pr-0 py-0">
-                    <h4 class="card-title fs-16 lh-2 text-dark mb-1">Newsletter Sign Up</h4>
-                    <p class="card-text mb-5 lh-15">Subscribe to new letter to receive exclusive offers and the latest property trends</p>
-                    <form>
-                      <div class="form-group mb-3">
-                        <label for="name" class="sr-only">Email</label>
-                        <input type="text" class="form-control form-control-lg border-0 shadow-none" id="name" name="email" placeholder="Enter your email">
+            </div>
+          </div>
+      </section>
+      <section class="pb-7 shadow-5 pt-7 bg-primary">
+        <div class="container">
+          
+          <div class="d-md-flex justify-content-md-between mb-1">
+            <ul class="list-inline d-sm-flex align-items-sm-center mb-0">
+              <li class="list-inline-item badge badge-orange mr-2"><?php echo ($row['featured']=='Yes'?'Featured':''); ?></li>
+              <li class="list-inline-item badge badge-primary mr-3"><?php echo $row['label']; ?></li>
+              <li class="list-inline-item mr-2 mt-2 mt-sm-0 text-white"><i class="fal fa-clock mr-1"></i>
+                <?php 
+                $new_date = date('d-m-Y', strtotime($row['date_added']));
+                echo $new_date; ?>
+              </li>
+              <!-- <li class="list-inline-item mt-2 mt-sm-0 text-white"><i class="fal fa-eye mr-1"></i>1039 views</li> -->
+            </ul>
+            <ul class="list-inline mb-0 mr-n2 my-4 my-md-0">
+              <!-- <li class="list-inline-item mr-2">
+                <a href="#" class="btn btn-outline-light px-3 text-white d-flex align-items-center h-32 border">
+                  <i class="far fa-heart mr-2 fs-15 text-white"></i>Save
+                </a>
+              </li> -->
+              <li class="list-inline-item mr-2">
+                <a href="mailto:<?php echo $rowUsers['email']; ?>?subject=Property%20<?php echo $row['ref']; ?>%3A<?php echo $row['seo_url']; ?>&body=I%20would%20like%20to%20receive%20more%20information%20about%20this%20property" class="btn btn-outline-light px-3 text-white d-flex align-items-center h-32 border">
+                  <i class="far fa-share-alt mr-2 fs-15 text-white"></i>Email
+                </a>
+              </li>
+              <li class="list-inline-item mr-2">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://elimo.rw/property-detail.php?id=<?php echo $row['id']; ?>" class="btn btn-outline-light px-3 text-white d-flex align-items-center h-32 border">
+                  <i class="fab fa-facebook-f fs-15 text-white"></i>
+                </a>
+              </li>
+              <li class="list-inline-item mr-2">
+                <a href="https://twitter.com/intent/tweet?text=https://elimo.rw/property-detail.php?c=<?php echo $row['seo_url']; ?>&id=<?php echo $row['id']; ?>" class="btn btn-outline-light px-3 text-white d-flex align-items-center h-32 border">
+                  <i class="fab fa-twitter fs-15 text-white"></i>
+                </a>
+              </li>
+              <!-- <li class="list-inline-item mr-2">
+                <a href="#" class="btn btn-outline-light px-3 text-white d-flex align-items-center h-32 border">
+                  <i class="fab fa-linkedin-in fs-15 text-white"></i>
+                </a>
+              </li> -->
+            </ul>
+          </div>
+          <div class="d-md-flex justify-content-md-between mb-6">
+            <div>
+              <h2 class="fs-35 font-weight-600 lh-15 text-white"><?php echo $row['title']; ?></h2>
+              <div class="d-lg-flex justify-content-lg-between pb-2">
+                <ul class="list-inline d-flex mb-0 flex-wrap">
+                  <li class="list-inline-item text-white font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="3 Bedroom">
+                    <svg class="icon icon-bedroom fs-18 text-white mr-1">
+                      <use xlink:href="#icon-bedroom"></use>
+                    </svg>
+                    <?php echo $row['beds']; ?> Beds
+                  </li>
+                  <li class="list-inline-item text-white font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="3 Bathrooms">
+                    <svg class="icon icon-shower fs-18 text-white mr-1">
+                      <use xlink:href="#icon-shower"></use>
+                    </svg>
+                    <?php echo $row['baths']; ?> Baths
+                  </li>
+                  <li class="list-inline-item text-white font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="1 Garage">
+                    <svg class="icon icon-Garage fs-18 text-white mr-1">
+                      <use xlink:href="#icon-Garage"></use>
+                    </svg>
+                    <?php echo $row['garages']; ?> Garages
+                  </li>
+                  <li class="list-inline-item text-white font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Size">
+                    <svg class="icon icon-square fs-18 text-white mr-1">
+                      <use xlink:href="#icon-square"></use>
+                    </svg>
+                    <?php echo $row['size']; ?> m <sup>2</sup>
+                  </li>
+                 <!--  <li class="list-inline-item text-gray font-weight-500 fs-13 d-flex align-items-center mr-5" data-toggle="tooltip" title="Year">
+                    <svg class="icon icon-year fs-18 text-primary mr-1">
+                      <use xlink:href="#icon-year"></use>
+                    </svg>
+                    2020
+                  </li> -->
+                </ul>
+                
+              </div>
+              <p class="mb-0 text-white"><i class="fal fa-map-marker-alt mr-2"></i><?php echo districtName($row['district']); ?></p>
+            </div>
+            <div class="mt-2 text-md-right">
+              <p class="fs-22 text-white font-weight-bold mb-0"><?php echo $row['currency']; ?> <?php echo number_format((float)$row['price'], 0, '.', ',');?></p>
+              <!-- <p class="mb-0 text-white"><?php echo $row['frequency']; ?></p> -->
+            </div>
+          </div>
+          
+        </div>
+      </section>
+      <div class="primary-content bg-gray-01 pt-7 pb-12">
+        <div class="container">
+          <div class="row">
+            <article class="col-lg-8">
+              <section class="pb-8 px-6 pt-5 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Description</h4>
+                <p class="mb-0 lh-214"><?php echo $row['description']; ?></p>
+              </section>
+              <?php if ($row['category']=="1") { ?>
+              <section class="mt-2 pb-3 px-6 pt-5 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Property Summary</h4>
+                <div class="row">
+                  
+                  <div class="col-lg-3 col-sm-3 mb-6">
+                    <div class="media">
+                      <div class="p-2 shadow-xxs-1 rounded-lg mr-2">
+                        <svg class="icon icon-bedroom fs-32 text-primary">
+                          <use xlink:href="#icon-bedroom"></use>
+                        </svg>
                       </div>
-                      <button type="submit" class="btn btn-primary btn-lg btn-block shadow-none mb-2">
-                        Subscribe
+                      <div class="media-body">
+                        <h5 class="my-1 fs-14 text-uppercase letter-spacing-093 font-weight-normal">Bedrooms</h5>
+                        <p class="mb-0 fs-13 font-weight-bold text-heading"><?php echo $row['beds']; ?></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-sm-3 mb-6">
+                    <div class="media">
+                      <div class="p-2 shadow-xxs-1 rounded-lg mr-2">
+                        <svg class="icon icon-sofa fs-32 text-primary">
+                          <use xlink:href="#icon-sofa"></use>
+                        </svg>
+                      </div>
+                      <div class="media-body">
+                        <h5 class="my-1 fs-14 text-uppercase letter-spacing-093 font-weight-normal">bathrooms</h5>
+                        <p class="mb-0 fs-13 font-weight-bold text-heading"><?php echo $row['baths']; ?></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-sm-3 mb-6">
+                    <div class="media">
+                      <div class="p-2 shadow-xxs-1 rounded-lg mr-2">
+                        <svg class="icon icon-Garage fs-32 text-primary">
+                          <use xlink:href="#icon-Garage"></use>
+                        </svg>
+                      </div>
+                      <div class="media-body">
+                        <h5 class="my-1 fs-14 text-uppercase letter-spacing-093 font-weight-normal">GARAGES</h5>
+                        <p class="mb-0 fs-13 font-weight-bold text-heading"><?php echo $row['garages']; ?></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-sm-3 mb-6">
+                    <div class="media">
+                      <div class="p-2 shadow-xxs-1 rounded-lg mr-2">
+                        <svg class="icon icon-price fs-32 text-primary">
+                          <use xlink:href="#icon-price"></use>
+                        </svg>
+                      </div>
+                      <div class="media-body">
+                        <h5 class="my-1 fs-14 text-uppercase letter-spacing-093 font-weight-normal">Size</h5>
+                        <p class="mb-0 fs-13 font-weight-bold text-heading"><?php echo $row['size']; ?>m<sup>2</sup></p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div class="col-lg-3 col-sm-4 mb-6">
+                    <div class="media">
+                      <div class="p-2 shadow-xxs-1 rounded-lg mr-2">
+                        <svg class="icon icon-status fs-32 text-primary">
+                          <use xlink:href="#icon-status"></use>
+                        </svg>
+                      </div>
+                      <div class="media-body">
+                        <h5 class="my-1 fs-14 text-uppercase letter-spacing-093 font-weight-normal">Status</h5>
+                        <p class="mb-0 fs-13 font-weight-bold text-heading"><?php echo $row['status']; ?></p>
+                      </div>
+                    </div>
+                  </div> -->
+                </div>
+              </section>
+              <?php } ?>
+              <section class="mt-2 pb-6 px-6 pt-5 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Additional Details</h4>
+                <div class="row">
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Property ID</dt>
+                    <dd><?php echo $row['ref']; ?></dd>
+                  </dl>
+                  <!-- <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Price</dt>
+                    <dd>$<?php echo $row['price']; ?></dd>
+                  </dl> -->
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Property type</dt>
+                    <dd><?php echo $rowTypes['name']; ?></dd>
+                  </dl>
+                  <!-- <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Category</dt>
+                    <dd><?php echo $rowCategories['name']; ?></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Property status</dt>
+                    <dd><?php echo $row['label']; ?></dd>
+                  </dl> -->
+                  <?php if ($row['category']=="1") { ?>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Stories</dt>
+                    <dd><?php echo $row['stories']; ?></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Bedrooms</dt>
+                    <dd><?php echo $row['beds']; ?></dd>
+                  </dl>
+                  
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Bathrooms</dt>
+                    <dd><?php echo $row['baths']; ?></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Garage</dt>
+                    <dd><?php echo $row['garages']; ?></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Furnished</dt>
+                    <dd><?php echo $row['furnished']; ?></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Multi-family</dt>
+                    <dd><?php echo $row['multi_family']; ?></dd>
+                  </dl>
+                  <?php } ?>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Building Size</dt>
+                    <dd><?php echo $row['size']; ?>m<sup>2</sup></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Plot Size</dt>
+                    <dd><?php echo $row['plot_size']; ?>m<sup>2</sup></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Zoning</dt>
+                    <dd><?php echo $row['zoning']; ?></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Permit</dt>
+                    <dd><?php echo $row['construction_permit']; ?></dd>
+                  </dl>
+                  <dl class="col-sm-6 mb-0 d-flex">
+                    <dt class="w-110px fs-14 font-weight-500 text-heading pr-2">Year build</dt>
+                    <dd><?php echo $row['year']; ?></dd>
+                  </dl>
+                  
+                </div>
+              </section>
+
+              <?php if ($row['category']!="4") { ?>
+              <section class="mt-2 pb-7 px-6 pt-5 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6"> Property Features</h4>
+                <ul class="list-unstyled mb-0 row no-gutters">
+                  <?php if ($rowFeatures['ac']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Air Conditioner</li><?php } ?>
+                  <?php if ($rowFeatures['alarm']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Alarm System</li><?php } ?>
+                  <?php if ($rowFeatures['fibre']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Optic Fiber</li><?php } ?>
+                  <?php if ($rowFeatures['wardrobes']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Built in wardrobes</li><?php } ?>
+                  <?php if ($rowFeatures['proximity_schools']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Proximity to schools</li><?php } ?>
+                  <?php if ($rowFeatures['tarmac']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Tarmac road</li><?php } ?>
+                  <?php if ($rowFeatures['shops']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Proximity to shops</li><?php } ?>
+                  <?php if ($rowFeatures['public_transport']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Proximity to public transport</li><?php } ?>
+                  <?php if ($rowFeatures['water_tank']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Water Tank</li><?php } ?>
+                  <?php if ($rowFeatures['solar_heater']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Solar Water Heater</li><?php } ?>
+                  <?php if ($rowFeatures['garden']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Garden</li><?php } ?>
+                  <?php if ($rowFeatures['open_plan_kitchen']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Open Plan Kitchen</li><?php } ?>
+                  <?php if ($rowFeatures['bath_tub']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Bath Tub</li><?php } ?>
+                  <?php if ($rowFeatures['washing_machine']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Washing Machine</li><?php } ?>
+                  <?php if ($rowFeatures['dryer']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Dryer</li><?php } ?>
+                  <?php if ($rowFeatures['dishwasher']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Dishwasher</li><?php } ?>
+                  <?php if ($rowFeatures['parks']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Proximity to Parks</li><?php } ?>
+                  <?php if ($rowFeatures['servant']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Servant Quarters</li><?php } ?>
+                  <?php if ($rowFeatures['outside_kitchen']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Outside Kitchen</li><?php } ?>
+                  <?php if ($rowFeatures['gym']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Gym</li><?php } ?>
+                  <?php if ($rowFeatures['steam']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Steam</li><?php } ?>
+                  <?php if ($rowFeatures['cctv']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>CCTV</li><?php } ?>
+                  <?php if ($rowFeatures['office']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Office</li><?php } ?>
+                  <?php if ($rowFeatures['panoramic']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Panoramic View</li><?php } ?>
+                </ul>
+              </section>
+              <?php } ?>
+
+              <?php if ($row['label']=="For Rent") { ?>
+              <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Amenities: </h4>
+                <ul class="list-unstyled mb-0 row no-gutters">
+                  <?php if ($rowAmenities['water_bill']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Water bill</li><?php } ?>
+                  <?php if ($rowAmenities['electricity']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Electricity</li><?php } ?>
+                  <?php if ($rowAmenities['internet']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Internet</li><?php } ?>
+                  <?php if ($rowAmenities['cable_tv']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Cable tv</li><?php } ?>
+                  <?php if ($rowAmenities['cleaning']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Cleaning services</li><?php } ?>
+                  <?php if ($rowAmenities['laundry']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Laundry</li><?php } ?>
+                  <?php if ($rowAmenities['garbage']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Garbage collection</li><?php } ?>
+                  <?php if ($rowAmenities['security']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Security</li><?php } ?>
+                </ul>
+              </section>
+              <?php } ?>
+
+              <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Views: </h4>
+                <ul class="list-unstyled mb-0 row no-gutters">
+                  <?php if ($rowViews['city_view']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>City</li><?php } ?>
+                  <?php if ($rowViews['mountain']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Mountain</li><?php } ?>
+                  <?php if ($rowViews['water']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Water</li><?php } ?>
+                  <?php if ($rowViews['golf_course']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Golf Course</li><?php } ?>
+                </ul>
+              </section>
+
+              <?php if ($row['label']=="For Rent") { ?>
+              <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Ideal for on Rentals: </h4>
+                <ul class="list-unstyled mb-0 row no-gutters">
+                  <?php if ($rowIdealRentals['single']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Single person</li><?php } ?>
+                  <?php if ($rowIdealRentals['couple']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Couple</li><?php } ?>
+                  <?php if ($rowIdealRentals['family_children']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Family with children</li><?php } ?>
+                  <?php if ($rowIdealRentals['short_term']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Short term rentals</li><?php } ?>
+                </ul>
+              </section>
+              <?php } ?>
+
+              <?php if ($row['label']=="For Sale") { ?>
+              <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Ideal for on Sales:</h4>
+                <ul class="list-unstyled mb-0 row no-gutters">
+                  <?php if ($rowIdealSales['investors']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>First time investors</li><?php } ?>
+                  <?php if ($rowIdealSales['flip']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Flip and sale</li><?php } ?>
+                  <?php if ($rowIdealSales['retirement']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Retirement home</li><?php } ?>
+                  <?php if ($rowIdealSales['family']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Family</li><?php } ?>
+                  <?php if ($rowIdealSales['developers']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Developers</li><?php } ?>
+                  <?php if ($rowIdealSales['long_term']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Long term investment</li><?php } ?>
+                  <?php if ($rowIdealSales['equity_growth']==1) { ?><li class="col-sm-4 col-6 mb-2"><i class="far fa-check mr-2 text-primary"></i>Equity growth</li><?php } ?>
+                </ul>
+              </section>
+              <?php } ?>
+
+              <?php if ($row['video']!="") { ?>
+                <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg" id="property-video">
+                  <h4 class="fs-22 text-heading mb-6">Property Video</h4>
+                  <?php echo $row['video']; ?>
+                </section>
+              <?php } ?>
+
+              <?php if ($row['virtual_tour']!="") { ?>
+              <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg" id="virtual-tour">
+                <h4 class="fs-22 text-heading mb-6">Virtual Tour</h4>
+                <!-- <?php echo $row['virtual_tour']; ?> -->
+                <iframe src="<?php echo $row['virtual_tour']; ?>" allowfullscreen="true" width="100%" height="500px"></iframe>
+              </section>
+              <?php } ?>
+
+              <?php if ($row['proximity_to']!="") { ?>
+              <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg" id="virtual-tour">
+                <h4 class="fs-22 text-heading mb-6">In close proximity to</h4>
+                <?php echo $row['proximity_to']; ?>
+              </section>
+              <?php } ?>
+
+              <?php if ($row['development']>"0") { ?>
+              <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg" id="virtual-tour">
+                <h4 class="fs-22 text-heading mb-6">Property is part of the following development</h4>
+                
+                <div class="row">
+                    <div class="col-lg-12 mb-8 mb-lg-0">
+
+                        <div class="media p-4 border rounded-lg shadow-hover-1 pr-lg-8 mb-6 flex-column flex-lg-row no-gutters" data-animate="fadeInUp">
+                          <div class="col-lg-4 mr-lg-5 card border-0 hover-change-image bg-hover-overlay">
+                            <a href="development-detail.php?c=<?php echo $rowProperty_Development['seo_url']; ?>&id=<?php echo $row['development']; ?>" class="">
+                            <img src="https://agency.elimo.rw/resource/property-files/<?php echo $rowProperty_Development['image']; ?>" class="card-img" alt="<?php echo $rowProperty_Development['title']; ?>">
+                            <div class="card-img-overlay p-2 d-flex flex-column">
+                              <div>
+                                <span class="badge badge-yellow">Development</span>
+                              </div>
+                              <div class="mt-auto d-flex hover-image">
+                                
+                              </div>
+                            </div>
+                          </a>
+                          </div>
+                          <div class="media-body mt-5 mt-lg-0">
+                            <div class="d-lg-flex justify-content-lg-between">
+                                <h2 class="my-0 d-flex flex-wrap">
+                                  <a href="development-detail.php?c=<?php echo $rowProperty_Development['seo_url']; ?>&id=<?php echo $row['development']; ?>" class="fs-18 lh-2 text-dark hover-primary d-block"><?php echo $rowProperty_Development['title']; ?></a>
+                                </h2>
+                            </div>
+                            <!-- <p class="mb-2 font-weight-500 text-gray-light"><?php echo $rowCities['name']; ?></p> -->
+                            <p class="mb-2 mxw-571 ml-0 brief-description"><?php echo $rowProperty_Development['description']; ?></p>
+                            
+                          </div>
+                        </div>
+                        
+                      </div>
+                  </div>
+              </section>
+              <?php } ?>
+
+
+              <!-- <section class="mt-2 pb-6 px-6 pt-6 bg-white rounded-lg">
+                <h4 class="fs-22 text-heading mb-6">Location</h4>
+                <div class="position-relative">
+                  <div id="map" class="mapbox-gl map-point-animate"
+                             data-mapbox-access-token="pk.eyJ1IjoiZHVvbmdsaCIsImEiOiJjanJnNHQ4czExMzhyNDVwdWo5bW13ZmtnIn0.f1bmXQsS6o4bzFFJc8RCcQ"
+                             data-mapbox-options='{"center":[-1.95527, 30.0641191],"setLngLat":[-1.95527, 30.0641191]}'
+                             data-mapbox-marker='[{"position":[-1.95527, 30.0641191],"className":"marker","backgroundImage":"images/googlle-market-01.png","backgroundRepeat":"no-repeat","width":"30px","height":"40px"}]'>
+                  </div>
+                  <p class="mb-0 p-3 bg-white shadow rounded-lg position-absolute pos-fixed-bottom mb-4 ml-4 lh-17 z-index-2">Kiyovu <br/>
+                     Kigali</p>
+                </div>
+              </section> -->
+
+   
+             
+            </article>
+            <aside class="col-lg-4 pl-xl-4 primary-sidebar sidebar-sticky agents-section" id="sidebar">
+              <div class="primary-sidebar-inner">
+                <div class="card mb-4 bg-primary">
+                  <div class="card-body px-6 py-4 text-center">
+                    <a href="agent-details-1.php" class="d-block mb-2">
+                      <img src="https://agency.elimo.rw/resource/avatar/<?php echo $rowAgent['avatar']; ?>"
+                                     class="rounded-circle" alt="<?php echo $rowAgent['fullname']; ?>">
+                    </a>
+                    <a href="agent-details-1.php"
+                               class="fs-16 lh-214 text-white mb-0 font-weight-500 hover-primary"><?php echo $rowAgent['fullname']; ?></a>
+                    <p class="mb-0 text-yellow"><?php echo $rowAgent['designation']; ?></p>
+                    
+                    <a href="mailto:<?php echo $rowUsers['email']; ?>" class="text-white"><?php echo $rowUsers['email']; ?></a>
+                    <a href="tel:<?php echo $rowAgent['mobile']; ?>7" class="text-white font-weight-600 d-block mb-4"><?php echo $rowAgent['mobile']; ?></a>
+                    
+                    <form class="mt-5" action="property-form.php" method="POST">
+                      <div class="form-group mb-2">
+                        <label for="name" class="sr-only">Name</label>
+                        <input type="text" class="form-control form-control-lg border-0 shadow-none"
+                                           id="name" name="fullname" 
+                                           placeholder="Your name">
+                      </div>
+                      <div class="form-group mb-2">
+                        <label for="email" class="sr-only">Email</label>
+                        <input type="text" class="form-control form-control-lg border-0 shadow-none"
+                                           id="email" name="email" 
+                                           placeholder="Your email address">
+                      </div>
+                      <div class="form-group mb-2">
+                        <label for="phone" class="sr-only">Phone</label>
+                        <input type="text" class="form-control form-control-lg border-0 shadow-none"
+                                           id="phone" name="phone" 
+                                           placeholder="Your phone number">
+                      </div>
+                      <div class="form-group mb-4">
+                        <label for="message" class="sr-only">Message</label>
+                        <textarea class="form-control border-0 shadow-none" placeholder="Your message" id="message" name="message"></textarea>
+                        <input type="hidden" name="property_id" value="<?php echo $row['id']; ?>">
+                        <input type="hidden" name="seo_url" value="<?php echo $row['seo_url']; ?>">
+                      </div>
+                      <button type="submit" class="btn btn-primary btn-lg btn-block shadow-none">Request
+                        Info
                       </button>
+                      
                     </form>
                   </div>
                 </div>
-               
-                <div class="card border-0">
-                  <div class="card-body pl-0 pl-lg-6 pr-0 py-0">
-                    <h4 class="card-title fs-16 lh-2 text-dark mb-3">Latest Posts</h4>
-                    <ul class="list-group list-group-flush">
-
-                      <?php
-                        foreach ($db->query($SqlPosts) as $row) { 
-                      ?>
-
-                      <li class="list-group-item px-0 pt-0 pb-3">
-                        <div class="media">
-                          <div class="position-relative mr-3">
-                            <a href="article.php?c=<?php echo $row['seo_url']; ?>&id=<?php echo $rowPost['post_id']; ?>" class="d-block w-100px rounded pt-11 bg-img-cover-center" style="background-image: url('http://agency.elimo.rw/resource/post-files/<?php echo $rowPost['image']; ?>')">
-                            </a>
-                            <!-- <a href="blog-grid-with-sidebar.php" class="badge text-white bg-dark-opacity-04 m-1 fs-13 font-weight-500 bg-hover-primary hover-white position-absolute pos-fixed-top">
-                              creative
-                            </a> -->
-                          </div>
-                          <div class="media-body">
-                            <h4 class="fs-12 lh-15 mb-0">
-                              <a href="article.php?c=<?php echo $rowPost['seo_url']; ?>&id=<?php echo $rowPost['post_id']; ?>" class="text-dark hover-primary">
-                                <?php echo $rowPost['title']; ?>
-                              </a>
-                            </h4>
-                            <div class="text-gray-light fs-12">
-                              <?php 
-                              $new_date = date('d-m-Y', strtotime($rowPost['date_created']));
-                              echo $new_date; ?>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-
-                    <?php } ?> 
-                      
-                    </ul>
+                
+                
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+      <section>
+        <div class="d-flex bottom-bar-action bottom-bar-action-01 py-2 px-4 bg-gray-01 align-items-center position-fixed fixed-bottom d-sm-none">
+          <div class="media align-items-center">
+            <img src="https://agency.elimo.rw/resource/avatar/<?php echo $rowAgent['avatar']; ?>" alt="<?php echo $rowAgent['fullname']; ?>" class="mr-4 rounded-circle">
+            <div class="media-body">
+              <a href="#" class="d-block text-dark fs-15 font-weight-500 lh-15"><?php echo $rowAgent['fullname']; ?></a>
+              <span class="fs-13 lh-2"><?php echo $rowAgent['designation']; ?></span>
+            </div>
+          </div>
+          <div class="ml-auto">
+            <a href="mailto:<?php echo $rowAgent['email']; ?>" class="btn btn-primary fs-18 p-2 lh-1 mr-1 mb-1 shadow-none"><i class="fal fa-comment"></i></a>
+            <a href="tel:<?php echo $rowAgent['mobile']; ?>" class="btn btn-primary fs-18 p-2 lh-1 mb-1 shadow-none" target="_blank"><i
+                    class="fal fa-phone"></i></a>
+          </div>
+        </div>
+        <div class="modal fade" id="modal-messenger" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header border-0 pb-0">
+                <h4 class="modal-title text-heading" id="exampleModalLabel">Contact Form</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="property-form.php" method="POST">
+                <div class="modal-body pb-6">
+                  <div class="form-group mb-2">
+                    <input type="text" class="form-control form-control-lg border-0" placeholder="Name" name="fullname">
                   </div>
-                </div>
+                  <div class="form-group mb-2">
+                    <input type="email" class="form-control form-control-lg border-0" placeholder="Email" name="email">
+                  </div>
+                  <div class="form-group mb-2">
+                    <input type="tel" class="form-control form-control-lg border-0" placeholder="Phone" name="phone">
+                  </div>
+                  <div class="form-group mb-2">
+                    <textarea class="form-control border-0" name="message" rows="4">Hello, I'm interested in the <?php echo $row['title']; ?></textarea>
+                  </div>
+                  <!-- <div class="form-group form-check mb-4">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck3">
+                    <label class="form-check-label fs-13" for="exampleCheck3">Egestas fringilla phasellus faucibus
+                      scelerisque eleifend donec.</label>
+                  </div> -->
+                  <button type="submit" class="btn btn-primary btn-lg btn-block rounded">Request Info</button>
+                </form>
               </div>
             </div>
-
-            </div>          
-
+          </div>
         </div>
       </section>
-      
     </main>
     <?php include 'include/footer.php'; ?>
     <!-- Vendors scripts -->
@@ -919,6 +1185,63 @@ switch($_SESSION['la']){
     <script src="vendors/dataTables/jquery.dataTables.min.js"></script>
     <!-- Theme scripts -->
     <script src="js/theme.js"></script>
+    <!-- Custom Gallery Script -->
+    <script>
+    $(document).ready(function() {
+        var $gallery = $('#property-gallery');
+        var $imageCounter = $('#image-counter');
+        var $downloadBtn = $('#download-current-image');
+        var totalImages = $gallery.find('.box').length;
+        var currentSlide = 0;
+        
+        // Update image counter
+        function updateImageCounter() {
+            var slick = $gallery.slick('getSlick');
+            currentSlide = slick.currentSlide + 1;
+            $imageCounter.text(currentSlide + ' / ' + totalImages);
+        }
+        
+        // Initialize slick slider
+        $gallery.on('init', function() {
+            updateImageCounter();
+        });
+        
+        // Update counter on slide change
+        $gallery.on('afterChange', function() {
+            updateImageCounter();
+        });
+        
+        // Download current image functionality
+        $downloadBtn.on('click', function() {
+            var slick = $gallery.slick('getSlick');
+            var currentSlide = slick.currentSlide;
+            var $currentSlide = $gallery.find('.slick-slide').eq(currentSlide);
+            var imageUrl = $currentSlide.find('.box').data('image-url');
+            
+            if (imageUrl) {
+                // Create a temporary link to download the image
+                var link = document.createElement('a');
+                link.href = imageUrl;
+                link.download = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+        
+        // Keyboard navigation
+        $(document).on('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                $gallery.slick('slickPrev');
+            } else if (e.key === 'ArrowRight') {
+                $gallery.slick('slickNext');
+            } else if (e.key === 'd' || e.key === 'D') {
+                $downloadBtn.click();
+            }
+        });
+    });
+    </script>
     <div class="modal fade login-register login-register-modal" id="login-register-modal" tabindex="-1" role="dialog"
      aria-labelledby="login-register-modal" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered mxw-571" role="document">

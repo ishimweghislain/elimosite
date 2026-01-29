@@ -960,19 +960,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
             <?php if (!empty($agents)): ?>
             <?php foreach ($agents as $row): ?> 
             <div class="py-8">
-              <div class="card border-lg-0 shadow-hover-xs-4 hover-change-image" data-animate="flipInX">
-                <div class="card-body text-center pt-6 pb-3 px-3">
-                  <a href="team.php" class="d-inline-block mb-2">
-                    <img src="images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>" style="width:120px; height:120px; object-fit:cover; border-radius:50%;">
-                  </a>
-                  <a href="team.php"
-               class="d-block fs-16 lh-1 text-dark mb-0 font-weight-500 hover-primary team-member"><?php echo $row['name']; ?></a>
-                  <p class="mb-2 fs-13 text-danger"><?php echo $row['position']; ?></p>
+              <div class="card border-0 shadow-lg bg-primary mt-6" data-animate="flipInX">
+                <div class="card-body text-center pt-0 pb-6 px-3">
+                  <div class="agent-image-wrapper" style="margin-top: -50px;">
+                    <a href="team.php" class="d-inline-block mb-3">
+                      <img src="images/<?php echo $row['image'] ?: 'team-placeholder.jpg'; ?>" alt="<?php echo $row['name']; ?>" 
+                           style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 4px solid rgba(255,255,255,0.2);">
+                    </a>
+                  </div>
+                  <a href="team.php" class="d-block fs-18 lh-1 text-white mb-1 font-weight-600 hover-yellow team-member"><?php echo $row['name']; ?></a>
+                  <p class="mb-3 text-yellow font-weight-500 fs-14"><?php echo $row['position']; ?></p>
                   
-                   <a href="mailto:<?php echo htmlspecialchars($row['email']); ?>" class="text-body d-block"><?php echo htmlspecialchars($row['email']); ?></a>
-                   <a href="tel:<?php echo htmlspecialchars($row['phone']); ?>" class="text-heading font-weight-600 d-block"><?php echo htmlspecialchars($row['phone']); ?></a>
-
+                  <div class="mt-4 pt-4 border-top border-white-opacity-01">
+                    <a href="mailto:<?php echo htmlspecialchars($row['email']); ?>" class="text-white opacity-07 d-block mb-2 fs-14 hover-white text-decoration-none">
+                      <i class="fas fa-envelope mr-2 text-yellow"></i><?php echo htmlspecialchars($row['email']); ?>
+                    </a>
+                    <a href="tel:<?php echo htmlspecialchars($row['phone']); ?>" class="text-white font-weight-600 d-block fs-16 hover-white text-decoration-none">
+                      <i class="fas fa-phone-alt mr-2 text-yellow"></i><?php echo htmlspecialchars($row['phone']); ?>
+                    </a>
+                  </div>
                 </div>
+              </div>
                
               </div>
             </div>

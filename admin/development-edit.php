@@ -384,7 +384,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-primary">Assigned Agent</label>
+                                    <label class="form-label fw-bold text-primary">Listing Agent</label>
                                     <select name="agent_id" class="form-select">
                                         <option value="">No specific agent (Default)</option>
                                         <?php 

@@ -514,27 +514,36 @@ if (!empty($property['agent_id'])) {
             <!-- Sidebar -->
             <div class="col-lg-4">
                 <?php if ($agent): ?>
-                <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
-                    <h3 class="fs-18 text-heading mb-4 font-weight-600">Assigned Agent</h3>
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="mr-4">
-                            <img src="images/<?php echo $agent['image'] ?: 'property-placeholder.jpg'; ?>" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;" alt="<?php echo htmlspecialchars($agent['name']); ?>">
-                        </div>
-                        <div>
-                            <h5 class="fs-16 mb-0 font-weight-700"><?php echo htmlspecialchars($agent['name']); ?></h5>
-                            <p class="text-primary fs-14 mb-0"><?php echo htmlspecialchars($agent['position']); ?></p>
-                        </div>
+                <div class="card mb-6 bg-primary text-center shadow-lg border-0">
+                  <div class="card-body px-6 py-6">
+                    <h3 class="fs-18 text-white mb-4 font-weight-600">Listing Agent</h3>
+                    <div class="mb-4">
+                      <img src="images/<?php echo $agent['image'] ?: 'team-placeholder.jpg'; ?>"
+                                     class="rounded-circle mb-3 border border-4 border-white-opacity-01" style="width: 110px; height: 110px; object-fit: cover;" alt="<?php echo htmlspecialchars($agent['name']); ?>">
                     </div>
-                    <?php if ($agent['phone']): ?>
-                        <a href="tel:<?php echo $agent['phone']; ?>" class="btn btn-outline-primary btn-block mb-2">
-                            <i class="fas fa-phone-alt mr-2"></i> <?php echo htmlspecialchars($agent['phone']); ?>
+                    <h5 class="fs-18 lh-214 text-white mb-0 font-weight-600"><?php echo htmlspecialchars($agent['name']); ?></h5>
+                    <p class="mb-3 text-yellow font-weight-500 fs-15"><?php echo htmlspecialchars($agent['position']); ?></p>
+                    
+                    <div class="agent-contact-info mt-4">
+                        <?php if ($agent['email']): ?>
+                            <a href="mailto:<?php echo $agent['email']; ?>" class="text-white d-block mb-3 fs-14 hover-white text-decoration-none">
+                                <i class="fas fa-envelope mr-2 text-yellow"></i><?php echo htmlspecialchars($agent['email']); ?>
+                            </a>
+                        <?php endif; ?>
+                        
+                        <?php if ($agent['phone']): ?>
+                            <a href="tel:<?php echo $agent['phone']; ?>" class="text-white font-weight-700 d-block mb-2 fs-18 hover-white text-decoration-none">
+                                <i class="fas fa-phone-alt mr-2 text-yellow"></i><?php echo htmlspecialchars($agent['phone']); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <a href="#inquiry-form" class="btn btn-yellow btn-block font-weight-600 shadow-none">
+                            <i class="fal fa-comment-alt-lines mr-2"></i>Contact Agent
                         </a>
-                    <?php endif; ?>
-                    <?php if ($agent['email']): ?>
-                        <a href="mailto:<?php echo $agent['email']; ?>" class="btn btn-outline-secondary btn-block">
-                            <i class="fas fa-envelope mr-2"></i> Email Agent
-                        </a>
-                    <?php endif; ?>
+                    </div>
+                  </div>
                 </div>
                 <?php endif; ?>
 

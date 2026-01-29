@@ -459,7 +459,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <small class="text-muted">Link this property listing to an existing development project.</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Assigned Agent</label>
+                                    <label class="form-label fw-bold">Listing Agent</label>
                                     <select name="agent_id" class="form-select">
                                         <option value="">No specific agent (Default)</option>
                                         <?php 

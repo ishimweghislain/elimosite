@@ -48,6 +48,25 @@ $navbar-nav-link-padding-x: 1.25rem;*/
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+.bg-yellow { background-color: #f6b500 !important; }
+.text-yellow { color: #f6b500 !important; }
+.btn-yellow { 
+    background-color: #f6b500; 
+    color: #252839; 
+    border-color: #f6b500; 
+    font-weight: 600; 
+}
+.btn-yellow:hover { 
+    background-color: #e5a800; 
+    color: #1a1c28; 
+    border-color: #e5a800; 
+}
+.border-white-opacity-01 { border-color: rgba(255,255,255,0.1) !important; }
+.border-white-opacity-02 { border-color: rgba(255,255,255,0.2) !important; }
+.white-opacity-01 { background-color: rgba(255,255,255,0.1) !important; }
+.hover-yellow:hover { color: #f6b500 !important; }
+.hover-white:hover { color: #fff !important; }
+
 
 *,
 *::before,
