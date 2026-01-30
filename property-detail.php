@@ -30,36 +30,31 @@ if (!empty($property['agent_id'])) {
 <!doctype html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <?php 
     $og_img = !empty($property['image_main']) ? $property['image_main'] : 'property-placeholder.jpg';
     $encoded_img = implode('/', array_map('rawurlencode', explode('/', $og_img)));
     $og_img_url = rtrim(SITE_URL, '/') . '/images/' . $encoded_img;
     $og_ttl = htmlspecialchars($property['title']);
     ?>
-
-    <!-- WhatsApp and Social Media Priority -->
-    <meta property="og:title" content="<?php echo $og_ttl; ?>">
-    <meta property="og:description" content="<?php echo truncate_text(strip_tags($property['description']), 160); ?>">
+    <!-- Social Preview Priority -->
     <meta property="og:image" content="<?php echo $og_img_url; ?>">
     <meta property="og:image:secure_url" content="<?php echo $og_img_url; ?>">
-    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:title" content="<?php echo $og_ttl; ?>">
+    <meta property="og:description" content="View property details on Elimo Real Estate">
     <meta property="og:url" content="<?php echo rtrim(SITE_URL, '/'); ?>/property-detail.php?id=<?php echo $id; ?>">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Elimo Real Estate">
-
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?php echo $og_ttl; ?>">
-    <meta name="twitter:description" content="<?php echo truncate_text(strip_tags($property['description']), 160); ?>">
     <meta name="twitter:image" content="<?php echo $og_img_url; ?>">
-
-    <title><?php echo $og_ttl; ?> - Elimo Real Estate</title>
     <link rel="image_src" href="<?php echo $og_img_url; ?>">
     <meta itemprop="image" content="<?php echo $og_img_url; ?>">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><?php echo $og_ttl; ?> - Elimo Real Estate</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vendors/fontawesome-pro-5/css/all.css">
