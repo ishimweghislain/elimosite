@@ -35,42 +35,33 @@ if (!empty($dev['agent_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <?php 
-    $og_image_dev = !empty($dev['image_main']) ? $dev['image_main'] : 'property-placeholder.jpg';
-    // URL encode filename for mobile compatibility
-    $encoded_image_dev = implode('/', array_map('rawurlencode', explode('/', $og_image_dev)));
-    $og_image_url_dev = rtrim(SITE_URL, '/') . '/images/' . $encoded_image_dev;
-    
-    $og_title_dev = htmlspecialchars($dev['title']);
-    $og_desc_dev = truncate_text(strip_tags($dev['description']), 150);
+    $og_img_dev = !empty($dev['image_main']) ? $dev['image_main'] : 'property-placeholder.jpg';
+    $encoded_img_dev = implode('/', array_map('rawurlencode', explode('/', $og_img_dev)));
+    $og_img_url_dev = rtrim(SITE_URL, '/') . '/images/' . $encoded_img_dev;
+    $og_ttl_dev = htmlspecialchars($dev['title']);
+    $og_desc_dev = truncate_text(strip_tags($dev['description']), 160);
     ?>
 
-    <!-- Primary Meta Tags -->
-    <title><?php echo $og_title_dev; ?> - Development Details</title>
-    <meta name="title" content="<?php echo $og_title_dev; ?>">
-    <meta name="description" content="<?php echo $og_desc_dev; ?>">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo rtrim(SITE_URL, '/'); ?>/development-detail.php?id=<?php echo $id; ?>">
-    <meta property="og:title" content="<?php echo $og_title_dev; ?>">
+    <!-- WhatsApp and Social Media Priority -->
+    <meta property="og:title" content="<?php echo $og_ttl_dev; ?>">
     <meta property="og:description" content="<?php echo $og_desc_dev; ?>">
-    <meta property="og:image" content="<?php echo $og_image_url_dev; ?>">
-    <meta property="og:image:secure_url" content="<?php echo $og_image_url_dev; ?>">
+    <meta property="og:image" content="<?php echo $og_img_url_dev; ?>">
+    <meta property="og:image:secure_url" content="<?php echo $og_img_url_dev; ?>">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="<?php echo get_setting('site_name'); ?>">
+    <meta property="og:url" content="<?php echo rtrim(SITE_URL, '/'); ?>/development-detail.php?id=<?php echo $id; ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Elimo Real Estate">
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="<?php echo rtrim(SITE_URL, '/'); ?>/development-detail.php?id=<?php echo $id; ?>">
-    <meta property="twitter:title" content="<?php echo $og_title_dev; ?>">
-    <meta property="twitter:description" content="<?php echo $og_desc_dev; ?>">
-    <meta property="twitter:image" content="<?php echo $og_image_url_dev; ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo $og_ttl_dev; ?>">
+    <meta name="twitter:description" content="<?php echo $og_desc_dev; ?>">
+    <meta name="twitter:image" content="<?php echo $og_img_url_dev; ?>">
 
-    <!-- WhatsApp / Mobile Specific -->
-    <link rel="image_src" href="<?php echo $og_image_url_dev; ?>">
-    <meta itemprop="image" content="<?php echo $og_image_url_dev; ?>">
+    <title><?php echo $og_ttl_dev; ?> - Development Details</title>
+    <link rel="image_src" href="<?php echo $og_img_url_dev; ?>">
+    <meta itemprop="image" content="<?php echo $og_img_url_dev; ?>">
     
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vendors/fontawesome-pro-5/css/all.css">
@@ -244,33 +235,44 @@ if (!empty($dev['agent_id'])) {
 
             <!-- Sidebar -->
             <div class="col-lg-4">
+                <?php if ($agent): ?>
+                <div class="card mb-6 bg-primary text-center shadow-lg border-0">
+                  <div class="card-body px-6 py-6">
+                    <h3 class="fs-18 text-white mb-4 font-weight-600">Listing Agent</h3>
+                    <div class="mb-4">
+                      <img src="images/<?php echo $agent['image'] ?: 'team-placeholder.jpg'; ?>"
+                                     class="rounded-circle mb-3 border border-4 border-white-opacity-01" style="width: 110px; height: 110px; object-fit: cover;" alt="<?php echo htmlspecialchars($agent['name']); ?>">
+                    </div>
+                    <h5 class="fs-18 lh-214 text-white mb-0 font-weight-600"><?php echo htmlspecialchars($agent['name']); ?></h5>
+                    <p class="mb-3 text-yellow font-weight-500 fs-15"><?php echo htmlspecialchars($agent['position']); ?></p>
+                    
+                    <div class="agent-contact-info mt-4">
+                        <?php if ($agent['email']): ?>
+                            <a href="mailto:<?php echo $agent['email']; ?>" class="text-white d-block mb-3 fs-14 hover-white text-decoration-none">
+                                <i class="fas fa-envelope mr-2 text-yellow"></i><?php echo htmlspecialchars($agent['email']); ?>
+                            </a>
+                        <?php endif; ?>
+                        
+                        <?php if ($agent['phone']): ?>
+                            <a href="tel:<?php echo $agent['phone']; ?>" class="text-white font-weight-700 d-block mb-2 fs-18 hover-white text-decoration-none">
+                                <i class="fas fa-phone-alt mr-2 text-yellow"></i><?php echo htmlspecialchars($agent['phone']); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <a href="mailto:<?php echo $agent['email']; ?>" class="btn btn-yellow btn-block font-weight-600 shadow-none">
+                            <i class="fal fa-comment-alt-lines mr-2"></i>Contact Agent
+                        </a>
+                    </div>
+                  </div>
+                </div>
+                <?php endif; ?>
+
                 <div class="sticky-top" style="top: 100px; z-index: 1;">
                     <!-- Inquiry Card -->
                     <div class="bg-white shadow rounded-lg p-6 mb-6">
                         <h4 class="mb-4">Development Inquiry</h4>
-                        <?php if ($agent): ?>
-                            <div class="mb-4 p-4 bg-gray-01 rounded-lg border-left border-primary border-4">
-                                <div class="d-flex align-items-center mb-3">
-                                    <img src="images/<?php echo $agent['image'] ?: 'property-placeholder.jpg'; ?>" class="rounded-circle mr-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
-                                    <div>
-                                        <h6 class="mb-0 font-weight-700 fs-16"><?php echo htmlspecialchars($agent['name']); ?></h6>
-                                        <div class="text-primary small font-weight-600"><?php echo htmlspecialchars($agent['position']); ?></div>
-                                    </div>
-                                </div>
-                                <div class="agent-contacts">
-                                    <?php if (!empty($agent['phone'])): ?>
-                                        <a href="tel:<?php echo $agent['phone']; ?>" class="btn btn-primary btn-block btn-sm mb-2 shadow-none">
-                                            <i class="fas fa-phone-alt mr-2"></i> <?php echo htmlspecialchars($agent['phone']); ?>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if (!empty($agent['email'])): ?>
-                                        <a href="mailto:<?php echo $agent['email']; ?>" class="btn btn-outline-primary btn-block btn-sm shadow-none">
-                                            <i class="fas fa-envelope mr-2"></i> Message Agent
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
                         
                         <?php if (isset($inquiry_result)): ?>
                             <div class="alert alert-<?php echo $inquiry_result['success'] ? 'success' : 'danger'; ?>">

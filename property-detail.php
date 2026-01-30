@@ -34,42 +34,32 @@ if (!empty($property['agent_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <?php 
-    $og_image = !empty($property['image_main']) ? $property['image_main'] : 'property-placeholder.jpg';
-    // URL encode the filename to handle spaces/special characters for mobile
-    $encoded_image = implode('/', array_map('rawurlencode', explode('/', $og_image)));
-    $og_image_url = rtrim(SITE_URL, '/') . '/images/' . $encoded_image;
-    
-    $og_title = htmlspecialchars($property['title']);
-    $og_desc = truncate_text(strip_tags($property['description']), 150);
+    $og_img = !empty($property['image_main']) ? $property['image_main'] : 'property-placeholder.jpg';
+    $encoded_img = implode('/', array_map('rawurlencode', explode('/', $og_img)));
+    $og_img_url = rtrim(SITE_URL, '/') . '/images/' . $encoded_img;
+    $og_ttl = htmlspecialchars($property['title']);
     ?>
 
-    <!-- Primary Meta Tags -->
-    <title><?php echo $og_title; ?> - <?php echo get_setting('site_name'); ?></title>
-    <meta name="title" content="<?php echo $og_title; ?>">
-    <meta name="description" content="<?php echo $og_desc; ?>">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo rtrim(SITE_URL, '/'); ?>/property-detail.php?id=<?php echo $id; ?>">
-    <meta property="og:title" content="<?php echo $og_title; ?>">
-    <meta property="og:description" content="<?php echo $og_desc; ?>">
-    <meta property="og:image" content="<?php echo $og_image_url; ?>">
-    <meta property="og:image:secure_url" content="<?php echo $og_image_url; ?>">
+    <!-- WhatsApp and Social Media Priority -->
+    <meta property="og:title" content="<?php echo $og_ttl; ?>">
+    <meta property="og:description" content="<?php echo truncate_text(strip_tags($property['description']), 160); ?>">
+    <meta property="og:image" content="<?php echo $og_img_url; ?>">
+    <meta property="og:image:secure_url" content="<?php echo $og_img_url; ?>">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="<?php echo get_setting('site_name'); ?>">
+    <meta property="og:url" content="<?php echo rtrim(SITE_URL, '/'); ?>/property-detail.php?id=<?php echo $id; ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Elimo Real Estate">
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="<?php echo rtrim(SITE_URL, '/'); ?>/property-detail.php?id=<?php echo $id; ?>">
-    <meta property="twitter:title" content="<?php echo $og_title; ?>">
-    <meta property="twitter:description" content="<?php echo $og_desc; ?>">
-    <meta property="twitter:image" content="<?php echo $og_image_url; ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo $og_ttl; ?>">
+    <meta name="twitter:description" content="<?php echo truncate_text(strip_tags($property['description']), 160); ?>">
+    <meta name="twitter:image" content="<?php echo $og_img_url; ?>">
 
-    <!-- WhatsApp / Mobile Specific -->
-    <link rel="image_src" href="<?php echo $og_image_url; ?>">
-    <meta itemprop="image" content="<?php echo $og_image_url; ?>">
+    <title><?php echo $og_ttl; ?> - Elimo Real Estate</title>
+    <link rel="image_src" href="<?php echo $og_img_url; ?>">
+    <meta itemprop="image" content="<?php echo $og_img_url; ?>">
     
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vendors/fontawesome-pro-5/css/all.css">
