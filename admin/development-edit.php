@@ -532,29 +532,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         }
 
-        function uploadImagesAjax(files) {
+        async function uploadImagesAjax(files) {
             isUploading = true;
             const progressContainer = document.getElementById('upload-progress-container');
             const progressBar = document.getElementById('upload-progress-bar');
             const uploadMessage = document.getElementById('upload-message');
             progressContainer.classList.remove('d-none');
             
-            const formData = new FormData();
-            Array.from(files).forEach(file => formData.append('images[]', file));
-
-            fetch('ajax/upload-images.php', { method: 'POST', body: formData })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    data.uploaded_files.forEach(f => uploadedImages.push(f.saved_name));
-                    document.getElementById('uploadedSubImages').value = JSON.stringify(uploadedImages);
-                    progressBar.style.width = '100%';
-                    progressBar.classList.remove('progress-bar-animated');
-                    progressBar.classList.add('bg-success');
-                    uploadMessage.textContent = '✓ Uploaded successfully';
+            const totalFiles = files.length;
+            let uploadedCount = 0;
+            
+            for (let i = 0; i < totalFiles; i++) {
+                const file = files[i];
+                uploadMessage.textContent = `Uploading image ${i + 1} of ${totalFiles}...`;
+                
+                let success = false;
+                let retries = 0;
+                const maxRetries = 10;
+                
+                while (!success && retries < maxRetries) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('images[]', file);
+                        
+                        const response = await fetch('ajax/upload-images.php', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success && data.uploaded_files) {
+                            data.uploaded_files.forEach(f => uploadedImages.push(f.saved_name));
+                            document.getElementById('uploadedSubImages').value = JSON.stringify(uploadedImages);
+                            success = true;
+                            uploadedCount++;
+                        } else {
+                            throw new Error(data.message || 'Upload failed');
+                        }
+                    } catch (error) {
+                        retries++;
+                        uploadMessage.textContent = `Retrying image ${i + 1} (attempt ${retries + 1})...`;
+                        await new Promise(r => setTimeout(r, Math.min(1000 * Math.pow(2, retries), 10000)));
+                    }
                 }
-                isUploading = false;
-            });
+                
+                const progress = Math.round(((i + 1) / totalFiles) * 100);
+                progressBar.style.width = progress + '%';
+            }
+            
+            progressBar.classList.remove('progress-bar-animated');
+            if (uploadedCount > 0) {
+                progressBar.classList.add('bg-success');
+                uploadMessage.textContent = `✓ Successfully uploaded ${uploadedCount} image(s)`;
+            } else {
+                progressBar.classList.add('bg-danger');
+                uploadMessage.textContent = '✗ Upload failed. Check connection.';
+            }
+            isUploading = false;
         }
 
         function removeGalleryImg(btn, filename) {

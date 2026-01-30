@@ -78,12 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
     <link rel="stylesheet" href="vendors/slick/slick.min.css">
     <link rel="stylesheet" href="vendors/magnific-popup/magnific-popup.min.css">
     <link rel="stylesheet" href="vendors/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" href="vendors/chartjs/Chart.min.css">
-    <link rel="stylesheet" href="vendors/dropzone/css/dropzone.min.css">
     <link rel="stylesheet" href="vendors/animate.css">
-    <link rel="stylesheet" href="vendors/timepicker/bootstrap-timepicker.min.css">
-    <link rel="stylesheet" href="vendors/mapbox-gl/mapbox-gl.min.css">
-    <link rel="stylesheet" href="vendors/dataTables/jquery.dataTables.min.css">
     <!-- Themes core CSS -->
     <link rel="stylesheet" href="css/themes.css">
     <!-- Favicons -->
@@ -197,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
             <p class="text-white fs-md-18 fs-14 font-weight-500 letter-spacing-367 mb-2 text-center text-uppercase">Let
               us help you</p>
             <h2 class="text-white display-2 text-center mb-sm-5 mb-5">Find Your Dream Home</h2>
-            <img class="mxw-180 d-block mx-auto mt-4 mb-6" src="images/line-01.png" alt="">
+            <img class="mxw-180 d-block mx-auto mt-4 mb-6" src="images/line-01.png" alt="" fetchpriority="high">
             <form class="property-search py-lg-0 z-index-2 position-relative d-none d-lg-block pt-5" action="index.php" method="POST">
               <input type="hidden" name="property_search" value="1">
               <div class="row no-gutters">
@@ -641,7 +636,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
                    <div class="card border-0 shadow-hover-1 card-hover-primary mb-6">
                     <div class="card-img-top position-relative">
                       <img src="<?php echo !empty($property['image_main']) ? 'images/' . $property['image_main'] : 'images/property-placeholder.jpg'; ?>" 
-                           alt="<?php echo htmlspecialchars($property['title']); ?>">
+                           alt="<?php echo htmlspecialchars($property['title']); ?>" loading="lazy">
                       <div class="card-img-overlay p-2">
                         <span class="badge badge-yellow"><?php echo htmlspecialchars($property['status']); ?></span>
                       </div>
@@ -862,7 +857,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
                   <div class="position-relative d-flex align-items-end card-img-top">
                     <a href="blog.php" class="hover-shine">
                       <img src="images/<?php echo $row['image']; ?>"
-                                     alt="<?php echo $row['title']; ?>">
+                                     alt="<?php echo $row['title']; ?>" loading="lazy">
                     </a>
                   </div>
                   <div class="card-body px-5 pt-3 pb-5">
@@ -1087,22 +1082,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
     
     <!-- Vendors scripts -->
     <script src="vendors/jquery.min.js"></script>
-    <script src="vendors/jquery-ui/jquery-ui.min.js"></script>
-    <script src="vendors/bootstrap/bootstrap.bundle.js"></script>
-    <script src="vendors/bootstrap-select/js/bootstrap-select.min.js"></script>
-    <script src="vendors/slick/slick.min.js"></script>
-    <script src="vendors/waypoints/jquery.waypoints.min.js"></script>
-    <script src="vendors/counter/countUp.js"></script>
-    <script src="vendors/magnific-popup/jquery.magnific-popup.min.js"></script>
-    <script src="vendors/chartjs/Chart.min.js"></script>
-    <script src="vendors/dropzone/js/dropzone.min.js"></script>
-    <script src="vendors/timepicker/bootstrap-timepicker.min.js"></script>
-    <script src="vendors/hc-sticky/hc-sticky.min.js"></script>
-    <script src="vendors/jparallax/TweenMax.min.js"></script>
-    <script src="vendors/mapbox-gl/mapbox-gl.js"></script>
-    <script src="vendors/dataTables/jquery.dataTables.min.js"></script>
+    <script src="vendors/jquery-ui/jquery-ui.min.js" defer></script>
+    <script src="vendors/bootstrap/bootstrap.bundle.js" defer></script>
+    <script src="vendors/bootstrap-select/js/bootstrap-select.min.js" defer></script>
+    <script src="vendors/slick/slick.min.js" defer></script>
+    <script src="vendors/waypoints/jquery.waypoints.min.js" defer></script>
+    <script src="vendors/counter/countUp.js" defer></script>
+    <script src="vendors/magnific-popup/jquery.magnific-popup.min.js" defer></script>
+    <script src="vendors/hc-sticky/hc-sticky.min.js" defer></script>
+    <script src="vendors/jparallax/TweenMax.min.js" defer></script>
     <!-- Theme scripts -->
-    <script src="js/theme.js"></script>
+    <script src="js/theme.js" defer></script>
     
 
 

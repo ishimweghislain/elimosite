@@ -801,66 +801,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const totalFiles = files.length;
             let uploadedCount = 0;
             let failedCount = 0;
-            const batchSize = 5; // Upload 5 images at a time
             
             uploadMessage.textContent = `Preparing to upload ${totalFiles} image(s)...`;
             
-            // Upload in batches
-            uploadBatch(0);
+            // Upload one by one for maximum reliability
+            uploadFileIter(0);
             
-            function uploadBatch(startIndex) {
-                if (startIndex >= totalFiles) {
-                    // All batches complete
+            async function uploadFileIter(index) {
+                if (index >= totalFiles) {
                     finishUpload();
                     return;
                 }
                 
-                const endIndex = Math.min(startIndex + batchSize, totalFiles);
-                const batchFiles = Array.from(files).slice(startIndex, endIndex);
+                const file = files[index];
+                uploadMessage.textContent = `Uploading image ${index + 1} of ${totalFiles}...`;
+                uploadMessage.classList.remove('text-danger');
                 
-                const formData = new FormData();
-                batchFiles.forEach(file => {
-                    formData.append('images[]', file);
-                });
+                let success = false;
+                let retries = 0;
+                const maxRetries = 10;
                 
-                fetch('ajax/upload-images.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.uploaded_files) {
-                        // Store uploaded filenames
-                        data.uploaded_files.forEach(file => {
-                            uploadedImages.push(file.saved_name);
+                while (!success && retries < maxRetries) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('images[]', file);
+                        
+                        const response = await fetch('ajax/upload-images.php', {
+                            method: 'POST',
+                            body: formData
                         });
-                        uploadedCount += data.uploaded_files.length;
+                        
+                        const data = await response.json();
+                        
+                        if (data.success && data.uploaded_files && data.uploaded_files.length > 0) {
+                            data.uploaded_files.forEach(f => {
+                                uploadedImages.push(f.saved_name);
+                            });
+                            uploadedCount++;
+                            success = true;
+                        } else {
+                            throw new Error(data.message || 'Upload failed');
+                        }
+                    } catch (error) {
+                        retries++;
+                        console.error(`Upload failed for file ${index}, retry ${retries}/${maxRetries}:`, error);
+                        uploadMessage.textContent = `Retrying image ${index + 1} (attempt ${retries + 1})...`;
+                        uploadMessage.classList.add('text-warning');
+                        // Wait before retry - exponential backoff
+                        await new Promise(resolve => setTimeout(resolve, Math.min(1000 * Math.pow(2, retries), 10000)));
                     }
-                    
-                    if (data.failed_files) {
-                        failedCount += data.failed_files.length;
-                    }
-                    
-                    // Update progress
-                    const progress = Math.round((uploadedCount + failedCount) / totalFiles * 100);
-                    progressBar.style.width = progress + '%';
-                    progressBar.setAttribute('aria-valuenow', progress);
-                    progressPercentage.textContent = progress + '%';
-                    uploadStatus.textContent = `${uploadedCount} / ${totalFiles}`;
-                    uploadMessage.textContent = `Uploaded ${uploadedCount} of ${totalFiles} image(s)${failedCount > 0 ? ` (${failedCount} failed)` : ''}`;
-                    
-                    // Upload next batch
-                    uploadBatch(endIndex);
-                })
-                .catch(error => {
-                    console.error('Upload error:', error);
-                    failedCount += batchFiles.length;
-                    uploadMessage.textContent = `Error uploading batch. ${failedCount} file(s) failed.`;
-                    uploadMessage.classList.add('text-danger');
-                    
-                    // Continue with next batch despite error
-                    uploadBatch(endIndex);
-                });
+                }
+                
+                if (!success) {
+                    failedCount++;
+                    console.error(`Failed to upload file ${index} after ${maxRetries} attempts.`);
+                }
+                
+                // Update progress
+                const progress = Math.round((index + 1) / totalFiles * 100);
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+                progressPercentage.textContent = progress + '%';
+                uploadStatus.textContent = `${uploadedCount} / ${totalFiles}`;
+                
+                // Upload next file
+                uploadFileIter(index + 1);
             }
             
             function finishUpload() {
@@ -874,13 +879,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (uploadedCount > 0) {
                     progressBar.classList.remove('progress-bar-animated');
                     progressBar.classList.add('bg-success');
-                    uploadMessage.classList.remove('text-muted');
+                    uploadMessage.classList.remove('text-muted', 'text-warning');
                     uploadMessage.classList.add('text-success');
-                    uploadMessage.textContent = `✓ Successfully uploaded ${uploadedCount} image(s)${failedCount > 0 ? `. ${failedCount} failed.` : '!'}`;
+                    uploadMessage.textContent = `✓ Successfully uploaded ${uploadedCount} image(s)${failedCount > 0 ? `. ${failedCount} failed after multiple attempts.` : '!'}`;
                 } else {
                     progressBar.classList.add('bg-danger');
                     uploadMessage.classList.add('text-danger');
-                    uploadMessage.textContent = `✗ All uploads failed. Please try again.`;
+                    uploadMessage.textContent = `✗ All uploads failed. Please check your internet connection and try again.`;
                 }
                 
                 // Clear file input
