@@ -884,57 +884,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
             Trusted by the biggest local and international institutions</h2>
           <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
           <div class="pt-2 pb-12">
-            <div class="slick-slider mx-0 partners"
-           data-slick-options='{"slidesToShow": 5, "autoplay":true,"dots":false,"arrows":false,"responsive":[{"breakpoint": 1200,"settings": {"slidesToShow":4}},{"breakpoint": 992,"settings": {"slidesToShow":3}},{"breakpoint": 768,"settings": {"slidesToShow": 3}},{"breakpoint": 576,"settings": {"slidesToShow": 2}}]}'>
-              
-              <div class="box">
+            <div class="row justify-content-center">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/mastercard.png" alt="Mastercard" class="image">
+                  <img src="images/newimages/mastercard.png" alt="Mastercard" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/sa-embassy.png" alt="SA Embassy" class="image">
+                  <img src="images/newimages/sa-embassy.png" alt="SA Embassy" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/wildlife.png" alt="Wildlife" class="image">
+                  <img src="images/newimages/wildlife.png" alt="Wildlife" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/british-council.png" alt="British Council" class="image">
+                  <img src="images/newimages/british-council.png" alt="British Council" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/care.png" alt="Care" class="image">
+                  <img src="images/newimages/care.png" alt="Care" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/canal.png" alt="Canal Plus" class="image">
+                  <img src="images/newimages/canal.png" alt="Canal Plus" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/save-the-children.png" alt="Save the Children" class="image">
+                  <img src="images/newimages/save-the-children.png" alt="Save the Children" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/unhcr.png" alt="UNHCR" class="image">
+                  <img src="images/newimages/unhcr.png" alt="UNHCR" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/coat-of-arms.png" alt="Coat of Arms" class="image">
+                  <img src="images/newimages/coat-of-arms.png" alt="Coat of Arms" class="image" loading="lazy">
                 </a>
               </div>
-              <div class="box">
+              <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 text-center">
                 <a href="#" class="item">
-                  <img src="images/newimages/one-acre-fund.png" alt="One Acre Fund" class="image">
+                  <img src="images/newimages/one-acre-fund.png" alt="One Acre Fund" class="image" loading="lazy">
                 </a>
               </div>
             </div>
@@ -943,7 +941,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
       </section>
 
 
-      <?php if(false): ?>
+
       <!-- Agents Section -->
       <section class="pt-7 pb-10 pb-xl-6 agents-section bg-primary">
         <div class="container container-xxl">
@@ -952,13 +950,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
             Meet our agents. Experienced professionals with local expertise to help sell your home.
           </h2>
            <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
-          <div class="slick-slider slick-dots-mt-0 item-nth-2-active-lg"
-         data-slick-options='{"slidesToShow": 3, "dots":false,"arrows":false,"infinite": true, "autoplay": true, "responsive":[{"breakpoint": 1600,"settings": {"slidesToShow":3,"dots":false}},{"breakpoint": 1200,"settings": {"slidesToShow":4,"dots":false}},{"breakpoint": 992,"settings": {"slidesToShow":3 ,"dots":false}},{"breakpoint": 768,"settings": {"slidesToShow": 2 ,"dots":false}},{"breakpoint": 600,"settings": {"slidesToShow": 2,"dots":false}}]}'>
+          <div class="row justify-content-center">
             
             <?php if (!empty($agents)): ?>
             <?php foreach ($agents as $row): ?> 
-            <div class="py-8">
-              <div class="card border-lg-0 shadow-hover-xs-4 hover-change-image" data-animate="flipInX">
+            <div class="col-12 col-sm-6 col-lg-4 mb-4">
+              <div class="card border-lg-0 shadow-hover-xs-4 hover-change-image">
                 <div class="card-body text-center pt-6 pb-3 px-3">
                   <a href="team.php" class="d-inline-block mb-2">
                     <img src="images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>" style="width:120px; height:120px; object-fit:cover; border-radius:50%;" loading="lazy">
@@ -985,7 +982,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
           </div>
         </div>
       </section>
-      <?php endif; ?>
+
 
       <!-- Property Types -->
       <section class="pt-lg-12 pb-lg-15 py-11">
