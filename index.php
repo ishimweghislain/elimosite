@@ -54,21 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="<?php echo get_setting('site_description', 'Elimo Real Estate'); ?>">
+    <meta name="author" content="">
+    <meta name="generator" content="Jekyll">
     <title><?php echo get_page_title(); ?></title>
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="<?php echo SITE_URL; ?>">
-    <meta property="og:title" content="<?php echo get_page_title(); ?>">
-    <meta property="og:description" content="<?php echo get_setting('site_description', 'Elimo Real Estate'); ?>">
-    <meta property="og:image" content="<?php echo SITE_URL; ?>images/banner-1.jpg">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="<?php echo SITE_URL; ?>">
-    <meta property="twitter:title" content="<?php echo get_page_title(); ?>">
-    <meta property="twitter:description" content="<?php echo get_setting('site_description', 'Elimo Real Estate'); ?>">
-    <meta property="twitter:image" content="<?php echo SITE_URL; ?>images/banner-1.jpg">
     <!-- Google fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet">
@@ -80,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
     <link rel="stylesheet" href="vendors/jquery-ui/jquery-ui.min.css">
     <link rel="stylesheet" href="vendors/animate.css">
     <!-- Themes core CSS -->
-    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/themes.css?v=<?php echo time(); ?>">
     <!-- Favicons -->
     <link rel="icon" href="images/favicon.png">
     <!-- Twitter -->
@@ -475,7 +463,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
                 </div>
               </div>
             </form>
-            <form class="property-search property-search-mobile d-lg-none z-index-2 position-relative bg-white rounded mx-md-10"  action="search-results.html">
+            <form class="property-search property-search-mobile d-lg-none z-index-2 position-relative bg-white rounded mx-md-10"  action="search-results.php" style="z-index: 1050;">
               <div class="row align-items-lg-center" id="accordion-4-mobile">
                 <div class="col-12">
                   <div class="form-group mb-0 position-relative">
@@ -876,6 +864,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
           </div>
         </div>
       </section>
+
       
       <!-- Report Section -->
       <section class="py-8 bg-yellow">
@@ -953,6 +942,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
         </div>
       </section>
 
+
+      <?php if(false): ?>
       <!-- Agents Section -->
       <section class="pt-7 pb-10 pb-xl-6 agents-section bg-primary">
         <div class="container container-xxl">
@@ -962,32 +953,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
           </h2>
            <img class="mxw-180 d-block mx-auto mt-4 mb-1" src="images/newimages/line-01.png" alt="">
           <div class="slick-slider slick-dots-mt-0 item-nth-2-active-lg"
-         data-slick-options='{"slidesToShow": 3, "dots":false,"arrows":false,"responsive":[{"breakpoint": 1600,"settings": {"slidesToShow":3,"dots":false}},{"breakpoint": 1200,"settings": {"slidesToShow":4,"dots":false}},{"breakpoint": 992,"settings": {"slidesToShow":3 ,"dots":false}},{"breakpoint": 768,"settings": {"slidesToShow": 2 ,"dots":false}},{"breakpoint": 576,"settings": {"slidesToShow": 1,"dots":false}}]}'>
+         data-slick-options='{"slidesToShow": 3, "dots":false,"arrows":false,"infinite": true, "autoplay": true, "responsive":[{"breakpoint": 1600,"settings": {"slidesToShow":3,"dots":false}},{"breakpoint": 1200,"settings": {"slidesToShow":4,"dots":false}},{"breakpoint": 992,"settings": {"slidesToShow":3 ,"dots":false}},{"breakpoint": 768,"settings": {"slidesToShow": 2 ,"dots":false}},{"breakpoint": 600,"settings": {"slidesToShow": 2,"dots":false}}]}'>
             
             <?php if (!empty($agents)): ?>
             <?php foreach ($agents as $row): ?> 
             <div class="py-8">
-              <div class="card border-0 shadow-lg bg-primary mt-6" data-animate="flipInX">
-                <div class="card-body text-center pt-0 pb-6 px-3">
-                  <div class="agent-image-wrapper" style="margin-top: -50px;">
-                    <a href="team.php" class="d-inline-block mb-3">
-                      <img src="images/<?php echo $row['image'] ?: 'team-placeholder.jpg'; ?>" alt="<?php echo $row['name']; ?>" 
-                           style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 4px solid rgba(255,255,255,0.2);">
-                    </a>
-                  </div>
-                  <a href="team.php" class="d-block fs-18 lh-1 text-white mb-1 font-weight-600 hover-yellow team-member"><?php echo $row['name']; ?></a>
-                  <p class="mb-3 text-yellow font-weight-500 fs-14"><?php echo $row['position']; ?></p>
+              <div class="card border-lg-0 shadow-hover-xs-4 hover-change-image" data-animate="flipInX">
+                <div class="card-body text-center pt-6 pb-3 px-3">
+                  <a href="team.php" class="d-inline-block mb-2">
+                    <img src="images/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>" style="width:120px; height:120px; object-fit:cover; border-radius:50%;" loading="lazy">
+                  </a>
+                  <a href="team.php"
+               class="d-block fs-16 lh-1 text-dark mb-0 font-weight-500 hover-primary team-member"><?php echo $row['name']; ?></a>
+                  <p class="mb-2 fs-13 text-danger"><?php echo $row['position']; ?></p>
                   
-                  <div class="mt-4 pt-4 border-top border-white-opacity-01">
-                    <a href="mailto:<?php echo htmlspecialchars($row['email']); ?>" class="text-white opacity-07 d-block mb-2 fs-14 hover-white text-decoration-none">
-                      <i class="fas fa-envelope mr-2 text-yellow"></i><?php echo htmlspecialchars($row['email']); ?>
-                    </a>
-                    <a href="tel:<?php echo htmlspecialchars($row['phone']); ?>" class="text-white font-weight-600 d-block fs-16 hover-white text-decoration-none">
-                      <i class="fas fa-phone-alt mr-2 text-yellow"></i><?php echo htmlspecialchars($row['phone']); ?>
-                    </a>
-                  </div>
+                   <a href="mailto:<?php echo htmlspecialchars($row['email']); ?>" class="text-body d-block"><?php echo htmlspecialchars($row['email']); ?></a>
+                   <a href="tel:<?php echo htmlspecialchars($row['phone']); ?>" class="text-heading font-weight-600 d-block"><?php echo htmlspecialchars($row['phone']); ?></a>
+
                 </div>
-              </div>
                
               </div>
             </div>
@@ -1002,6 +985,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
           </div>
         </div>
       </section>
+      <?php endif; ?>
 
       <!-- Property Types -->
       <section class="pt-lg-12 pb-lg-15 py-11">
@@ -1075,6 +1059,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
           </form>
         </div>
       </section>
+
+
       
     </main>
     
@@ -1092,7 +1078,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_search'])) {
     <script src="vendors/hc-sticky/hc-sticky.min.js" defer></script>
     <script src="vendors/jparallax/TweenMax.min.js" defer></script>
     <!-- Theme scripts -->
-    <script src="js/theme.js" defer></script>
+    <script src="js/theme.js?v=<?php echo time(); ?>"></script>
     
 
 

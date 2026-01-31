@@ -1261,7 +1261,7 @@
 		APP.ShowCompare.init();
 		APP.headerSticky.init();
 		APP.sidebarSticky.init();
-		APP.mapbox.init();
+		// APP.mapbox.init();
 		APP.invoice.init();
 	});
 })(jQuery);
